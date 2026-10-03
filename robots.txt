@@ -10,60 +10,98 @@ Disallow: /admin/
 # 境外站就是要被 Google 读到：收录、AI 摘要、Gemini 训练语料全部放行。
 User-agent: Googlebot
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 # ---- AI assistants and generative engines ----
 User-agent: GPTBot
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: OAI-SearchBot
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: ClaudeBot
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: Claude-User
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: anthropic-ai
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: Applebot
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: Bytespider
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: Baiduspider
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: CCBot
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: Amazonbot
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: DuckAssistBot
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: meta-externalagent
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: YouBot
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 User-agent: Diffbot
 Allow: /
+Disallow: /404.html
+Disallow: /admin/
 
 Sitemap: https://gficcrew.com/sitemap-index.xml
