@@ -5,15 +5,79 @@
     <link>https://gficcrew.com</link>
     <description>GFIC Crew (GFIC歪果社) is a growing real-life social community for expats in China, founded by locals who know the country well. We meet up in person in Guangzhou and Shenzhen, and we run online groups plus a national group that expats in any Chinese city can join. We keep ten meetup formats on the board, from parties and networking mixers to food crawls, language exchange and weekend getaways.</description>
     <language>en</language>
-    <lastBuildDate>Thu, 08 Oct 2026 07:11:20 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 08 Oct 2026 07:16:03 GMT</lastBuildDate>
     <atom:link href="https://gficcrew.com/rss.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Guangzhou expat living guide</title>
+      <title>GFIC Crew (GFIC歪果社) — Expat Community &amp; Events in China</title>
+      <link>https://gficcrew.com/</link>
+      <guid isPermaLink="true">https://gficcrew.com/</guid>
+      <category>Home</category>
+      <pubDate>Thu, 08 Oct 2026 07:16:03 GMT</pubDate>
+      <description>GFIC Crew (GFIC歪果社) — a real-life social community for expats in China. Events, city guides and practical help, city by city.</description>
+    </item>
+    <item>
+      <title>About GFIC Crew — Expat Community &amp; Events in China</title>
+      <link>https://gficcrew.com/about/</link>
+      <guid isPermaLink="true">https://gficcrew.com/about/</guid>
+      <category>About</category>
+      <pubDate>Thu, 08 Oct 2026 07:16:03 GMT</pubDate>
+      <description>GFIC Crew is a real-life social community for expats in China — founded by locals, built on real-world meetups and practical help for newcomers.</description>
+    </item>
+    <item>
+      <title>Cities &amp; Guides — GFIC Crew Expat Communities Across China</title>
+      <link>https://gficcrew.com/cities/</link>
+      <guid isPermaLink="true">https://gficcrew.com/cities/</guid>
+      <category>Cities &amp; Guides</category>
+      <pubDate>Thu, 08 Oct 2026 06:17:36 GMT</pubDate>
+      <description>Cost-of-living notes and expat living guides by city. We meet in Guangzhou and Shenzhen; the national group is open anywhere in China.</description>
+    </item>
+    <item>
+      <title>GFIC Crew Events — Expat Meetups in Guangzhou &amp; Shenzhen</title>
+      <link>https://gficcrew.com/events/</link>
+      <guid isPermaLink="true">https://gficcrew.com/events/</guid>
+      <category>Events</category>
+      <pubDate>Thu, 08 Oct 2026 06:17:36 GMT</pubDate>
+      <description>Ten expat meetup formats: parties and socials, networking mixers, food crawls, language exchange, hikes, sports leagues and more. In Guangzhou and Shenzhen.</description>
+    </item>
+    <item>
+      <title>Membership — GFIC Crew Plans (Free to Join Now)</title>
+      <link>https://gficcrew.com/membership/</link>
+      <guid isPermaLink="true">https://gficcrew.com/membership/</guid>
+      <category>Membership</category>
+      <pubDate>Thu, 08 Oct 2026 06:17:36 GMT</pubDate>
+      <description>GFIC Crew membership is not open yet. Planned tiers: National RMB 288, City RMB 688, Business RMB 2,888, all lifetime. Every group is free to join right now.</description>
+    </item>
+    <item>
+      <title>FAQ — GFIC Crew, Expat Community in China</title>
+      <link>https://gficcrew.com/faq/</link>
+      <guid isPermaLink="true">https://gficcrew.com/faq/</guid>
+      <category>FAQ</category>
+      <pubDate>Thu, 08 Oct 2026 06:17:36 GMT</pubDate>
+      <description>Answers about GFIC Crew membership plans (not open yet), refunds, events, apartment rental, WeChat Pay, healthcare and language exchange for expats in China.</description>
+    </item>
+    <item>
+      <title>Contact GFIC Crew — WeChat DN8117</title>
+      <link>https://gficcrew.com/contact/</link>
+      <guid isPermaLink="true">https://gficcrew.com/contact/</guid>
+      <category>Contact</category>
+      <pubDate>Thu, 08 Oct 2026 06:17:36 GMT</pubDate>
+      <description>Contact GFIC Crew (GFIC歪果社): add WeChat DN8117, or search “GFIC Crew” on X, Instagram, YouTube, Xiaohongshu or WeChat Official Account.</description>
+    </item>
+    <item>
+      <title>City Guides — Expat Living Guides by City | GFIC Crew</title>
+      <link>https://gficcrew.com/guides/</link>
+      <guid isPermaLink="true">https://gficcrew.com/guides/</guid>
+      <category>City guides</category>
+      <pubDate>Thu, 08 Oct 2026 06:17:36 GMT</pubDate>
+      <description>First-hand expat living guides by city from GFIC Crew: visas, housing, banking, healthcare, transport, food, language and where to meet people.</description>
+    </item>
+    <item>
+      <title>Guangzhou Expat Living Guide | GFIC Crew</title>
       <link>https://gficcrew.com/guides/guangzhou/</link>
-      <guid isPermaLink="false">https://gficcrew.com/guides/guangzhou/#Guide</guid>
-      <category>Guide</category>
-      <pubDate>Tue, 29 Sep 2026 16:00:00 GMT</pubDate>
-      <description>A practical living guide for expats in Guangzhou: visas and residence permits, apartment rental and district prices, banking and WeChat Pay, healthcare, transport, Cantonese food, language and a social scene built on ten meetup formats, from parties and networking mixers, food crawls and language exchange through to hikes, sports leagues and cultural experiences.</description>
+      <guid isPermaLink="true">https://gficcrew.com/guides/guangzhou/</guid>
+      <category>City guides</category>
+      <pubDate>Thu, 08 Oct 2026 06:17:36 GMT</pubDate>
+      <description>A practical living guide for expats in Guangzhou: visas, apartment rental, banking and WeChat Pay, healthcare, transport, Cantonese food and social life.</description>
     </item>
   </channel>
 </rss>
