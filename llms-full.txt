@@ -1,6 +1,6 @@
 # GFIC Crew (GFIC歪果社) — full content
 
-> GFIC Crew (known in Chinese as GFIC歪果社) is a growing real-life social community for expats in China. Founded by locals who know the country well, we are dedicated to helping global friends live a fun, connected, and hassle-free life here. We're starting in Guangzhou and Shenzhen, and expats anywhere in China can join our online groups and our national group. Here's what we're building towards: social events, parties, and meetups — everything from rooftop parties, BBQs, karaoke nights, wine tastings, and club nights to networking mixers, food crawls, language exchanges, hikes, sports leagues, Chinese cultural experiences, weekend getaways, and more. No lonely expat life here. This is your crew.
+> GFIC Crew (known in Chinese as GFIC歪果社) is a growing real-life social community for expats in China. Founded by locals who know the country well, we are dedicated to helping global friends live a fun, connected, and hassle-free life here. We're starting in Guangzhou and Shenzhen, and expats anywhere in China can join our online groups and our national group. Here's what we're building towards: social events, parties, and meetups: everything from rooftop parties, BBQs, karaoke nights, wine tastings, and club nights to networking mixers, food crawls, language exchanges, hikes, sports leagues, Chinese cultural experiences, weekend getaways, and more. Life happens face to face.
 
 Source: https://gficcrew.com
 Canonical language: English. The mainland-China mirror is https://gficcrew.cn (same English content, served from within China).
@@ -10,7 +10,7 @@ WeChat ID: DN8117.
 ## What GFIC Crew does
 
 ### Organization of Social Activities
-We organize and share social events across China, so no expat has to spend a weekend sitting at home. Ten formats sit on the board — from rooftop parties, BBQs, karaoke nights, wine tastings and club nights to networking mixers, food crawls, hikes, sports leagues and weekend getaways. We pick the place, set the time and gather the crew; all you have to do is turn up.
+We organize and share social events across China, so no expat has to spend a weekend sitting at home. Ten formats sit on the board: from rooftop parties, BBQs, karaoke nights, wine tastings and club nights to networking mixers, food crawls, hikes, sports leagues and weekend getaways. We pick the place, set the time and gather the crew; all you have to do is turn up.
 - Parties and socials: rooftop parties, BBQs, karaoke nights, wine tastings and club nights
 - Networking mixers, food crawls and shared meals, hikes, sports leagues and weekend getaways
 - Board games and trivia nights, coffee and brunch, interest groups like books, photography and film
@@ -32,7 +32,7 @@ Language exchange puts expats who want Mandarin next to locals who want English,
 - Mandarin and Cantonese practice in a supportive environment
 
 ### Daily Crew Communication
-Online groups where expats swap first-hand answers about daily life in China — housing, healthcare, banking, mobile payments and everything in between. Peer advice from people who have already done it, not a service desk.
+Online groups where expats swap first-hand answers about daily life in China: housing, healthcare, banking, mobile payments and everything in between. Peer advice from people who have already done it, not a service desk.
 - Healthcare: comparing international clinics and health insurance with people who use them
 - Housing: comparing districts, rents and lease terms before you sign
 - Banking and mobile payments: walking each other through WeChat Pay and Alipay setup
@@ -73,11 +73,11 @@ For founders, freelancers and anyone building something in China.
 ### Refunds
 Once paid membership opens: anyone who has not joined an activity in their first week and has not broken the community rules can leave and get the fee back in full. There is no fee to refund today, because every group is free to join.
 
-## Cities (14)
+## Cities (16)
 
 ### Guangzhou — Guangdong
-Our home base — Cantonese food, riverfront nights and the easiest city to make friends in.
-Guangzhou is our home base, and it is one of the most expat-friendly cities in China: affordable rent, world-class Cantonese food, a subtropical climate and a deeply international business community. It is one of the two cities where the crew meets in person. Ten meetup formats start here: parties and networking mixers, food crawls through the old districts and along the river, and language exchange, as well as sports leagues, hikes and cultural experiences.
+Our home base, with Cantonese food, riverfront nights and a small expat scene that is easy to join.
+Guangzhou is our home base. Rent is lower than in Beijing and Shanghai, Cantonese food is cheap enough to eat out often, the climate is subtropical and the trade community is deeply international. It is one of the two cities where the crew meets in person. Ten meetup formats start here: parties and networking mixers, food crawls through the old districts and along the river, and language exchange, as well as sports leagues, hikes and cultural experiences.
 Regular activity:
 - parties and networking mixers, food crawls and language exchange
 - sports leagues, hikes and weekend getaways, Cantonese cultural experiences
@@ -88,15 +88,15 @@ Regular activity:
 Cost of living: Living costs sit in the mid range for a Chinese first-tier city, noticeably below Beijing and Shanghai. Yuexiu, Tianhe and Zhujiang New Town are where most newcomers start looking.
 
 ### Shanghai — Shanghai
-China’s most international city — the biggest expat crowd and the widest choice of things to do.
-Shanghai has the largest expat community in mainland China, plus the widest choice of international restaurants, bars and professional networks, most of them concentrated in Jing’an, Xuhui and Huangpu. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Shanghai city chat. When people do meet up, the ones that are easy to start with are parties, food crawls and language exchange.
+A large, long-established expat community and a wide choice of international restaurants and bars.
+Shanghai has a large, long-established expat community, plus a wide choice of international restaurants, bars and professional networks, most of them concentrated in Jing’an, Xuhui and Huangpu. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Shanghai city chat. When people do meet up, the ones that are easy to start with are parties, food crawls and language exchange.
 Regular activity:
 - parties and socials: rooftop bars along the Bund and through the old French Concession
 - food crawls: street stalls and noodle shops in the old lanes, then Shanghainese dishes and tasting menus
-- language exchange: the hardest city in China to get daily Mandarin practice, because English works everywhere
+- language exchange: English works almost everywhere here, so daily Mandarin practice takes deliberate effort
 - sports, hikes and culture: riverside runs, weekend trips to Hangzhou and Suzhou, and gallery afternoons
-- board games, coffee and brunch: the strongest Western holiday calendar anywhere in the country
-- English is spoken more widely here than anywhere else on this list
+- board games, coffee and brunch: a full Western holiday calendar all year round
+- English is spoken widely across the city
 Cost of living: The most expensive city on this list, especially inside the inner ring. Expect to pay a premium for space and for international schooling.
 
 ### Beijing — Beijing
@@ -112,8 +112,8 @@ Regular activity:
 Cost of living: Pricier than most of China, though a little below Shanghai. Chaoyang and Dongcheng are the long-established expat districts.
 
 ### Shenzhen — Guangdong
-Tech energy, coastline and the youngest crowd in the Pearl River Delta.
-Shenzhen is China’s tech hub and one of its youngest cities, and most residents moved here from somewhere else, which makes people unusually open to meeting new arrivals. It is the second city where the crew meets in person, alongside Guangzhou. The same ten formats start here: parties and socials, seafood and night-market food crawls, and language exchange for people who have just landed.
+Tech energy, coastline and a young, mostly newly arrived crowd.
+Shenzhen is China’s tech hub and a city that grew up in a single generation, and most residents moved here from somewhere else, which makes people unusually open to meeting new arrivals. It is the second city where the crew meets in person, alongside Guangzhou. The same ten formats start here: parties and socials, seafood and night-market food crawls, and language exchange for people who have just landed.
 Regular activity:
 - parties and socials: Nanshan and Futian, close to Hong Kong and used to international crowds
 - food crawls: Cantonese seafood, night-market stalls and hotpot
@@ -124,15 +124,16 @@ Regular activity:
 Cost of living: Close to Beijing on cost and rising fast, with Nanshan and Futian the most popular districts.
 
 ### Chengdu — Sichuan
+A slower pace, teahouses and a Sichuan food scene people move here for.
 Chengdu runs at a slower pace than the coastal cities, and its teahouses, mahjong tables and Sichuan food are local institutions rather than tourist attractions. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Chengdu city chat.
 Regular activity:
 - parties and socials: a dense, cheap nightlife centerd on the city center and the river
-- food crawls: Sichuan hotpot, skewers and dumplings, arguably the strongest regional food scene on this list
+- food crawls: Sichuan hotpot, skewers and dumplings, and a food scene people move here for
 - language exchange: locals are curious about newcomers and slower to switch into English
 - sports, hikes and culture: teahouse afternoons, mahjong lessons and day hikes on Qingcheng Mountain
 - board games, coffee and brunch: the cafe scene suits a low-commitment first meetup
 - Panda base trips and the Leshan Giant Buddha are the standard errand when friends visit
-Cost of living: One of the most affordable big cities in China, with a slower pace and a food scene people move here for.
+Cost of living: Rents and food sit well below the coastal first-tier cities, with a slower pace and a food scene people move here for.
 
 ### Hangzhou — Zhejiang
 Hangzhou has West Lake, tea hills on the edge of the city and a tech scene that keeps pulling newcomers in, so the crowd here skews young and recently arrived. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Hangzhou city chat.
@@ -154,7 +155,7 @@ Regular activity:
 - sports, hikes and culture: stair climbs, hillside walks and karst country out at Wulong
 - board games, coffee and brunch: night-view photography walks suit this skyline better than most
 - River cruises on the Yangtze and Jialing are the standard introduction to the city
-Cost of living: Among the most affordable major cities, with low rents and a distinctive local food culture.
+Cost of living: Low rents by Chinese big-city standards, with and a distinctive local food culture.
 
 ### Suzhou — Jiangsu
 Suzhou trades on classical gardens, canals and water towns, and sits at the center of a large international manufacturing community just outside Shanghai. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Suzhou city chat.
@@ -179,7 +180,7 @@ Regular activity:
 Cost of living: Moderate for a coastal city, busy in summer, with a long-standing Korean community.
 
 ### Xi’an — Shaanxi
-Xi’an pairs the Terracotta Army and a walkable Ming-era city wall with one of the strongest street-food quarters in the country. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Xi’an city chat.
+Xi’an pairs the Terracotta Army and a walkable Ming-era city wall with a dense, long-standing street-food scene. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Xi’an city chat.
 Regular activity:
 - parties and socials: the bar streets inside and just beside the city wall
 - food crawls: Muslim Quarter street food, roujiamo and hand-pulled noodles
@@ -220,18 +221,40 @@ Regular activity:
 - sports, hikes and culture: karst hikes, Li River trips and the cormorant-fishing villages
 - board games, coffee and brunch: photography walks make more sense here than most formats
 - Yangshuo downriver is where most of the outdoor options actually are
-Cost of living: One of the cheapest cities here, known for scenery rather than for salaries.
+Cost of living: Cheap by Chinese big-city standards, known for scenery rather than for salaries.
 
-### Yunnan (Kunming, Dali, Lijiang) — Yunnan
-Yunnan covers three bases at once — Kunming, Dali and Lijiang — with spring-like weather, minority cultures and one of the strongest remote-work communities in the country. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Yunnan chat.
+### Kunming — Yunnan
+Kunming is the capital of Yunnan and the province’s main gateway, with mild weather all year round, a large student population and the rail and road links west to Dali and Lijiang. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Kunming city chat.
 Regular activity:
-- parties and socials: Kunming nightlife and the old-town bars in Dali
-- food crawls: crossing-the-bridge noodles, wild mushrooms and street skewers
-- language exchange: plenty of locals speak a minority language first and Mandarin second
-- sports, hikes and culture: Erhai cycling, Jade Dragon Snow Mountain and towns on the old tea-horse road
-- board games, coffee and brunch: festival parties, since the local calendar here is packed with them
-- Dali is small enough that people run into each other without planning to
-Cost of living: Costs vary between Kunming, Dali and Lijiang, but all three sit well below the first tier.
+- parties and socials: nightlife around the city center and the university districts
+- food crawls: crossing-the-bridge noodles, wild mushrooms in season and street skewers
+- language exchange: plenty of locals who want English practice, and Mandarin close to the textbook standard
+- sports, hikes and culture: day trips to the Stone Forest, Western Hills walks and minority-culture villages
+- board games, coffee and brunch: a cafe scene built partly around students and remote workers
+- Most of the province is reachable from here, so it is a common first stop in Yunnan
+Cost of living: Rents sit well below the coastal cities, with a mild climate all year round.
+
+### Dali — Yunnan
+Dali sits between Erhai Lake and the Cangshan mountains, with an established remote-work community alongside Bai minority culture in the old town and around the lake. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Dali city chat.
+Regular activity:
+- parties and socials: old-town bars and lakeside places around Erhai
+- food crawls: Yunnan dishes, mushroom season and the Bai markets around the lake
+- language exchange: long-stay foreigners and locals mixed together, so English and Mandarin both get used daily
+- sports, hikes and culture: cycling the Erhai loop, Cangshan trails and Bai villages
+- board games, coffee and brunch: the cafe culture here suits a low-key first meetup
+- The old town is small enough that people run into each other without planning to
+Cost of living: Cheap by most standards, though the popular spots around Erhai have risen with the inflow of remote workers.
+
+### Lijiang — Yunnan
+Lijiang is the old town at the foot of Jade Dragon Snow Mountain, with cobbled lanes, Naxi culture and trailheads for serious hiking in the province. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Lijiang city chat.
+Regular activity:
+- parties and socials: bars along the old-town canals and quieter places in the newer districts
+- food crawls: Naxi dishes, yak hotpot and the old-town snack streets
+- language exchange: a steady flow of visitors and long-stayers, so practice is easy to find
+- sports, hikes and culture: Tiger Leaping Gorge, Jade Dragon Snow Mountain and Naxi cultural sites
+- board games, coffee and brunch: guesthouse courtyards are where most first conversations happen
+- Most people come for a few days and end up staying longer than they planned
+Cost of living: Affordable, but the old town is tourist-heavy and seasonal, and most long-stayers end up in the newer districts.
 
 ## City guides
 
@@ -240,11 +263,11 @@ URL: https://gficcrew.com/guides/guangzhou/
 Last updated: 2026-09-30
 A practical living guide for expats in Guangzhou: visas and residence permits, apartment rental and district prices, banking and WeChat Pay, healthcare, transport, Cantonese food, language and a social scene built on ten meetup formats, from parties and networking mixers, food crawls and language exchange through to hikes, sports leagues and cultural experiences.
 
-Guangzhou is our home base and the city we know best. This guide covers what you actually need to sort out in your first month — visa, apartment, bank account, WeChat Pay, healthcare, transport — and then how to enjoy the city: Cantonese food, language and the social scene, built around ten meetup formats: parties and socials, networking mixers, food crawls and language exchange, sports leagues, hikes and cultural experiences.
+Guangzhou is our home base and the city we live in. This guide covers what you actually need to sort out in your first month — visa, apartment, bank account, WeChat Pay, healthcare, transport — and then how to enjoy the city: Cantonese food, language and the social scene, built around ten meetup formats: parties and socials, networking mixers, food crawls and language exchange, sports leagues, hikes and cultural experiences.
 
 #### Why expats choose Guangzhou
-Guangzhou is one of the most liveable big cities in China for foreigners. It has the food, the weather and the trade economy of a global city with roughly half the rent of Shanghai and Beijing. It has been a port for international commerce for more than a thousand years, which shows up in the local attitude: pragmatic, welcoming, and entirely unbothered by foreigners who cannot speak Chinese yet.
-For expats, the practical arguments are strong. Rent in Zhujiang New Town is the biggest line in your budget. Cantonese food, widely considered the best regional cuisine in China, is cheap enough to eat out often. Hong Kong, China, Shenzhen and most of Southeast Asia are within a few hours. The metro is clean, fast and covers the whole city.
+Guangzhou is an easy big city to settle into as a foreigner. It has the food, the weather and the trade economy of a global city with roughly half the rent of Shanghai and Beijing. It has been a port for international commerce for more than a thousand years, which shows up in the local attitude: pragmatic, welcoming, and entirely unbothered by foreigners who cannot speak Chinese yet.
+For expats, the practical arguments are strong. Rent in Zhujiang New Town is the biggest line in your budget. Cantonese food is cheap enough to eat out often. Hong Kong, China, Shenzhen and most of Southeast Asia are within a few hours. The metro is clean, fast and covers the whole city.
 
 #### Visas, work permits and residence permits in Guangzhou
 Most expats in Guangzhou arrive on a Z visa (work), an X visa (study) or a business visa, then convert to a residence permit. The standard sequence is: a job offer, then a work permit notification letter, then the Z visa at a Chinese embassy abroad, then entry, then the work permit card, then the residence permit within 30 days of arrival.
@@ -256,7 +279,7 @@ The residence permit is the sticker in your passport that lets you live in China
 - Visa renewal — start the paperwork at least 30 days before expiry
 
 #### Renting an apartment in Guangzhou
-Expect to pay a deposit of a couple of months rent plus rent in advance, and to sign a one-year lease. Bring your passport and visa to viewings. Popular expat areas are Zhujiang New Town (modern CBD, high-rises, nightlife), Tianhe (busy and convenient), Yuexiu (old city, parks, best traditional food), Haizhu (greener and cheaper along the river) and Panyu (families, international schools).
+Expect to pay a deposit of a couple of months rent plus rent in advance, and to sign a one-year lease. Bring your passport and visa to viewings. Popular expat areas are Zhujiang New Town (modern CBD, high-rises, nightlife), Tianhe (busy and convenient), Yuexiu (old city, parks, known for traditional food), Haizhu (greener and cheaper along the river) and Panyu (families, international schools).
 Always register at the local police station after moving in — your landlord is supposed to go with you, and you will need that registration for a lot of other paperwork. Ask the crew group for agent recommendations before you sign: the same apartment can vary in price quite a bit depending on who you rent through.
 - Zhujiang New Town: the most expensive option, modern one-bedrooms in the CBD
 - Tianhe or Yuexiu: noticeably less for a comparable apartment
@@ -287,7 +310,7 @@ For longer trips, Guangzhou South railway station connects to Hong Kong, China (
 - Driving license conversion is possible for many nationalities; expect a theory test
 
 #### Cantonese food: the real reason to live here
-Cantonese cooking is the most celebrated regional cuisine in China and Guangzhou is its home. The point of the cuisine is freshness and restraint: steamed rather than fried, seafood at its peak, and sauces that support the ingredient rather than bury it. It is also one of the easiest Chinese cuisines for newcomers to love, because it is mild and familiar.
+Cantonese cooking is Guangzhou’s home cuisine, and this is where to try it. The point of the cuisine is freshness and restraint: steamed rather than fried, seafood at its peak, and sauces that support the ingredient rather than bury it. It is also one of the easiest Chinese cuisines for newcomers to love, because it is mild and familiar.
 Start with dim sum on a weekend morning, which is the social heart of Cantonese food culture. Then work through clay pot rice, roast goose, wonton noodles, rice noodle rolls, herbal jelly and egg tarts. The part nobody warns you about is ordering. Menus often have no pictures, dish names are transliterations you cannot pronounce, and there is no obvious way to tell whether you chose well. That gap is why a food crawl works so well here: somebody who already knows orders for the table, so you get more dishes and none of the guesswork.
 - Dim sum (点心) — weekend morning institution, order har gow and siu mai first
 - Clay pot rice (煲仔饭) — one-pot rice with cured meat, best in winter
@@ -302,7 +325,7 @@ Language exchange gives you a stated reason to turn up, which is easier to say o
 
 #### Meeting people: the social scene
 Guangzhou is easier to make friends in than most Chinese megacities, mostly because the expat scene is smaller and more concentrated, so you keep running into the same people. The crew keeps ten meetup formats on the board, from parties and networking mixers, food crawls and language exchange through to sports leagues, hikes and weekend getaways, and Cantonese cultural experiences. Parties, food crawls and language exchange are the ones most people start with.
-A party is the easiest place to start, and the reason is prosaic: a drink gives you somewhere to stand and something to do with your hands, so there is no opening line to prepare. What genuinely helps in Guangzhou is knowing which places are used to foreign customers and what a night actually costs, which is not something a listings site will tell you. Food crawls work the same way, because there is food on the table and something to talk about. Language exchange suits people who would rather have a stated reason to be in the room. Sports leagues, hikes and weekend getaways, and Cantonese cultural experiences take more organizing, and they are the ones people keep coming back to.
+A party is an easy place to start, and the reason is prosaic: a drink gives you somewhere to stand and something to do with your hands, so there is no opening line to prepare. What genuinely helps in Guangzhou is knowing which places are used to foreign customers and what a night actually costs, which is not something a listings site will tell you. Food crawls work the same way, because there is food on the table and something to talk about. Language exchange suits people who would rather have a stated reason to be in the room. Sports leagues, hikes and weekend getaways, and Cantonese cultural experiences take more organizing, and they are the ones people keep coming back to.
 If you are new and turning up alone, start with a party or a food crawl. Both are structured enough that you are never standing on your own, and both involve talking about food or drink, which works in any language. Liwan and Yuexiu hold most of the older food streets, Zhujiang New Town is where the riverside bars cluster, and Baiyun Mountain plus Shamian Island are the easy halves of a day outdoors. Ask inside the group rather than trusting search results, because a lot of what is online has not been updated in years.
 - Parties and socials, food crawls and language exchange
 - Sports leagues, hikes and weekend getaways, Cantonese cultural experiences
@@ -313,15 +336,15 @@ If you are new and turning up alone, start with a party or a food crawl. Both ar
 
 #### Weekends and day trips from Guangzhou
 Guangzhou is a good base for exploring southern China. Conghua and Zengcheng offer hot springs and hiking within two hours. Baiyun Mountain is inside the city. Hong Kong, China and Macao, China are easy weekend trips, and the karst scenery of Guilin is a single high-speed train ride away.
-Reaching them is easier with other people. Tickets and trains sell out over holiday weekends, a car or a hotel room splits several ways, and somebody still has to read the signs. That is why hiking and weekend trips rank fifth even though they are the most trouble to organize. Ask in the crew group before booking anything non-refundable.
+Reaching them is easier with other people. Tickets and trains sell out over holiday weekends, a car or a hotel room splits several ways, and somebody still has to read the signs. That is also why hiking and weekend trips take more organizing than a night in town. Ask in the crew group before booking anything non-refundable.
 
 #### Guangzhou FAQ
 Q: Is Guangzhou a good city for expats?
-A: Yes. Guangzhou combines a lower cost of living than Beijing or Shanghai with world-class Cantonese food, a subtropical climate, a large international trade community and fast rail links to Hong Kong, China, Shenzhen and Southeast Asia. It is one of the friendliest Chinese cities for newcomers.
+A: Yes. Guangzhou combines a lower cost of living than Beijing or Shanghai with Cantonese food that is cheap enough to eat out often, a subtropical climate, a large international trade community and fast rail links to Hong Kong, China, Shenzhen and Southeast Asia. It is also a comparatively easy Chinese city to settle into.
 Q: How much does it cost to live in Guangzhou as an expat?
 A: A single expat can live comfortably here on a mid-range budget. Rent is the biggest variable by far, while food, transport and eating out all cost noticeably less than in Beijing or Shanghai.
 Q: Which area should I live in as an expat in Guangzhou?
-A: Zhujiang New Town is the modern CBD with high-rise apartments and nightlife. Tianhe is busy and convenient. Yuexiu has the old-city feel, parks and the best traditional food. Haizhu is greener and cheaper along the river. Panyu suits families near international schools.
+A: Zhujiang New Town is the modern CBD with high-rise apartments and nightlife. Tianhe is busy and convenient. Yuexiu has the old-city feel, parks and the traditional food most people come for. Haizhu is greener and cheaper along the river. Panyu suits families near international schools.
 Q: Can I get by in Guangzhou with only English?
 A: Yes for practical purposes, especially in Zhujiang New Town and Tianhe. That said, even survival-level Mandarin makes daily life much easier, and a little Cantonese gets you noticeably warmer treatment in markets and neighborhood restaurants.
 Q: How do I set up WeChat Pay in Guangzhou?
@@ -331,25 +354,25 @@ A: Smaller and more concentrated than Shanghai or Beijing, which makes it easier
 Q: How do I find a job in Guangzhou as a foreigner?
 A: The main sectors hiring foreigners are trading and sourcing, English teaching, hospitality, manufacturing and tech. A work permit requires a degree, a criminal record check and a medical exam.
 Q: Is Guangzhou safe for foreigners?
-A: Yes. Guangzhou has a low rate of violent crime and is one of the safest megacities in the world to walk around at night. The usual urban precautions apply — watch your phone in crowded areas and use Didi or the metro rather than unlicensed taxis.
+A: Yes. Guangzhou has a low rate of violent crime and is a safe city to walk around at night. The usual urban precautions apply — watch your phone in crowded areas and use Didi or the metro rather than unlicensed taxis.
 
 ## Events — the formats we run (10)
 
 In-person meetups happen in Guangzhou and Shenzhen. Dates are announced inside the WeChat groups once a venue is confirmed; there is no published calendar yet.
 
 ### Easy to turn up to on your own
-The social formats with the lowest barrier. You can arrive alone, and there is already something to do and someone to talk to.
+These are the ones you can turn up to on your own. You arrive alone, and there is already something to do and someone to talk to.
 
 #### Parties and socials
 The format everyone already knows how to enjoy.
-Why it works: No shared hobby and no structured activity to sit through — a party does the work for you. Rooftop parties, BBQs, karaoke nights, wine tastings, club nights, and themed or holiday nights all put people in the same room with something to do. That is why they are both the easiest way in and the thing people keep coming back to.
+Why it works: No shared hobby and no structured activity to sit through, so the party does the work for you. Rooftop parties, BBQs, karaoke nights, wine tastings, club nights, and themed or holiday nights all put people in the same room with something to do. That is why they are both an easy way in and the thing people keep coming back to.
 What changes in China: The party is familiar, the surroundings are not. Which venues are used to international crowds, what a night actually costs, how to get home afterwards, and how to find the crowd in the first place. Someone who already knows skips the part where you guess.
 If you come on your own: Turning up alone is normal here, not awkward: almost everyone at a party is there to meet people. Coming in with the crew means you are never the one left by the door.
 Also searched as: expat party China, rooftop party Guangzhou, club night Shenzhen, karaoke night expats China, wine tasting China, themed party China, pub crawl Guangzhou
 
 #### Networking mixers
 A room where everyone is there to meet someone new.
-Why it works: A mixer gives you a reason to talk to a stranger before you have one — work, a side project, or simply being new in town. It suits people who would rather have a stated purpose than a purely social night, and it is where a lot of the practical help in the community first gets passed around.
+Why it works: A mixer gives you a reason to talk to a stranger before you have one: work, a side project, or simply being new in town. It suits people who would rather have a stated purpose than a purely social night, and it is where a lot of the practical help in the community first gets passed around.
 What changes in China: Industry events happen in every big Chinese city, but they are scattered, often run in Chinese, and hard to find from the outside. A crew mixer pulls the same expat and internationally-minded crowd into one room and handles the introductions.
 If you come on your own: Everyone arrives alone, so there is nothing to explain. The whole point of the format is that you do not know anyone yet.
 Also searched as: expat networking China, business mixer Guangzhou, professional meetup Shenzhen, foreigners business network China
@@ -398,7 +421,7 @@ Narrower interests, or formats that work best once you already recognize a few f
 #### Board games and trivia nights
 The game supplies the conversation so you do not have to.
 Why it works: Structure is the whole appeal. Nobody has to improvise small talk because there is something on the table that everyone is looking at. It suits people who are new in town, or who are not going to walk up to a stranger and introduce themselves.
-What changes in China: It needs games in English and most shops stock Chinese versions, so somebody has to bring them. A bit more setup than everything above, which is the only reason it sits lower.
+What changes in China: It needs games in English and most shops stock Chinese versions, so somebody has to bring them. That takes a bit more setup than a night out, so it takes longer to get going.
 If you come on your own: Good first event. You spend the first twenty minutes learning rules rather than making conversation.
 Also searched as: board game night expats China, trivia night Guangzhou foreigners
 
@@ -427,7 +450,7 @@ Q: Who can join GFIC Crew?
 A: Anyone living in China as an expat, and anyone planning to move to China who wants a community before they land. That includes English teachers, engineers, entrepreneurs, students, remote workers, trailing spouses and long-term travelers. We also welcome globally-minded Chinese members who want genuine international friendships. There is no nationality requirement.
 
 Q: Is GFIC Crew active in Guangzhou?
-A: Yes. Guangzhou is our home base and the city where we can actually meet up in person. Alongside Shenzhen it is where we meet people offline, and it is what this site’s living guide is grounded in — visas, housing, banking, healthcare and getting around.
+A: Yes. Guangzhou is our home base and the city where we can actually meet up in person. Alongside Shenzhen it is where we meet people offline, and it is what this site’s living guide is grounded in: visas, housing, banking, healthcare and getting around.
 
 Q: Which cities does GFIC Crew cover?
 A: We meet offline in Guangzhou and Shenzhen, which is where we are based. Everywhere else in China you can still join us: our online groups and our national group are open to expats in any city, and that is where most of the day-to-day conversation, questions and event announcements happen. If your city grows a group of its own, we will build it out from there.
@@ -441,7 +464,7 @@ Q: How much does GFIC Crew membership cost?
 A: Paid membership has not opened yet, so joining costs nothing today. These are the prices it will use when it does: RMB 288 (USD 42) for the National Group, RMB 688 (USD 98) for a City Group and RMB 2,888 (USD 420) for the Business Group. Each is a single payment rather than a subscription.
 
 Q: What is the difference between the National Group, City Group and Business Group?
-A: The National Group (RMB 288) is the nationwide community: online groups and event announcements, open wherever you are in China. A City Group (RMB 688) adds the local group for your city and its local knowledge. The Business Group (RMB 2,888) adds business networking and visibility for your own projects within the crew. These are our membership tiers for when paid membership opens — every group is free to join right now.
+A: The National Group (RMB 288) is the nationwide community: online groups and event announcements, open wherever you are in China. A City Group (RMB 688) adds the local group for your city and its local knowledge. The Business Group (RMB 2,888) adds business networking and visibility for your own projects within the crew. These are our membership tiers for when paid membership opens. Every group is free to join right now.
 
 Q: Can I get a refund?
 A: Yes, once paid membership opens. Anyone who has not joined an activity in their first week and has not broken the community rules will be able to leave and get the fee back in full. Until then there is no fee to refund, because every group is free.
@@ -455,7 +478,7 @@ A: There is nothing to pay yet, because paid membership has not opened. Add WeCh
 ### Events & Activities
 
 Q: What kind of events does GFIC Crew organize?
-A: Ten formats: parties and socials, networking mixers, food crawls and shared meals, language exchange, hikes and weekend getaways, sports leagues and fitness, Chinese cultural experiences, board games and trivia, coffee and brunch, and interest groups. The ones at the front of the list are the easiest to turn up to on your own.
+A: Ten formats: parties and socials, networking mixers, food crawls and shared meals, language exchange, hikes and weekend getaways, sports leagues and fitness, Chinese cultural experiences, board games and trivia, coffee and brunch, and interest groups. Parties, mixers and food crawls are the ones you can turn up to on your own.
 
 Q: How often are events held?
 A: We are just getting started, so there is no fixed schedule yet. Meetups are announced inside the WeChat groups as they are confirmed, and we add people to the event group the day before each one. Guangzhou and Shenzhen are where in-person meetups happen first; other cities join in through the online and national groups until a local group forms.
@@ -483,25 +506,25 @@ A: Yes, especially in Guangzhou and Shenzhen where Cantonese is part of daily li
 Q: What cultural activities do you organize?
 A: Cultural workshops cover cooking, calligraphy, tea ceremony and tai chi, run by locals rather than performed for visitors. Being shown something by somebody who grew up with it is the difference, and people pick up on it straight away. We do not run a standing workshop calendar, so when one goes ahead it is announced in the groups.
 
-### Living in China — Housing
+### Living in China · Housing
 
 Q: How much does rent cost in Guangzhou?
-A: It depends heavily on district. Zhujiang New Town is the modern, most expensive option; Tianhe and Yuexiu give you more space for less; Haizhu and Panyu are cheaper again. Rather than trust a number on a website, ask inside the group — members post what they actually pay, and that changes faster than any guide.
+A: It depends heavily on district. Zhujiang New Town is the modern, most expensive option; Tianhe and Yuexiu give you more space for less; Haizhu and Panyu are cheaper again. Rather than trust a number on a website, ask inside the group: members post what they actually pay, and that changes faster than any guide.
 
-### Living in China — Money
+### Living in China · Money
 
 Q: How do I set up WeChat Pay and Alipay as a foreigner?
 A: You need a Chinese bank account or an accepted international card, then verify your identity inside WeChat (Me → Services → Wallet → Cards) or Alipay with your passport. Most expats open a local bank account first because it makes rent, utilities and transfers much simpler. Our members share which banks currently accept passport-only applications in each city.
 
-### Living in China — Healthcare
+### Living in China · Healthcare
 
 Q: Do I need health insurance in China?
 A: Most work permits require it, and it is strongly recommended in any case because private care is expensive. Typically you are covered by employer-provided insurance plus a personal international policy. We share comparisons of local and international plans in the member groups.
 
-### Living in China — Daily Life
+### Living in China · Daily Life
 
 Q: How do I get a Chinese phone number?
-A: Go to a China Mobile, China Unicom or China Telecom flagship store with your passport; registration is tied to your passport and takes about 15 minutes. You need a number for almost everything — bank accounts, delivery apps, ride hailing, WeChat Pay verification.
+A: Go to a China Mobile, China Unicom or China Telecom flagship store with your passport; registration is tied to your passport and takes about 15 minutes. You need a number for almost everything: bank accounts, delivery apps, ride hailing, WeChat Pay verification.
 
 Q: Which apps do I need to live in China?
 A: The essentials are WeChat (messaging and payment), Alipay (payment), Amap or Baidu Maps (navigation), Didi (taxis), Meituan or Ele.me (food delivery), Taobao and JD (shopping), 12306 (trains) and Trip.com (flights and hotels).
@@ -509,10 +532,10 @@ A: The essentials are WeChat (messaging and payment), Alipay (payment), Amap or 
 ### Guangzhou
 
 Q: Why do expats choose Guangzhou?
-A: Guangzhou combines a lower cost of living than Beijing or Shanghai with world-class Cantonese food, a subtropical climate, a huge international trade community and fast rail links to Hong Kong, Shenzhen and Southeast Asia. It is also one of the friendliest Chinese cities for newcomers because the local culture is famously practical and non-judgmental.
+A: Guangzhou combines a lower cost of living than Beijing or Shanghai with Cantonese food that is cheap enough to eat out often, a subtropical climate, a huge international trade community and fast rail links to Hong Kong, Shenzhen and Southeast Asia. It is also a comparatively easy Chinese city to settle into, because the local culture is famously practical and non-judgmental.
 
-Q: What is the best area to live in Guangzhou as an expat?
-A: Zhujiang New Town is the modern CBD with high-rise apartments and nightlife; Tianhe is convenient and busy; Yuexiu has the old-city feel, parks and the best traditional food; Haizhu is greener and cheaper along the river; Panyu is popular with families near international schools.
+Q: Where do expats usually live in Guangzhou?
+A: Zhujiang New Town is the modern CBD with high-rise apartments and nightlife; Tianhe is convenient and busy; Yuexiu has the old-city feel, parks and the traditional food most people come for; Haizhu is greener and cheaper along the river; Panyu is popular with families near international schools.
 
 ### Community Rules
 
@@ -530,16 +553,16 @@ A: Add WeChat ID DN8117, or search “GFIC Crew” on WeChat Official Account, W
 Q: Do I need a WeChat account to join?
 A: It helps a lot, because event coordination in China runs on WeChat groups. If you are not in China yet, install WeChat and set it up before arrival, and add DN8117 so we can keep you updated until you land.
 
-### Living in China — Daily Life
+### Living in China · Daily Life
 
 Q: What should expats do in China during National Day Golden Week?
-A: During National Day Golden Week (October 1-7) major attractions are extremely crowded and hotel prices spike. For expats already living in China, staying local usually beats traveling: neighborhood restaurants stay open, and small parks and lesser-known districts are quiet. It is a good week to ask the group what everyone is doing — plenty of members are around and not traveling.
+A: During National Day Golden Week (October 1-7) major attractions are extremely crowded and hotel prices spike. For expats already living in China, staying local usually beats traveling: neighborhood restaurants stay open, and small parks and lesser-known districts are quiet. It is a good week to ask the group what everyone is doing; plenty of members are around and not traveling.
 
 Q: Is it a good time for foreigners to visit China during Golden Week?
 A: Golden Week is one of the busiest travel periods in China: trains, flights and hotels book out weeks ahead, and the first and last days are the worst. If you are already living here, the crowds are a good reason to stay local and join community events instead. If you are planning a first visit, the two weeks after October 8 are far more comfortable, and you will find the local groups easier to reach too.
 
 Q: What is open and closed in China during National Day?
-A: Most restaurants, shopping malls, convenience stores and supermarkets stay open through the holiday, and public transport runs as usual. Some government offices, banks and administrative services may close or run reduced hours, and many businesses shift their rest days around the first week. If you rely on a specific service, check its holiday notice a few days ahead — and for anything time-sensitive, start it before the break rather than during it.
+A: Most restaurants, shopping malls, convenience stores and supermarkets stay open through the holiday, and public transport runs as usual. Some government offices, banks and administrative services may close or run reduced hours, and many businesses shift their rest days around the first week. If you rely on a specific service, check its holiday notice a few days ahead. For anything time-sensitive, start it before the break rather than during it.
 
 Q: How can I avoid crowds in China during October holiday?
 A: Avoid major tourist landmarks on peak days. Choose lesser-known destinations such as smaller museums, local parks, or historic neighborhoods. If you are in Guangzhou, explore areas beyond Tianhe and Yuexiu, try local markets, or join small-group community events. GFIC Crew events are often smaller and more relaxed than typical tourist activities.
@@ -550,10 +573,10 @@ A: Golden Week is one of the easiest weeks of the year to meet people, because n
 ### Events & Activities
 
 Q: Which meetup should I start with if I am coming on my own?
-A: A party or a networking mixer, if one is going. Arriving alone at something social is normal here, and coming in with a group means you are never the one left standing by the door. Food crawls come next, because nobody has to be interesting when there is food on the table. Language exchange is a close third and suits people who would rather have a stated reason to be in the room.
+A: A party or a networking mixer, if one is going. Arriving alone at something social is normal here, and coming in with a group means you are never the one left standing by the door. Food crawls work well too, because nobody has to be interesting when there is food on the table. Language exchange suits people who would rather have a stated reason to be in the room.
 
 Q: Do you run bar nights or pub crawls?
-A: Yes — club nights and pub crawls sit inside our parties and socials format. A drink gives you somewhere to stand and something to do with your hands, so there is no opening line to prepare. What is genuinely China-specific is knowing which places are used to international crowds, what a night actually costs, and how the room reads once it fills up. That is the idea behind our pub crawls: somebody who already knows takes the lead.
+A: Yes. Club nights and pub crawls sit inside our parties and socials format. A drink gives you somewhere to stand and something to do with your hands, so there is no opening line to prepare. What is genuinely China-specific is knowing which places are used to international crowds, what a night actually costs, and how the room reads once it fills up. That is the idea behind our pub crawls: somebody who already knows takes the lead.
 
 Q: Can I join a food crawl if I cannot read a menu?
 A: That is most of the point. Pictureless menus, dishes you cannot pronounce, and no way to tell whether you ordered well are exactly what puts people off eating out here. On a food crawl somebody orders for the table, so you get more dishes and none of the guesswork. Hands-on food like hotpot and dumplings works best, because everyone is busy doing something rather than making conversation.
