@@ -62,7 +62,7 @@ One city group, with local meetups and local knowledge. Guangzhou first.
 - Priority access to limited-capacity events
 - Your own event ideas promoted to the city group
 
-### Business Group — RMB 2888 (USD 420)
+### Business Group — RMB 2,888 (USD 420)
 Unit: per person · lifetime.
 For founders, freelancers and anyone building something in China.
 - Everything in the City Group
@@ -76,7 +76,7 @@ Once paid membership opens: anyone who has not joined an activity in their first
 ## Cities (16)
 
 ### Guangzhou — Guangdong
-Our home base, with Cantonese food, riverfront nights and a small expat scene that is easy to join.
+In-person meetups in our home base, with online groups for life in China.
 Guangzhou is our home base. Rent is lower than in Beijing and Shanghai, Cantonese food is cheap enough to eat out often, the climate is subtropical and the trade community is deeply international. It is one of the two cities where the crew meets in person. Ten meetup formats start here: parties and networking mixers, food crawls through the old districts and along the river, and language exchange, as well as sports leagues, hikes and cultural experiences.
 Regular activity:
 - parties and networking mixers, food crawls and language exchange
@@ -88,7 +88,7 @@ Regular activity:
 Cost of living: Living costs sit in the mid range for a Chinese first-tier city, noticeably below Beijing and Shanghai. Yuexiu, Tianhe and Zhujiang New Town are where most newcomers start looking.
 
 ### Shanghai — Shanghai
-A large, long-established expat community and a wide choice of international restaurants and bars.
+A broad international scene, joined through Shanghai chat and national online groups.
 Shanghai has a large, long-established expat community, plus a wide choice of international restaurants, bars and professional networks, most of them concentrated in Jing’an, Xuhui and Huangpu. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Shanghai city chat. When people do meet up, the ones that are easy to start with are parties, food crawls and language exchange.
 Regular activity:
 - parties and socials: rooftop bars along the Bund and through the old French Concession
@@ -100,7 +100,7 @@ Regular activity:
 Cost of living: The most expensive city on this list, especially inside the inner ring. Expect to pay a premium for space and for international schooling.
 
 ### Beijing — Beijing
-History, hutongs and the Great Wall within reach.
+Historic city life with practical answers in Beijing chat and national online groups.
 Beijing is where Chinese history is most accessible: hutongs, temples and several Great Wall sections are all within a day trip, and Chaoyang and Dongcheng have been the established expat districts for decades. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Beijing city chat.
 Regular activity:
 - parties and socials: Sanlitun and the houhai bar streets, the longest-established expat nightlife in the country
@@ -112,10 +112,10 @@ Regular activity:
 Cost of living: Pricier than most of China, though a little below Shanghai. Chaoyang and Dongcheng are the long-established expat districts.
 
 ### Shenzhen — Guangdong
-Tech energy, coastline and a young, mostly newly arrived crowd.
+In-person meetups in a young tech city, with practical help for new arrivals.
 Shenzhen is China’s tech hub and a city that grew up in a single generation, and most residents moved here from somewhere else, which makes people unusually open to meeting new arrivals. It is the second city where the crew meets in person, alongside Guangzhou. The same ten formats start here: parties and socials, seafood and night-market food crawls, and language exchange for people who have just landed.
 Regular activity:
-- parties and socials: Nanshan and Futian, close to Hong Kong and used to international crowds
+- parties and socials: Nanshan and Futian, close to Hong Kong, China and used to international crowds
 - food crawls: Cantonese seafood, night-market stalls and hotpot
 - language exchange: heavy demand from both sides, locals in tech and newcomers who have just arrived
 - sports, hikes and culture: coastal trails, Wutong Mountain and day trips out to Dapeng
@@ -124,10 +124,10 @@ Regular activity:
 Cost of living: Close to Beijing on cost and rising fast, with Nanshan and Futian the most popular districts.
 
 ### Chengdu — Sichuan
-A slower pace, teahouses and a Sichuan food scene people move here for.
+A slower-paced city chat for food, culture and everyday questions.
 Chengdu runs at a slower pace than the coastal cities, and its teahouses, mahjong tables and Sichuan food are local institutions rather than tourist attractions. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Chengdu city chat.
 Regular activity:
-- parties and socials: a dense, cheap nightlife centerd on the city center and the river
+- parties and socials: a dense, cheap nightlife centred on the city center and the river
 - food crawls: Sichuan hotpot, skewers and dumplings, and a food scene people move here for
 - language exchange: locals are curious about newcomers and slower to switch into English
 - sports, hikes and culture: teahouse afternoons, mahjong lessons and day hikes on Qingcheng Mountain
@@ -136,6 +136,7 @@ Regular activity:
 Cost of living: Rents and food sit well below the coastal first-tier cities, with a slower pace and a food scene people move here for.
 
 ### Hangzhou — Zhejiang
+West Lake and tech-city life, with support in Hangzhou chat and national groups.
 Hangzhou has West Lake, tea hills on the edge of the city and a tech scene that keeps pulling newcomers in, so the crowd here skews young and recently arrived. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Hangzhou city chat.
 Regular activity:
 - parties and socials: lakeside bars and the strips along the river near the CBD
@@ -147,6 +148,7 @@ Regular activity:
 Cost of living: Cheaper than Shanghai but not cheap, and popular with tech professionals.
 
 ### Chongqing — Chongqing
+Hotpot, hillside city life and practical answers in Chongqing’s online community.
 Chongqing is a vertical city of hotpot, fog and river views, where getting around often means stairs rather than blocks. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Chongqing city chat.
 Regular activity:
 - parties and socials: nightlife spread across Jiefangbei and along the riverfront
@@ -155,9 +157,10 @@ Regular activity:
 - sports, hikes and culture: stair climbs, hillside walks and karst country out at Wulong
 - board games, coffee and brunch: night-view photography walks suit this skyline better than most
 - River cruises on the Yangtze and Jialing are the standard introduction to the city
-Cost of living: Low rents by Chinese big-city standards, with and a distinctive local food culture.
+Cost of living: Low rents by Chinese big-city standards, with a distinctive local food culture.
 
 ### Suzhou — Jiangsu
+Canals, classical gardens and manufacturing life, connected through online groups.
 Suzhou trades on classical gardens, canals and water towns, and sits at the center of a large international manufacturing community just outside Shanghai. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Suzhou city chat.
 Regular activity:
 - parties and socials: garden-side and canal-side drinking, plus the bar streets in the industrial park
@@ -169,6 +172,7 @@ Regular activity:
 Cost of living: Moderate costs, a short train ride from Shanghai, with a large manufacturing and expat base.
 
 ### Qingdao — Shandong
+Coastal city life and local answers through Qingdao chat and national groups.
 Qingdao has beaches, German-era architecture and the Tsingtao brewery, and fills up with visitors every summer. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Qingdao city chat.
 Regular activity:
 - parties and socials: beach bars and beer halls, including the brewery itself
@@ -180,6 +184,7 @@ Regular activity:
 Cost of living: Moderate for a coastal city, busy in summer, with a long-standing Korean community.
 
 ### Xi’an — Shaanxi
+Deep history and street food, with an online community for everyday life.
 Xi’an pairs the Terracotta Army and a walkable Ming-era city wall with a dense, long-standing street-food scene. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Xi’an city chat.
 Regular activity:
 - parties and socials: the bar streets inside and just beside the city wall
@@ -191,6 +196,7 @@ Regular activity:
 Cost of living: Affordable by first-tier standards, with a large student population and deep history.
 
 ### Tianjin — Tianjin
+A northern port city within reach of Beijing, connected through online groups.
 Tianjin sits about half an hour from Beijing by high-speed rail, with European-style concessions along the Haihe and a port that keeps pulling in international businesses. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Tianjin city chat.
 Regular activity:
 - parties and socials: concession-era streets and riverside bars along the Haihe
@@ -202,6 +208,7 @@ Regular activity:
 Cost of living: Moderate costs, and a short train ride from Beijing.
 
 ### Xiamen — Fujian
+Island living, seafood and coastal routines, with support in Xiamen chat.
 Xiamen is an island city of mild weather, seafood and a creative crowd, with a largely pedestrian center that makes meeting up straightforward. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Xiamen city chat.
 Regular activity:
 - parties and socials: beachfront bars and the old-villa lanes on Gulangyu
@@ -213,6 +220,7 @@ Regular activity:
 Cost of living: Moderate for a coastal city with a mild climate and a noticeably relaxed pace.
 
 ### Guilin — Guangxi
+Karst landscapes and a slower pace, connected through Guilin chat and national groups.
 Guilin trades on karst mountains and the Li River, and draws teachers, photographers and remote workers looking for somewhere slower. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Guilin city chat.
 Regular activity:
 - parties and socials: small bar streets around the pedestrian center
@@ -224,6 +232,7 @@ Regular activity:
 Cost of living: Cheap by Chinese big-city standards, known for scenery rather than for salaries.
 
 ### Kunming — Yunnan
+A mild-weather gateway to Yunnan, with everyday answers in online groups.
 Kunming is the capital of Yunnan and the province’s main gateway, with mild weather all year round, a large student population and the rail and road links west to Dali and Lijiang. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Kunming city chat.
 Regular activity:
 - parties and socials: nightlife around the city center and the university districts
@@ -235,6 +244,7 @@ Regular activity:
 Cost of living: Rents sit well below the coastal cities, with a mild climate all year round.
 
 ### Dali — Yunnan
+Remote-work life between Erhai and Cangshan, connected through Dali chat.
 Dali sits between Erhai Lake and the Cangshan mountains, with an established remote-work community alongside Bai minority culture in the old town and around the lake. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Dali city chat.
 Regular activity:
 - parties and socials: old-town bars and lakeside places around Erhai
@@ -246,6 +256,7 @@ Regular activity:
 Cost of living: Cheap by most standards, though the popular spots around Erhai have risen with the inflow of remote workers.
 
 ### Lijiang — Yunnan
+Old-town life and mountain access, with online support for longer stays.
 Lijiang is the old town at the foot of Jade Dragon Snow Mountain, with cobbled lanes, Naxi culture and trailheads for serious hiking in the province. The crew meets in person in Guangzhou and Shenzhen, so members here join the national online groups and the Lijiang city chat.
 Regular activity:
 - parties and socials: bars along the old-town canals and quieter places in the newer districts
@@ -396,7 +407,7 @@ Bigger and more organized, and each one takes a bit more setting up than a night
 
 #### Hikes and weekend getaways
 A whole day together does more than an evening does.
-Why it works: Time is the thing that turns acquaintances into friends. On a day trip there is room for the conversation to get past where you are from and what you do. Westerners generally arrive already liking the outdoors, so there is nothing to sell.
+Why it works: Time is the thing that turns acquaintances into friends. On a day trip there is room for the conversation to get past where you are from and what you do. People who move here often arrive already liking the outdoors, so there is nothing to sell.
 What changes in China: There is a lot of scenery within reach of every big Chinese city, and getting to it means tickets, transport, sometimes a night somewhere, and a language gap at each step. Doing that alone on a Saturday is a big ask, which is why most people never do.
 If you come on your own: Nobody joins a hike to talk to people they already know. Turning up alone is the normal way to do it.
 Also searched as: expat hiking China, weekend trip from Guangzhou, camping with foreigners China
@@ -427,7 +438,7 @@ Also searched as: board game night expats China, trivia night Guangzhou foreigne
 
 #### Coffee chats and brunch
 A low-commitment first step rather than the main event.
-Why it works: Brunch is a real cultural touchstone for plenty of Westerners and an easy first meeting. Nobody has to commit their whole evening and nobody has to drink.
+Why it works: Brunch is a real cultural touchstone for many newcomers and an easy first meeting. Nobody has to commit their whole evening and nobody has to drink.
 What changes in China: Coffee here is a fast transaction and brunch crowds exist mainly in the biggest cities, so it carries less weight than it does at home. Useful as a gentle entry, weak as a centerpiece.
 If you come on your own: Sitting in a cafe with people you have not met yet costs you an hour and nothing else.
 Also searched as: expat brunch China, coffee meetup Guangzhou foreigners
@@ -439,24 +450,7 @@ What changes in China: Retention more than recruitment. It matters once somebody
 If you come on your own: Joining alone is fine, though these work better once you already recognize somebody in the room.
 Also searched as: photography walk expats China, book club Guangzhou foreigners
 
-### Canton Fair Phase 2: What to Do After the Halls Close
-City: Guangzhou · Category: Parties & Socials · Cadence: Daily
-Next date: 2026-10-24T19:00 to 2026-10-27T22:30 · Venue: Guangzhou · Price: Free
-Phase 2 of the 140th Canton Fair runs from October 23–27, 2026, focusing on home décor, gifts, and daily-use products across 25,000+ booths and 515,000 square meters of exhibition space.
-
-The halls close at 6pm. If you’re in Guangzhou for the fair, here’s what’s happening after hours:
-
-October 24, 7pm — ASIAPRO Canton Fair Meetup at JoJo’s Riverside (Haizhu). Free, no agenda, no pitches. Buyers, distributors, and importers talking on the Pearl River.
-
-October 24, 7pm — NZGBA Networking Drinks at ATOC Bar (Zhujiang New Town). Free entry, happy hour until 10pm, Kiwi-owned bar in the heart of the city’s after-work district.
-
-Any night — neighborhood restaurants in Haizhu, Yuexiu, or Liwan. The best conversations in Guangzhou don’t happen in hotel lobbies.
-
-GFIC Crew runs regular social events across Guangzhou — food crawls, language exchanges, weekend trips, and meetups that mix business travelers with long-term residents.
-
-Search “GFIC Crew” on X, Instagram, YouTube, Xiaohongshu, or WeChat Official Account. WeChat: DN8117.
-
-## FAQ (40 questions)
+## FAQ (42 questions)
 
 ### About GFIC Crew
 
@@ -549,7 +543,7 @@ A: The essentials are WeChat (messaging and payment), Alipay (payment), Amap or 
 ### Guangzhou
 
 Q: Why do expats choose Guangzhou?
-A: Guangzhou combines a lower cost of living than Beijing or Shanghai with Cantonese food that is cheap enough to eat out often, a subtropical climate, a huge international trade community and fast rail links to Hong Kong, Shenzhen and Southeast Asia. It is also a comparatively easy Chinese city to settle into, because the local culture is famously practical and non-judgmental.
+A: Guangzhou combines a lower cost of living than Beijing or Shanghai with Cantonese food that is cheap enough to eat out often, a subtropical climate, a huge international trade community and fast rail links to Hong Kong, China, Shenzhen and Southeast Asia. It is also a comparatively easy Chinese city to settle into, because the local culture is famously practical and non-judgmental.
 
 Q: Where do expats usually live in Guangzhou?
 A: Zhujiang New Town is the modern CBD with high-rise apartments and nightlife; Tianhe is convenient and busy; Yuexiu has the old-city feel, parks and the traditional food most people come for; Haizhu is greener and cheaper along the river; Panyu is popular with families near international schools.
@@ -609,6 +603,16 @@ A: That is most of the point. Pictureless menus, dishes you cannot pronounce, an
 
 Q: How is your language exchange different from the ones I have tried?
 A: The complaint we hear most is that they quietly turn into a dating event, or an English corner where nobody talks to anyone new. What we aim for instead is a host, a structure and an actual topic, so you get paired with somebody early instead of standing in a corner. It also pulls two crowds into one room: expats who want Chinese and locals who want English. Demand for this in China is enormous and the quality is uneven, which is why ours runs with a host, a structure and an actual topic.
+
+### Events & Activities
+
+Q: What actually happens at a meetup?
+A: Each confirmed meetup is built around one of the formats on the events page, such as a shared meal, a social night, a hike or a language exchange. The event announcement gives the date, meeting point, cost and what to expect. If no date is listed, ask in the WeChat group rather than assuming a format is running this week.
+
+### About GFIC Crew
+
+Q: Who writes GFIC Crew guides?
+A: Guides are published by GFIC Crew as an organization, based on the community organizer’s experience in China. We do not use a fictional personal author or require the organizer to publish personal social accounts. Outdated information can be reported through WeChat DN8117.
 
 ## Contact
 
