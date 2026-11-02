@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import JoinDropdown from '../../components/JoinDropdown.astro';
+import { SITE } from '../../data/site.js';
+import { upcomingEvents } from '../../data/events.js';
+import { eventSchema, orgSchema, breadcrumbSchema, webPageSchema } from '../../data/schema.js';
+
+// Only confirmed, not-yet-finished events get a canonical URL. Adding real event data in
+// the CMS therefore creates both the detail page and its Event schema at the next build.
+export function getStaticPaths() {
+  return upcomingEvents().map((event) => ({ params: { slug: event.slug }, props: { event } }));
+}
+
+const { event } = Astro.props;
+const url = new URL(`/events/${event.slug}/`, SITE.url).href;
+const date = new Date(`${event.startDate.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', {
+  day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
+});
+const schema = [
+  orgSchema(),
+  webPageSchema({ url, name: event.title, description: event.description }),
+  eventSchema(event, url),
+  breadcrumbSchema([
+    { name: 'Home', url: `${SITE.url}/` },
+    { name: 'Events', url: `${SITE.url}/events/` },
+    { name: event.title, url },
+  ]),
+];
+---
+
+<BaseLayout title={`${event.title} — GFIC Crew ${event.city}`} description={event.description} schema={schema}>
+  <section class="section section--tight">
+    <div class="wrap wrap--measure">
+      <p class="breadcrumb"><a href="/">Home</a> / <a href="/events/">Events</a> / {event.title}</p>
+      <h1>{event.title}</h1>
+      <p class="lead">{event.description}</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap wrap--measure">
+      <h2>Event details</h2>
+      <dl class="event-facts">
+        <div><dt>Date</dt><dd>{date}</dd></div>
+        <div><dt>Time</dt><dd>{event.startDate.slice(11, 16)}–{event.endDate.slice(11, 16)} (China Standard Time, UTC+8)</dd></div>
+        <div><dt>City</dt><dd>{event.city}</dd></div>
+        <div><dt>Venue</dt><dd>{event.venue}</dd></div>
+        <div><dt>Price</dt><dd>{event.price}</dd></div>
+        {event.cadence ? <div><dt>Schedule</dt><dd>{event.cadence}</dd></div> : null}
+      </dl>
+
+      <h2>How to join</h2>
+      <p>
+        Sign-ups happen on WeChat. Add <strong>{SITE.wechat}</strong>, tell us the event name and
+        we will confirm the details and your place. Every group is free to join right now.
+      </p>
+      <JoinDropdown label="Join this event" size="lg" align="left" />
+      <p style="margin-top:26px"><a class="text-link" href="/events/">Back to all events →</a></p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .event-facts { margin: 0 0 42px; }
+  .event-facts div { display: grid; grid-template-columns: 110px 1fr; gap: 18px; padding: 12px 0; border-bottom: 1px solid var(--line-soft); }
+  .event-facts dt { color: var(--muted); }
+  .event-facts dd { margin: 0; color: var(--body); }
+  @media (max-width: 520px) { .event-facts div { grid-template-columns: 1fr; gap: 2px; } }
+</style>

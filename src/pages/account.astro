@@ -1,0 +1,22 @@
+---
+import { SITE } from '../data/site.js';
+
+// Retired page: there are no member accounts. Kept so old links resolve.
+const target = new URL('/', SITE.url).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>GFIC Crew</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={target} />
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+  </head>
+  <body>
+    <p style="font-family:system-ui,sans-serif;padding:24px">
+      This page has moved. Go to the <a href={target}>GFIC Crew home page</a>.
+    </p>
+  </body>
+</html>

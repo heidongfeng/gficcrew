@@ -1,0 +1,24 @@
+---
+import { SITE } from '../data/site.js';
+
+// Retired page: joining now happens through WeChat (see the Join the Crew dropdown).
+// Kept so old links and any already-shared URLs land somewhere sensible.
+const target = new URL('/', SITE.url).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Join GFIC Crew — WeChat DN8117</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={target} />
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+  </head>
+  <body>
+    <p style="font-family:system-ui,sans-serif;padding:24px">
+      Joining the crew happens on WeChat now. Add <strong>DN8117</strong>, or use the Join the Crew
+      button on the <a href={target}>home page</a>.
+    </p>
+  </body>
+</html>

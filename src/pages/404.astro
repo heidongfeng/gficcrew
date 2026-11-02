@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../data/site.js';
+---
+
+<BaseLayout
+  title="Page not found — GFIC Crew"
+  description="The page you were looking for is not here. Explore GFIC Crew events, cities and the Guangzhou expat guide instead."
+  robots="noindex, follow"
+  noCanonical
+>
+  <section class="section">
+    <div class="wrap" style="max-width:640px">
+      <span class="eyebrow">404</span>
+      <h1>This page went to another city</h1>
+      <p class="lead">
+        The page you wanted does not exist. Try the events page, the city list or the Guangzhou
+        expat guide.
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:22px">
+        <a class="btn btn--primary" href="/">Back to home</a>
+        <a class="btn btn--ghost" href="/events/">Events</a>
+        <a class="btn btn--ghost" href="/faq/">FAQ</a>
+      </div>
+      <p class="note" style="margin-top:24px">WeChat: {SITE.wechat} · {SITE.url}</p>
+    </div>
+  </section>
+</BaseLayout>

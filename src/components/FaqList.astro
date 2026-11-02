@@ -1,0 +1,32 @@
+---
+const { items } = Astro.props;
+
+// Group by category, preserving the order the categories first appear.
+const groups = [];
+const index = new Map();
+for (const item of items) {
+  if (!index.has(item.category)) {
+    index.set(item.category, []);
+    groups.push({ category: item.category, items: index.get(item.category) });
+  }
+  index.get(item.category).push(item);
+}
+---
+
+<div class="faq-groups">
+  {
+    groups.map((group) => (
+      <div class="faq-group">
+        <h3>{group.category}</h3>
+        {group.items.map((item) => (
+          <details class="faq" id={`faq-${item.q.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`}>
+            <summary>{item.q}</summary>
+            <div class="answer">
+              <p>{item.a}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+    ))
+  }
+</div>

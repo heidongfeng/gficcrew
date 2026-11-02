@@ -1,0 +1,145 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { SITE, SERVICES, RULES, ORG_METHODS } from '../data/site.js';
+import { CONTACT, fill } from '../data/contact.js';
+import { orgSchema, breadcrumbSchema, webPageSchema, itemListSchema } from '../data/schema.js';
+
+const url = `${SITE.url}/about/`;
+
+// The full brand paragraph now lives on the homepage only, so About does not repeat it.
+// This page's JSON-LD description therefore summarises what About actually contains, rather than
+// restating the brand blurb. The meta tag carries its own shorter line so the snippet is one
+// whole sentence.
+const metaDescription =
+  'GFIC Crew is a real-life social community for expats in China — founded by locals, built on real-world meetups and practical help for newcomers.';
+
+const schema = [
+  orgSchema(),
+  webPageSchema({
+    url,
+    name: 'About GFIC Crew',
+    description:
+      'Who GFIC Crew is for, the four services we run, how events get organized and the community rules.',
+  }),
+  breadcrumbSchema([
+    { name: 'Home', url: SITE.url + '/' },
+    { name: 'About GFIC Crew', url },
+  ]),
+  itemListSchema({
+    id: `${url}#services`,
+    name: 'GFIC Crew services for expats in China',
+    description: 'Daily communication, language exchange, social activities and cultural experiences.',
+    items: SERVICES.map((s) => ({ name: s.title, url: `${url}#${s.id}`, description: s.summary })),
+  }),
+];
+---
+
+<BaseLayout
+  title="About GFIC Crew — Expat Community & Events in China"
+  description={metaDescription}
+  schema={schema}
+>
+  <section class="section section--tight">
+    <div class="wrap wrap--measure">
+      <p class="breadcrumb"><a href="/">Home</a> / About</p>
+      <h1>About GFIC Crew (GFIC歪果社)</h1>
+    </div>
+  </section>
+
+  <section class="section section--soft">
+    <div class="wrap wrap--measure">
+      <h2>Who this is for</h2>
+      <div class="grid grid--2" style="margin-top:22px">
+        <div class="block">
+          <h3>Newly arrived expats</h3>
+          <p>
+            Your first month in China is the hardest: SIM card, bank account, WeChat Pay, rental
+            deposit, residence permit. The crew compresses that learning curve from months to weeks.
+          </p>
+        </div>
+        <div class="block">
+          <h3>Long-term residents</h3>
+          <p>
+            You know the systems but the social circle has thinned out. Ten formats to choose from and a
+            rotating cast of newcomers keep the city interesting again.
+          </p>
+        </div>
+        <div class="block">
+          <h3>Planning a move to China</h3>
+          <p>
+            Join before you land. Ask the city group about districts, salaries, schools and
+            contracts, and arrive with people already expecting you.
+          </p>
+        </div>
+        <div class="block">
+          <h3>Globally-minded locals</h3>
+          <p>
+            Chinese members who want genuine international friendships, language practice and a
+            non-commercial space are welcome.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap wrap--measure">
+      <h2>Our four services</h2>
+      {
+        SERVICES.map((service) => (
+          <article id={service.id} style="margin-top:34px">
+            <h3>{service.title}</h3>
+            <p>{service.summary}</p>
+            <ul>
+              {service.points.map((p) => <li>{p}</li>)}
+            </ul>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section section--soft">
+    <div class="wrap wrap--measure">
+      <h2>How events get organized</h2>
+      <ol style="color:var(--body);padding-left:22px;margin-top:16px">
+        {ORG_METHODS.map((m) => <li style="margin-bottom:10px">{m}</li>)}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap wrap--measure">
+      <h2>Community rules</h2>
+      <ol style="color:var(--body);padding-left:22px;margin-top:16px">
+        {RULES.map((r) => <li style="margin-bottom:10px">{r}</li>)}
+      </ol>
+      <p class="note">
+        Anyone who violates any of the above rules will receive a warning for minor offenses and may
+        be removed from the crew for serious violations.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section--soft">
+    <div class="wrap wrap--measure">
+      <h2>Who writes our guides</h2>
+      <p>
+        Our guides are published by GFIC Crew and based on the community organizer’s experience in
+        China. We update them when local information changes. If you spot something outdated, tell
+        us on WeChat: <strong>{SITE.wechat}</strong>.
+      </p>
+      <h2>About this term: expats</h2>
+      <p>
+        You will sometimes see the phrase “foreigners in China” used on this site for broader search
+        coverage. Our preferred and primary term for our community is <strong>expats</strong>:
+        people who have chosen to build a life here, not just pass through.
+      </p>
+      <h2>{CONTACT.findUsTitle}</h2>
+      <p>{fill(CONTACT.findUsText)}</p>
+    </div>
+  </section>
+
+  <CtaBand title="Come meet the crew" text="Every group is free to join right now. Paid membership has not opened yet." />
+</BaseLayout>

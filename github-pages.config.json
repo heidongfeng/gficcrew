@@ -1,0 +1,12 @@
+{
+  "_help": [
+    "Which GitHub repo scripts/deploy-github-pages.mjs publishes to.",
+    "Verified 2026-10-03 against api.github.com: heidongfeng/gficcrew is public, completely empty (no files, no branches), Pages not enabled.",
+    "Run: npm run deploy:ghpages (dry run) / npm run deploy:ghpages:apply (push).",
+    "The token itself does NOT go here -- it lives in .github-token, which is gitignored."
+  ],
+  "owner": "heidongfeng",
+  "repo": "gficcrew",
+  "branch": "gh-pages",
+  "domain": "gficcrew.com"
+}

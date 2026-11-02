@@ -1,0 +1,46 @@
+{
+  "name": "gficcrew-site",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build --mode global",
+    "build:global": "astro build --mode global",
+    "build:cn": "astro build --mode cn",
+    "build:all": "npm run build:global && npm run build:cn",
+    "content:import": "node scripts/import-content.mjs",
+    "content:reset": "node scripts/reset-content.mjs",
+    "content:pull": "node scripts/pull-content.mjs",
+    "gate": "node scripts/publish-gate.mjs",
+    "gate:mark": "node scripts/publish-gate.mjs --mark",
+    "cn:zip": "node scripts/package-cn.mjs",
+    "indexnow:notify": "node scripts/notify-indexnow.mjs",
+    "indexnow:dry": "node scripts/notify-indexnow.mjs --dry-run",
+    "speedtest": "node tools/speedtest-cn.mjs",
+    "speedtest:sample": "node tools/speedtest-cn.mjs --csv",
+    "speedtest:report": "node tools/speedtest-cn.mjs --report",
+    "deploy:netlify:draft": "node scripts/deploy-netlify.mjs",
+    "deploy:netlify": "node scripts/deploy-netlify.mjs --prod",
+    "app:prepare": "node scripts/prepare-app.mjs",
+    "ghpages:prepare": "node scripts/prepare-gh-pages.mjs",
+    "ghpages:nocname": "node scripts/prepare-gh-pages.mjs --no-cname",
+    "deploy:ghpages": "node scripts/deploy-github-pages.mjs",
+    "deploy:ghpages:apply": "node scripts/deploy-github-pages.mjs --apply",
+    "release:all": "node scripts/release-all.mjs",
+    "release:verify": "node scripts/release-all.mjs --verify-only",
+    "src:zip": "node scripts/package-src.mjs",
+    "preview": "astro preview",
+    "publish": "node scripts/publish.mjs",
+    "publish:apply": "node scripts/publish.mjs --apply",
+    "deploy:cn:remote": "bash scripts/deploy-cn-remote.sh"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.2.1",
+    "@tencent-ai/workbuddy-cloud-sdk": "dev",
+    "astro": "^5.6.1"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.63.5"
+  }
+}

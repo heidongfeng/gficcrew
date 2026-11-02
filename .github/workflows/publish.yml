@@ -1,0 +1,75 @@
+name: 发布 gficcrew.com（云端内容 → 线上）
+
+# 这是原来那台机器上「每 6 小时自动更新」的替代品。
+#
+# 为什么放 Actions 而不是继续找一台机器跑 cron：
+#   原任务跑在某台常开机器上，机器关了/环境变了/人走了，任务就静默消失——这正是
+#   2026-11-01 之后发生的事：后台还能改内容，但没有任何东西会把它发上线。
+#   Actions 是仓库自带的，定义在版本库里，谁接手都看得见、能重跑、能改。
+#
+# 为什么不在腾讯云那台服务器上跑全套：
+#   那台是 CentOS 7.6，glibc 2.17；Astro 5 要 Node 20，而 Node 18+ 需要 glibc 2.28+。
+#   装不上，升 glibc 会动到同机其他项目的根基。所以服务器只做它擅长的事：
+#   定时从 gficcrew.com 拉 cn-bundle.txt 落盘（scripts/server-pull.sh），不参与构建。
+#
+# 频率与成本：
+#   一天 4 次。实测 build:all 约 4 秒，整个 job 约 3–4 分钟（含 npm ci 与 Pages 构建等待），
+#   约 360–480 分钟/月，占私有库 2000 分钟额度的 18%–24%。
+
+on:
+  schedule:
+    # UTC。0/6/12/18 点 = 北京时间 8/14/20/02 点
+    - cron: '0 */6 * * *'
+  # 改完内容想立刻上线时，在这里点一下
+  workflow_dispatch:
+
+# 不允许两轮并发：一轮正在推 gh-pages 时再起一轮，会把 tree 比对建立在过期的父提交上
+concurrency:
+  group: publish-com
+  cancel-in-progress: false
+
+permissions:
+  contents: write # 通过 Git Data API 更新 gh-pages 分支
+  pages: write # 显式触发 Pages 构建（GITHUB_TOKEN 推的提交不会自动触发）
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: 取代码
+        uses: actions/checkout@v4
+
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: 装依赖
+        run: npm ci
+
+      # 口令放 Secrets。轮换后台口令后必须同步更新这里，否则这一步会干净地失败，
+      # 后面的构建和发布都不会执行（站点保持上一版，不会变坏）。
+      - name: 拉云端内容
+        env:
+          GFIC_ADMIN_PW: ${{ secrets.GFIC_ADMIN_PW }}
+        run: npm run content:pull
+
+      - name: 写入 generated/
+        run: npm run content:import
+
+      # 一条命令覆盖：build:all → 12 项审计 → cn:zip → ghpages:prepare →
+      # 完整性守卫 → 新鲜度守卫 → 推 gh-pages → 线上逐页核验。
+      # 任何一步失败都会 exit 1，gh-pages 保持原样。
+      - name: 构建 · 审计 · 发布
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run publish:apply
+
+      # IndexNow 只加速发现，失败不代表站点有问题，所以不阻塞这次运行
+      - name: 通知搜索引擎（IndexNow）
+        if: success()
+        continue-on-error: true
+        run: npm run indexnow:notify

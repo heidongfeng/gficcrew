@@ -1,0 +1,155 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import JoinDropdown from '../../components/JoinDropdown.astro';
+import { SITE } from '../../data/site.js';
+import { CITIES, POPUP_NOTE } from '../../data/cities.js';
+import { GUIDES, guideForCity, guideUrl } from '../../data/guides.js';
+import { itemListSchema, breadcrumbSchema, webPageSchema } from '../../data/schema.js';
+
+const url = `${SITE.url}/cities/`;
+
+// Where we can actually put on an in-person meetup today. Every other city is online-only:
+// no local team, but those expats join the same national group.
+const OFFLINE_CITIES = new Set(['guangzhou', 'shenzhen']);
+
+// Built from CITIES instead of hand-typed: the hand-typed list kept naming "Yunnan" after the
+// province was split into Kunming / Dali / Lijiang, and its order had drifted from the array.
+const cityNames = CITIES.map((c) => c.name);
+const cityList = `${cityNames.slice(0, -1).join(', ')} and ${cityNames[cityNames.length - 1]}`;
+
+const description =
+  `GFIC Crew covers cities across China with cost-of-living notes and expat living guides — ${cityList}. We meet up in person in Guangzhou and Shenzhen, and our national group is open to expats anywhere in China.`;
+
+// The line above is the JSON-LD description, so it names every city.
+// The meta tag gets a shorter version so the search snippet is not cut mid-list.
+const metaDescription =
+  'Cost-of-living notes and expat living guides by city. We meet in Guangzhou and Shenzhen; the national group is open anywhere in China.';
+
+const schema = [
+  webPageSchema({
+    url,
+    name: 'GFIC Crew cities and city guides',
+    description,
+  }),
+  breadcrumbSchema([{ name: 'Home', url: SITE.url + '/' }, { name: 'Cities & Guides', url }]),
+  itemListSchema({
+    id: `${url}#city-list`,
+    name: 'GFIC Crew cities covered in China',
+    description: 'Chinese cities covered by GFIC Crew guides and online groups.',
+    items: CITIES.map((c) => ({
+      name: c.name,
+      url: OFFLINE_CITIES.has(c.slug) ? `${SITE.url}/cities/${c.slug}/` : `${url}#${c.slug}`,
+      description: c.tagline || c.blurb,
+    })),
+  }),
+  itemListSchema({
+    id: `${url}#guide-list`,
+    name: 'GFIC Crew city guides',
+    description: 'Long-form expat living guides by city.',
+    items: GUIDES.map((g) => ({
+      name: g.title,
+      url: new URL(guideUrl(g.slug), SITE.url).href,
+      description: g.description,
+    })),
+  }),
+];
+---
+
+<BaseLayout
+  title="Cities & Guides — GFIC Crew Expat Communities Across China"
+  description={metaDescription}
+  schema={schema}
+>
+  <section class="section section--tight">
+    <div class="wrap wrap--measure">
+      <p class="breadcrumb"><a href="/">Home</a> / Cities &amp; Guides</p>
+      <h1>Where we are, and how to live there</h1>
+      <p class="lead">
+        GFIC Crew covers {CITIES.length} cities across China with cost-of-living notes and, where
+        one is written, a full expat living guide. We meet up in person in Guangzhou and Shenzhen.
+        Everywhere else there is no local team yet. Those cities join us through the online groups
+        and our national group, which is open wherever you are in China.
+      </p>
+      <nav class="toc city-jump" aria-label="Jump to a city">
+        <p class="eyebrow">Jump to a city</p>
+        <ul>
+          {CITIES.map((c) => <li><a href={`#${c.slug}`}>{c.name}</a></li>)}
+        </ul>
+      </nav>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap wrap--measure">
+      <h2 id="guides">City guides</h2>
+      <p class="lead">
+        Long-form guides written from first-hand experience: visas, housing, banking, healthcare,
+        transport, food, language and where to meet people.
+      </p>
+      <div class="grid grid--2" style="margin-top:8px">
+        {
+          GUIDES.map((guide) => (
+            <article class="block">
+              <h3><a href={guideUrl(guide.slug)}>{guide.title}</a></h3>
+              <p>{guide.description}</p>
+              <p class="note">Updated {guide.updated}</p>
+            </article>
+          ))
+        }
+        <article class="block">
+          <h3>Shanghai · Beijing · Shenzhen</h3>
+          <p>
+            City guides are added one at a time, written from first-hand experience. Tell us which
+            city you want next and we will prioritize it.
+          </p>
+        </article>
+      </div>
+      <p style="margin-top:30px">
+        <a class="text-link" href="/guides/">All city guides →</a>
+        <span style="margin:0 12px">·</span>
+        <a class="text-link" href="/contact/">Request a city</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section section--soft">
+    <div class="wrap wrap--measure">
+      <h2 id="cities">All cities we cover</h2>
+      <div style="display:grid;gap:18px;margin-top:22px">
+        {
+          CITIES.map((city) => {
+            const guide = guideForCity(city.slug);
+            return (
+              <article class="city-item" id={city.slug}>
+                <h3>{city.name}</h3>
+                <div class="meta">
+                  {city.province}
+                  {OFFLINE_CITIES.has(city.slug) ? ' · We meet here in person' : ' · Online community'}
+                  {guide ? ' · Guide available' : ''}
+                </div>
+                {city.tagline ? <p class="meta" style="color:var(--body)">{city.tagline}</p> : null}
+                <p>{city.blurb}</p>
+                <ul class="plain">
+                  {city.highlights.map((h) => <li>{h}</li>)}
+                </ul>
+                <p class="note" style="margin:14px 0 0"><strong>Cost of living:</strong> {city.livingNote}</p>
+                <div class="city-actions">
+                  {OFFLINE_CITIES.has(city.slug) ? (
+                    <a class="text-link" href={`/cities/${city.slug}/`}>Explore {city.name} →</a>
+                  ) : null}
+                  {guide ? (
+                    <a class="text-link" href={guideUrl(guide.slug)}>Read the {city.name} guide →</a>
+                  ) : (
+                    <span class="note">Guide coming soon</span>
+                  )}
+                  <JoinDropdown label={`Join ${city.name}`} size="ghost" align="left" />
+                </div>
+              </article>
+            );
+          })
+        }
+      </div>
+      <p class="lead" style="margin-top:30px">{POPUP_NOTE}</p>
+    </div>
+  </section>
+</BaseLayout>

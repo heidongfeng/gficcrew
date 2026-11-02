@@ -1,0 +1,31 @@
+---
+import JoinDropdown from './JoinDropdown.astro';
+
+const {
+  title = 'Ready to meet your crew?',
+  text = 'Join the community, pick your city and show up.',
+  cta = 'Join the Crew',
+  href = '',
+  join = true,
+} = Astro.props;
+---
+
+<section class="section">
+  <div class="wrap">
+    <div class="cta-band">
+      <div>
+        <h2>{title}</h2>
+        <p>{text}</p>
+      </div>
+      <div class="cta-actions">
+        {
+          join && !href ? (
+            <JoinDropdown label={cta} align="left" />
+          ) : (
+            <a class="btn btn--primary" href={href || '/contact/'}>{cta}</a>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>

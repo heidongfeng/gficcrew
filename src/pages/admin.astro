@@ -1,0 +1,3672 @@
+---
+import { CITIES } from '../data/cities.js';
+import { EVENTS } from '../data/events.js';
+import { FAQ } from '../data/faq.js';
+import { PLANS, REFUND_TERMS } from '../data/plans.js';
+import { GUIDES } from '../data/guides.js';
+import { SITE, NAV, SERVICES, WHY_JOIN, RULES, ORG_METHODS, EVENT_CATEGORIES, EVENT_CADENCES, FORMATS, HOME } from '../data/site.js';
+import { CONTACT } from '../data/contact.js';
+import { PROBE_BANK, PROBE_CATEGORIES } from '../data/probe-bank.js';
+
+// Seed payload: the content currently checked into the repo. The admin can push it into the
+// cloud database with one click, which is how a fresh database gets its first content.
+const SEED = {
+  cities: CITIES,
+  events: EVENTS,
+  faq: FAQ,
+  plans: PLANS,
+  guides: GUIDES,
+  site: {
+    site: {
+      name: SITE.name,
+      nameZh: SITE.nameZh,
+      legalName: SITE.legalName,
+      wechat: SITE.wechat,
+      tagline: SITE.tagline,
+      description: SITE.description,
+      intro: SITE.intro,
+      keywords: SITE.keywords,
+    },
+    nav: NAV,
+    services: SERVICES,
+    whyJoin: WHY_JOIN,
+    rules: RULES,
+    orgMethods: ORG_METHODS,
+    refundTerms: REFUND_TERMS,
+    eventCategories: EVENT_CATEGORIES,
+    eventCadences: EVENT_CADENCES,
+    formats: FORMATS,
+    home: HOME,
+  },
+  contact: CONTACT,
+  // 探针题库随 seed 一起下发：后台据此渲染"每轮跑哪些题"，并把整库存到云端 monitor/probes。
+  probeBank: PROBE_BANK,
+  probeCategories: PROBE_CATEGORIES,
+};
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>内容后台 — GFIC Crew</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2315140f'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='16' fill='%23f4f2ed' text-anchor='middle'%3EGC%3C/text%3E%3C/svg%3E"
+    />
+    <!-- System fonts keep the internal admin usable on mainland networks; no render-blocking
+         Google Fonts request is needed for an operations tool. -->
+    <!-- is:global is required: nearly every element in this page is created by the
+         client script at runtime, so Astro's scoped-style attributes never reach them. -->
+    <style is:global>
+      /* ---------------------------------------------------------------
+         Tokens — warm "editorial paper" light theme, matching the public
+         site's restrained typographic feel, with a dark counterpart.
+      --------------------------------------------------------------- */
+      :root {
+        /* Native date/time pickers follow this, so the calendar popover matches the theme. */
+        color-scheme: light;
+        --paper: #f4f2ed;
+        --surface: #ffffff;
+        --surface-2: #faf8f4;
+        --ink: #15140f;
+        --ink-soft: #423f36;
+        --muted: #8b867a;
+        --line: #e2ddd2;
+        --line-soft: #eeeae1;
+        --accent: #b3341b;
+        --accent-ink: #ffffff;
+        --accent-soft: #fbeeea;
+        --ok: #2f6f4e;
+        --warn-bg: #fdf4e6;
+        --warn-line: #ecdcbb;
+        --warn-ink: #7d5410;
+        --radius: 10px;
+        --radius-sm: 7px;
+        --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        --serif: Georgia, 'Times New Roman', serif;
+        --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        --shadow-sm: 0 1px 2px rgba(21, 20, 15, 0.05);
+        --shadow-md: 0 10px 30px -14px rgba(21, 20, 15, 0.25);
+        --shadow-lg: 0 30px 70px -30px rgba(21, 20, 15, 0.4);
+      }
+      [data-theme='dark'] {
+        color-scheme: dark;
+        --paper: #100f0e;
+        --surface: #171614;
+        --surface-2: #1d1b19;
+        --ink: #f3efe6;
+        --ink-soft: #cbc6b9;
+        --muted: #8b867a;
+        --line: #2c2a26;
+        --line-soft: #232120;
+        --accent: #e0705a;
+        --accent-ink: #17140f;
+        --accent-soft: #2b1a16;
+        --ok: #74c199;
+        --warn-bg: #241c0f;
+        --warn-line: #3d2f16;
+        --warn-ink: #e2b45f;
+        --shadow-md: 0 10px 30px -14px rgba(0, 0, 0, 0.7);
+        --shadow-lg: 0 30px 70px -30px rgba(0, 0, 0, 0.85);
+      }
+
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font: 400 15px/1.6 var(--sans);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      /* Fine grain so the flat surfaces read as paper rather than plastic. */
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 999;
+        opacity: 0.035;
+        mix-blend-mode: multiply;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+      [data-theme='dark'] body::after { mix-blend-mode: screen; opacity: 0.03; }
+
+      .hidden { display: none !important; }
+      ::selection { background: var(--accent); color: var(--accent-ink); }
+      :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+      /* ---------- shared atoms ---------- */
+      .btn {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 8px 14px; border-radius: var(--radius-sm);
+        border: 1px solid var(--line); background: var(--surface);
+        color: var(--ink-soft); font: 500 13.5px/1 var(--sans); cursor: pointer;
+        transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.12s;
+        white-space: nowrap;
+      }
+      .btn:hover { border-color: #cdc7b9; color: var(--ink); background: var(--surface-2); }
+      .btn:active { transform: translateY(1px); }
+      .btn--primary { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+      .btn--primary:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+      .btn--ghost { border-color: transparent; background: transparent; }
+      .btn--ghost:hover { background: var(--surface-2); border-color: var(--line); }
+      .btn--danger { color: var(--accent); border-color: var(--line); }
+      .btn--danger:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+      .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+      .svg-btn { padding: 7px; }
+
+      .chip {
+        display: inline-flex; align-items: center; gap: 5px;
+        font: 500 11px/1 var(--mono); letter-spacing: 0.02em;
+        padding: 4px 7px; border-radius: 5px;
+        background: var(--surface-2); border: 1px solid var(--line-soft); color: var(--muted);
+      }
+      .eyebrow {
+        font: 600 10.5px/1 var(--sans); letter-spacing: 0.16em; text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      /* ---------- login ---------- */
+      .auth {
+        min-height: 100%; display: grid; place-items: center; padding: 32px 24px; position: relative;
+      }
+      .auth::before {
+        content: ''; position: absolute; inset: 0; z-index: -1;
+        background:
+          radial-gradient(60% 50% at 15% 0%, rgba(179, 52, 27, 0.07), transparent 70%),
+          radial-gradient(50% 45% at 100% 100%, rgba(179, 52, 27, 0.05), transparent 70%);
+      }
+      .auth-card {
+        width: 100%; max-width: 420px; background: var(--surface);
+        border: 1px solid var(--line); border-radius: 16px; padding: 40px 38px 32px;
+        box-shadow: var(--shadow-lg);
+        animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+      @keyframes rise { from { opacity: 0; transform: translateY(14px) scale(0.99); } }
+      .wordmark {
+        display: block; font: 400 30px/1 var(--serif); letter-spacing: -0.01em; color: var(--ink);
+      }
+      .wordmark em { font-style: italic; color: var(--accent); }
+      .auth-sub { display: block; margin-top: 8px; font-size: 13px; color: var(--muted); }
+      .auth-rule { height: 1px; background: var(--line); margin: 26px 0 24px; }
+      .auth h1 { margin: 0 0 6px; font: 400 22px/1.3 var(--serif); }
+      .auth-note { margin: 0 0 22px; font-size: 13.5px; color: var(--muted); }
+
+      .field { margin-bottom: 16px; }
+      .field > label {
+        display: block; margin-bottom: 6px;
+        font: 600 11px/1.2 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+      }
+      .field .hint { display: block; margin-top: 5px; font: 400 11.5px/1.4 var(--mono); color: var(--muted); text-transform: none; letter-spacing: 0; }
+      input[type='text'], input[type='password'], input[type='number'],
+      input[type='date'], input[type='datetime-local'], textarea {
+        width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm);
+        font: 400 14.5px/1.55 var(--sans); color: var(--ink); background: var(--surface-2);
+        transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+      }
+      /* Native pickers draw their own calendar icon; give it room and a visible colour. */
+      input[type='date'], input[type='datetime-local'] { padding-right: 6px; }
+      input[type='date']::-webkit-calendar-picker-indicator,
+      input[type='datetime-local']::-webkit-calendar-picker-indicator {
+        cursor: pointer; opacity: 0.55; width: 20px; height: 20px;
+      }
+      input[type='date']:hover::-webkit-calendar-picker-indicator,
+      input[type='datetime-local']:hover::-webkit-calendar-picker-indicator { opacity: 1; }
+      textarea { font-family: var(--mono); font-size: 13px; min-height: 96px; resize: vertical; }
+      /* 下拉选择框（目前只有城市指南的「选择城市」在用）。限定在 .field 内，
+         免得影响 AI 回答监测里那几个自带样式的 select。 */
+      .field select {
+        width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm);
+        font: 400 14.5px/1.55 var(--sans); color: var(--ink); background: var(--surface-2); cursor: pointer;
+        transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+      }
+      .field select:focus {
+        outline: none; background: var(--surface); border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+      }
+      input:focus, textarea:focus {
+        outline: none; background: var(--surface); border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+      }
+      input[type='checkbox'] { width: 17px; height: 17px; accent-color: var(--accent); }
+
+      .msg { margin: 0; font: 500 13px/1.5 var(--sans); min-height: 20px; }
+      .msg--ok { color: var(--ok); }
+      .msg--err { color: var(--accent); }
+
+      /* ---------- shell ---------- */
+      /* minmax(0, 1fr)：不给 0 下限，侧栏里那条横向滚动的导航会把整列撑宽，
+         手机上表现为整页出现横向滚动条（实测 iPhone 14 溢出 91px）。 */
+      .shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100%; }
+      .sidebar {
+        display: flex; flex-direction: column; gap: 4px;
+        border-right: 1px solid var(--line); background: var(--surface);
+        padding: 22px 14px 16px; position: sticky; top: 0; height: 100vh;
+        min-width: 0;
+      }
+      .brand { padding: 0 10px 20px; }
+      .brand .wordmark { font-size: 25px; }
+      .brand-sub { display: block; margin-top: 6px; font-size: 12px; color: var(--muted); }
+      .nav-label { padding: 0 10px 8px; }
+      .nav { display: flex; flex-direction: column; gap: 2px; }
+      .nav button {
+        display: flex; align-items: center; gap: 10px;
+        width: 100%; padding: 9px 10px; border: 0; border-radius: var(--radius-sm);
+        background: none; font: 500 14px/1.3 var(--sans); color: var(--ink-soft); cursor: pointer;
+        text-align: left; transition: background 0.14s, color 0.14s;
+      }
+      .nav button:hover { background: var(--surface-2); color: var(--ink); }
+      .nav button.is-active { background: var(--ink); color: var(--paper); }
+      .nav button .count {
+        margin-left: auto; font: 500 11px/1 var(--mono); color: var(--muted);
+        background: var(--surface-2); border: 1px solid var(--line-soft);
+        padding: 3px 6px; border-radius: 20px; min-width: 24px; text-align: center;
+      }
+      .nav button.is-active .count { background: rgba(255, 255, 255, 0.15); color: var(--paper); border-color: transparent; }
+      .side-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line-soft); display: flex; gap: 6px; align-items: center; }
+
+      .main { display: flex; flex-direction: column; min-width: 0; }
+      .topbar {
+        position: sticky; top: 0; z-index: 20;
+        display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap;
+        padding: 20px 34px 18px;
+        background: color-mix(in srgb, var(--paper) 88%, transparent);
+        backdrop-filter: saturate(160%) blur(10px);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar .titles { min-width: 0; }
+      .topbar h2 { margin: 5px 0 0; font: 400 27px/1.15 var(--serif); letter-spacing: -0.01em; }
+      .topbar-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+      .topbar-status { flex-basis: 100%; }
+
+      .search {
+        width: 190px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 20px;
+        background: var(--surface); font: 400 13.5px/1 var(--sans); color: var(--ink);
+      }
+      .search::placeholder { color: var(--muted); }
+
+      .progress { height: 2px; background: var(--line-soft); border-radius: 2px; overflow: hidden; margin-top: 8px; }
+      .progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.2s linear; }
+
+      .content { padding: 26px 34px 120px; max-width: 940px; width: 100%; }
+
+      /* ---------- list ---------- */
+      .list-head {
+        display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px;
+        padding: 0 14px; font: 600 10.5px/1 var(--sans); letter-spacing: 0.14em;
+        text-transform: uppercase; color: var(--muted);
+      }
+      .list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+      .list li {
+        display: flex; align-items: center; gap: 14px; padding: 0 14px;
+        border-bottom: 1px solid var(--line-soft); transition: background 0.13s;
+      }
+      .list li:last-child { border-bottom: 0; }
+      .list li:hover { background: var(--surface-2); }
+      .list .idx { font: 400 11.5px/1 var(--mono); color: var(--muted); width: 22px; flex: none; }
+      .list li > button {
+        flex: 1; min-width: 0; border: 0; background: none; cursor: pointer; text-align: left;
+        padding: 14px 0; font: 500 15px/1.4 var(--sans); color: var(--ink);
+        display: flex; align-items: baseline; gap: 10px;
+      }
+      .list li > button:hover { color: var(--accent); }
+      .list .sub { font: 400 11.5px/1 var(--mono); color: var(--muted); flex: none; }
+      .list .empty { padding: 34px 16px; text-align: center; color: var(--muted); font-size: 14px; }
+      .row-del {
+        flex: none; border: 1px solid transparent; background: none; border-radius: 6px;
+        padding: 6px 11px; font: 500 12.5px/1 var(--sans); color: var(--muted); cursor: pointer;
+        opacity: 0; transition: opacity 0.14s, color 0.14s, background 0.14s, border-color 0.14s;
+      }
+      .list li:hover .row-del { opacity: 1; }
+      .row-del:hover { color: var(--accent); background: var(--accent-soft); border-color: var(--line); }
+
+      .seg {
+        display: inline-flex; gap: 2px; padding: 2px; margin-bottom: 9px;
+        border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2);
+      }
+      .seg button {
+        border: 0; background: none; padding: 5px 12px; border-radius: 6px;
+        font: 500 12px/1 var(--sans); color: var(--muted); cursor: pointer; transition: background 0.14s, color 0.14s;
+      }
+      .seg button:hover { color: var(--ink); }
+      .seg button.is-on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
+
+      .idnote {
+        margin: 0; padding: 10px 12px; border-radius: var(--radius-sm);
+        background: var(--surface-2); border: 1px solid var(--line-soft);
+        font: 400 12.5px/1.6 var(--sans); color: var(--muted);
+      }
+      .idpreview {
+        padding: 9px 12px; border-radius: var(--radius-sm);
+        background: var(--surface-2); border: 1px dashed var(--line);
+        font: 400 13px/1.4 var(--mono); color: var(--ink-soft); word-break: break-all;
+      }
+      .imgbox { display: flex; flex-direction: column; gap: 9px; align-items: flex-start; }
+      .imgprev {
+        max-width: 180px; max-height: 180px; display: block; padding: 6px;
+        border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-2);
+      }
+      .fileinput { font: 400 13px var(--sans); color: var(--muted); padding: 4px 0; max-width: 100%; }
+      .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+      .chip-btn {
+        border: 1px solid var(--line); background: var(--surface-2); border-radius: 20px;
+        padding: 5px 11px; font: 400 12.5px/1 var(--sans); color: var(--ink-soft); cursor: pointer;
+        transition: background 0.14s, color 0.14s, border-color 0.14s;
+      }
+      .chip-btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+      /* ---------- editor ---------- */
+      .editor-head {
+        display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;
+        padding-bottom: 18px; margin-bottom: 22px; border-bottom: 1px solid var(--line);
+      }
+      .editor-head h3 { margin: 4px 0 0; font: 400 24px/1.2 var(--serif); flex: 1; min-width: 0; }
+      .card {
+        background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+        padding: 26px 28px; box-shadow: var(--shadow-sm);
+      }
+      .card + .card { margin-top: 18px; }
+      .card-title {
+        display: flex; align-items: center; gap: 10px; margin: 0 0 20px;
+        padding-bottom: 14px; border-bottom: 1px solid var(--line-soft);
+      }
+      .card-title span { font: 400 17px/1 var(--serif); color: var(--ink); }
+      .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+      .field--wide { grid-column: 1 / -1; }
+      .switch { display: flex; align-items: center; gap: 9px; padding: 9px 0; }
+      .switch label { margin: 0; text-transform: none; letter-spacing: 0; font: 500 14px/1 var(--sans); color: var(--ink-soft); }
+
+      .actionbar {
+        position: fixed; left: 248px; right: 0; bottom: 0; z-index: 30;
+        display: flex; align-items: center; gap: 10px;
+        padding: 14px 34px; border-top: 1px solid var(--line);
+        background: color-mix(in srgb, var(--surface) 92%, transparent);
+        backdrop-filter: saturate(160%) blur(10px);
+      }
+      .actionbar .spacer { flex: 1; }
+      .save-hint { font: 400 12px/1 var(--mono); color: var(--muted); }
+
+      /* ---------- modal ---------- */
+      .modal {
+        position: fixed; inset: 0; z-index: 200; display: grid; place-items: center;
+        background: rgba(21, 20, 15, 0.35); backdrop-filter: blur(3px);
+        opacity: 0; pointer-events: none; transition: opacity 0.16s;
+      }
+      .modal.is-open { opacity: 1; pointer-events: auto; }
+      .modal-box {
+        width: min(420px, calc(100% - 40px)); background: var(--surface);
+        border: 1px solid var(--line); border-radius: 14px; padding: 26px 28px;
+        box-shadow: var(--shadow-lg); transform: translateY(10px) scale(0.98);
+        transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .modal.is-open .modal-box { transform: none; }
+      .modal-box h4 { margin: 0 0 8px; font: 400 20px/1.3 var(--serif); }
+      .modal-box p { margin: 0 0 20px; font-size: 14px; color: var(--ink-soft); }
+
+      .warnbar {
+        padding: 10px 34px; background: var(--warn-bg); color: var(--warn-ink);
+        border-bottom: 1px solid var(--warn-line); font-size: 13px;
+      }
+
+      @media (max-width: 960px) {
+        .shell { grid-template-columns: minmax(0, 1fr); }
+        .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+        /* min-width:0 是横向滚动生效的前提：否则导航按内容宽度撑开整列。 */
+        .nav { flex-direction: row; overflow-x: auto; min-width: 0; }
+        .nav button .count { display: none; }
+        .actionbar { left: 0; }
+        .content, .topbar { padding-left: 20px; padding-right: 20px; }
+        .grid2 { grid-template-columns: 1fr; }
+      }
+      /* Phones (≤640px): tighter padding, full-width search, wrapping action bar. */
+      @media (max-width: 640px) {
+        .content { padding: 18px 14px 156px; }
+        .topbar { padding: 14px 14px 12px; gap: 12px; }
+        .warnbar { padding: 10px 14px; }
+        .topbar h2 { font-size: 22px; }
+        .topbar-actions { width: 100%; margin-left: 0; }
+        .search { width: 100%; }
+        .card { padding: 18px 15px; }
+        .editor-head { gap: 10px; }
+        .editor-head h3 { font-size: 20px; }
+        .sidebar { padding: 14px 10px 12px; }
+        .nav button { padding: 8px 10px; font-size: 13.5px; }
+        .list li { gap: 10px; padding: 0 10px; }
+        .actionbar { padding: 12px 14px; gap: 8px; flex-wrap: wrap; }
+        .save-hint { display: none; }
+        .modal-box { padding: 22px 18px; }
+        .auth-card { padding: 30px 22px 26px; }
+        input[type='text'], input[type='password'], input[type='number'],
+        input[type='date'], input[type='datetime-local'], textarea { font-size: 16px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      }
+
+      /* ---------- AI assistant ---------- */
+      .btn--ai {
+        margin-top: 9px; align-self: flex-start;
+        background: linear-gradient(135deg, #6d5efc, #a855f7); color: #fff;
+        border: 0; border-radius: 8px; font: 600 12.5px/1 var(--sans);
+        padding: 7px 12px; cursor: pointer; box-shadow: var(--shadow-sm);
+      }
+      .btn--ai:hover { filter: brightness(1.06); }
+      .ai-panel {
+        margin-top: 10px; padding: 12px 14px; border: 1px solid var(--line);
+        border-radius: 10px; background: var(--surface-2);
+        display: flex; flex-direction: column; gap: 9px;
+      }
+      .ai-panel .ai-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+      .ai-panel input {
+        flex: 1; min-width: 160px; padding: 7px 10px; border: 1px solid var(--line);
+        border-radius: 8px; font: 400 13px/1 var(--sans); background: var(--surface); color: var(--ink);
+      }
+      .ai-panel input:disabled { opacity: 0.6; cursor: not-allowed; }
+      .ai-panel .ai-status { font: 400 12px/1.4 var(--mono); color: var(--muted); white-space: pre-wrap; }
+      .ai-panel .ai-note { font: 400 11.5px/1.5 var(--sans); color: var(--warn-ink); }
+      .ai-trends {
+        width: 100%; min-height: 46px; margin-bottom: 9px; padding: 7px 10px;
+        border: 1px solid var(--line); border-radius: 8px;
+        font: 400 12.5px/1.4 var(--sans); background: var(--surface); color: var(--ink); resize: vertical;
+      }
+      .ai-out {
+        margin-top: 9px; padding: 10px 12px; border: 1px dashed var(--line); border-radius: 8px;
+        background: var(--surface-2); font: 400 12.5px/1.6 var(--sans);
+        color: var(--ink-soft); white-space: pre-wrap; max-height: 240px; overflow: auto;
+      }
+
+      /* ---------- AI answer monitoring (GEO) ---------- */
+      .mon-head { display: flex; flex-wrap: wrap; gap: 12px; }
+      .mon-stat { flex: 1 1 160px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+      .mon-stat b { display: block; font: 400 32px/1.1 var(--serif); color: var(--ink); }
+      .mon-stat span { display: block; margin-top: 6px; font: 500 11.5px/1.4 var(--sans); color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+      .mon-stat em { font: 400 12.5px/1.5 var(--sans); font-style: normal; color: var(--ink-soft); }
+      .mon-note { margin: 0 0 12px; font: 400 12.5px/1.65 var(--sans); color: var(--muted); }
+      .mon-note b { color: var(--ink-soft); font-weight: 600; }
+      .mon-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 4px; }
+      .mon-table { width: 100%; border-collapse: collapse; font: 400 13px/1.55 var(--sans); }
+      .mon-table th, .mon-table td { padding: 9px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line-soft); }
+      .mon-table th { font: 600 11.5px/1.4 var(--sans); color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+      .mon-table tr:last-child td { border-bottom: 0; }
+      .mon-table td.q { max-width: 300px; }
+      .mon-table td.who { max-width: 230px; color: var(--ink-soft); }
+      .mon-tag { display: inline-block; padding: 2px 8px; border-radius: 20px; font: 600 11.5px/1.6 var(--sans); white-space: nowrap; }
+      .mon-tag.hit { background: #e4f3ea; color: #1f6042; }
+      .mon-tag.part { background: var(--warn-bg); color: var(--warn-ink); }
+      .mon-tag.miss { background: var(--accent-soft); color: var(--accent); }
+      [data-theme='dark'] .mon-tag.hit { background: #16301f; color: #7fd0a2; }
+      .mon-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+      .mon-chip { padding: 3px 10px; border: 1px solid var(--line); border-radius: 20px; font: 400 12px/1.6 var(--sans); color: var(--ink-soft); background: var(--surface-2); }
+      .mon-chip b { font-weight: 600; color: var(--ink); }
+      .mon-list { margin: 0; padding-left: 20px; font: 400 13.5px/1.75 var(--sans); color: var(--ink-soft); }
+      .mon-hist { display: flex; align-items: flex-end; gap: 4px; height: 72px; margin: 4px 0 6px; }
+      .mon-bar { flex: 1 1 10px; min-width: 5px; height: 100%; background: var(--line-soft); border-radius: 3px; position: relative; overflow: hidden; }
+      .mon-bar i { position: absolute; left: 0; right: 0; bottom: 0; background: var(--ink); display: block; }
+      .mon-check { display: flex; gap: 8px; align-items: baseline; font: 400 13px/1.8 var(--sans); color: var(--ink-soft); }
+      .mon-check i { font-style: normal; flex: 0 0 16px; }
+      .mon-probe { display: flex; gap: 8px; align-items: center; margin-bottom: 7px; }
+      .mon-probe select, .mon-probe input { padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; font: 400 13px/1.4 var(--sans); background: var(--surface); color: var(--ink); }
+      .mon-probe select { flex: 0 0 108px; }
+      .mon-probe input { flex: 1 1 auto; min-width: 0; }
+      /* 分类标签：固定核心题用实色，轮换题用虚边，扫一眼就分得开。 */
+      .mon-probe .mon-tag { flex: 0 0 auto; background: var(--surface-2); color: var(--ink-soft); border: 1px solid var(--line); }
+      .mon-probe .mon-tag--rot { background: transparent; border-style: dashed; color: var(--muted); }
+      .mon-log { margin-top: 12px; padding: 10px 12px; border: 1px dashed var(--line); border-radius: 8px; background: var(--surface-2); font: 400 12px/1.75 var(--mono); color: var(--ink-soft); max-height: 200px; overflow: auto; white-space: pre-wrap; }
+      .search:disabled { opacity: 0.45; cursor: not-allowed; }
+      @media (max-width: 640px) {
+        .mon-table td.q, .mon-table td.who { max-width: none; }
+        .mon-probe { flex-wrap: wrap; }
+        .mon-probe select { flex: 1 1 100%; }
+      }
+      .mon-table details { margin-top: 7px; }
+
+      /* =================================================================
+         手机端适配
+         后台原本按桌面写：248px 侧栏 + 940px 内容区。手机上有四个硬伤：
+           ① 行内「删除」靠 :hover 才显示 —— 触屏没有 hover，等于点不出来
+           ② 监测页表格列多，会把整页撑出横向滚动条
+           ③ 底部操作条是 fixed 的，要避开 iPhone 底部安全区
+           ④ 输入框字号 < 16px 时 iOS 聚焦会强制放大整页
+         这一段放在最后，覆盖前面两个 640 断点里的旧值。
+         ================================================================= */
+
+      /* 表格横滑容器：卡片内部可以滑，页面本身不横向滚 */
+      .mon-scroll {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+      }
+      .mon-scroll--wide > .mon-table { min-width: 560px; }
+
+      /* 触屏设备一律显示行内删除按钮 */
+      @media (hover: none) {
+        .row-del { opacity: 1; border-color: var(--line); }
+      }
+
+      @media (max-width: 640px) {
+        /* --- 侧栏收成一条紧凑导航，别吃掉半屏 --- */
+        .sidebar { padding: 12px 10px 10px; }
+        .brand { padding: 0 10px 10px; }
+        .brand .wordmark { font-size: 21px; }
+        .brand-sub { display: none; }
+        .nav-label { padding: 0 10px 6px; }
+        .side-foot { margin-top: 10px; padding-top: 10px; }
+        /* 横向导航：条目不许被压扁；隐藏滚动条并保留惯性滑动 */
+        .nav { scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .nav::-webkit-scrollbar { display: none; }
+        .nav button { flex: 0 0 auto; width: auto; white-space: nowrap; }
+
+        /* --- 顶栏 --- */
+        .topbar { padding: 12px 14px; gap: 10px; }
+        .topbar h2 { font-size: 21px; }
+        .topbar-actions { gap: 6px; }
+
+        /* --- 列表：docId 太长会把标题挤没，截断它并对齐表头 --- */
+        .list-head { padding: 0 10px; }
+        .list li > button { gap: 8px; }
+        .list .sub { max-width: 34%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* --- 分段控件：选项多时换行，不要溢出 --- */
+        .seg { flex-wrap: wrap; max-width: 100%; }
+
+        .card { padding: 16px 14px; }
+
+        /* --- 底部操作条：三个按钮平分一行，避开 iPhone 底部安全区 --- */
+        .actionbar {
+          padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+          gap: 8px;
+        }
+        .actionbar .spacer { display: none; }
+        .actionbar .btn { flex: 1 1 auto; justify-content: center; }
+        .content { padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px)); }
+
+        /* --- 登录页 --- */
+        .auth { padding: 24px 14px calc(24px + env(safe-area-inset-bottom, 0px)); }
+
+        /* --- iOS 聚焦缩放：所有可输入控件的字号必须 ≥ 16px --- */
+        .search,
+        .mon-probe select, .mon-probe input,
+        .ai-panel input { font-size: 16px; }
+
+        /* --- 长内容滚动区在触屏上要惯性滚动 --- */
+        .ai-out, .mon-answer, .mon-log { -webkit-overflow-scrolling: touch; }
+
+        /* --- AI 面板：输入框独占一行，别和按钮挤在一起 --- */
+        .ai-panel input { flex: 1 1 100%; min-width: 0; }
+
+        /* --- 监测统计卡：手机上两个一行，比竖着排四个省一屏 --- */
+        .mon-stat { flex: 1 1 calc(50% - 6px); }
+        .mon-stat b { font-size: 26px; }
+      }
+
+      /* 超窄屏（≤380px）：统计卡改回整行，标题再收一档 */
+      @media (max-width: 380px) {
+        .mon-stat { flex: 1 1 100%; }
+        .topbar h2 { font-size: 19px; }
+      }
+      .mon-table details summary { cursor: pointer; font: 500 12px/1.5 var(--sans); color: var(--muted); }
+      .mon-table details summary:hover { color: var(--ink); }
+      .mon-answer { margin-top: 7px; padding: 9px 11px; border-left: 2px solid var(--line); background: var(--surface-2); font: 400 12.5px/1.7 var(--sans); color: var(--ink-soft); white-space: pre-wrap; max-height: 300px; overflow: auto; }
+    </style>
+  </head>
+  <body>
+    <div class="warnbar hidden" id="origin-warn"></div>
+
+    <div class="auth" id="gate">
+      <div class="auth-card">
+        <span class="wordmark">GFIC <em>Crew</em></span>
+        <span class="auth-sub">内容管理后台 · Content admin</span>
+        <div class="auth-rule"></div>
+        <h1>登录</h1>
+        <p class="auth-note">
+          一个后台管两个站点。改动会同时用于境外版 gficcrew.com 和国内版 gficcrew.cn。
+        </p>
+        <form id="gate-form">
+          <div class="field">
+            <label for="gate-pw">管理口令</label>
+            <input id="gate-pw" type="password" autocomplete="current-password" placeholder="• • • • • • • •" />
+          </div>
+          <div class="msg" id="gate-msg"></div>
+          <div class="row" style="display: flex; gap: 10px; margin-top: 18px">
+            <button class="btn btn--primary" type="submit" id="gate-go" style="width: 100%; justify-content: center">
+              登录
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="shell hidden" id="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="wordmark">GFIC <em>Crew</em></span>
+          <span class="brand-sub">内容管理后台</span>
+        </div>
+        <p class="eyebrow nav-label">内容集合</p>
+        <nav class="nav" id="side"></nav>
+        <p class="eyebrow nav-label" style="margin-top: 16px">SEO / GEO</p>
+        <nav class="nav" id="side-tools"></nav>
+        <div class="side-foot">
+          <button class="btn btn--ghost svg-btn" id="btn-theme" type="button" title="切换深浅色">◐</button>
+          <button class="btn btn--ghost" id="btn-pw" type="button" style="font-size: 12.5px">改口令</button>
+          <span style="flex: 1"></span>
+          <button class="btn btn--ghost" id="btn-out" type="button" style="font-size: 12.5px">退出</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="titles">
+            <p class="eyebrow">GFIC Crew</p>
+            <h2 id="title">载入中…</h2>
+          </div>
+          <div class="topbar-actions">
+            <input class="search" id="search" type="text" placeholder="筛选…" />
+            <button class="btn btn--primary" id="btn-new" type="button">+ 新增</button>
+            <button class="btn" id="btn-export" type="button">导出 JSON</button>
+            <button class="btn" id="btn-seed" type="button">导入初始数据</button>
+          </div>
+          <div class="topbar-status">
+            <div class="msg" id="msg"></div>
+            <div class="progress hidden" id="progress"><i></i></div>
+          </div>
+        </header>
+        <div class="content" id="pane"></div>
+      </main>
+    </div>
+
+    <div class="actionbar hidden row" id="actionbar">
+      <button class="btn btn--primary" type="button" id="btn-save">保存</button>
+      <button class="btn btn--ghost" type="button" id="btn-back">返回</button>
+      <span class="spacer"></span>
+      <span class="save-hint" id="save-hint">⌘/Ctrl + S 保存</span>
+      <button class="btn btn--danger" type="button" id="btn-del">删除</button>
+    </div>
+
+    <div class="modal" id="modal">
+      <div class="modal-box">
+        <h4 id="modal-title">确认</h4>
+        <p id="modal-text"></p>
+        <div style="display: flex; gap: 10px; justify-content: flex-end">
+          <button class="btn btn--ghost" type="button" id="modal-cancel">取消</button>
+          <button class="btn btn--primary" type="button" id="modal-ok">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      import { createWorkBuddyCloud } from '@tencent-ai/workbuddy-cloud-sdk';
+      import { codecToText, codecFromText, CODEC_HINT, slugify } from '../scripts/guide-codec.js';
+
+      const ENDPOINT = 'https://gficcrew.app.workbuddy.host';
+      const PUBLISHABLE_KEY = 'wbpk_1uORfVuxR6GP7CtKSD3Ciw_ZlNBhhoZQmyPg3rXxYL6aZvBv5miIAum';
+      const PW_KEY = 'gfic_admin_pw';
+      const THEME_KEY = 'gfic_admin_theme';
+
+      const SEED = JSON.parse(document.getElementById('seed-payload').textContent || '{}');
+
+      const cloud = createWorkBuddyCloud({ endpoint: ENDPOINT, publishableKey: PUBLISHABLE_KEY });
+      const db = cloud.database;
+
+      // slugify 由 ../scripts/guide-codec.js 提供，这里不再重复定义。
+      // 之前两者同名并存：import 被本地 function 遮蔽，打包器把失效的 import 丢掉所以线上
+      // 能跑，但这个脚本块本身不是合法 JS（Identifier 'slugify' has already been declared），
+      // 任何直接解析它的工具都会失败。两处实现当时一致，但改一处会静默分叉。
+
+      const COLLECTIONS = {
+        site: {
+          label: '站点内容',
+          pageTitle: '站点内容',
+          single: true,
+          title: () => '品牌信息 / 导航 / 服务 / 规则',
+          heading: '全站通用内容',
+          groups: [
+            {
+              title: '首页（/）',
+              fields: [
+                { key: 'home.eyebrow', label: '顶部小标题', type: 'text' },
+                { key: 'home.title', label: '主标题 H1', type: 'text' },
+                {
+                  key: 'home.lead',
+                  label: '开头段落',
+                  type: 'textarea',
+                  wide: true,
+                  hint: '写 {brand} 会自动替换成加粗的品牌名，不用手写。改品牌名请到下面「品牌」分组。',
+                },
+                {
+                  key: 'home.highlights',
+                  label: '主标题下面的亮点列表，一行一条',
+                  type: 'list',
+                  wide: true,
+                  hint:
+                    '就是主标题下面那几条要点。一行一条：改某一行＝修改内容，删某一行＝删除该条，在最后补一行＝新增一条。' +
+                    '从上到下按顺序显示，建议 4–6 条。',
+                },
+              ],
+            },
+            {
+              title: '首页各区块小标题',
+              fields: [
+                { key: 'home.servicesEyebrow', label: '「四大服务」小标题', type: 'text' },
+                { key: 'home.servicesTitle', label: '「四大服务」标题', type: 'text' },
+                { key: 'home.servicesLead', label: '「四大服务」引言', type: 'textarea', wide: true },
+
+                { key: 'home.citiesEyebrow', label: '「城市与指南」小标题', type: 'text' },
+                { key: 'home.citiesTitle', label: '「城市与指南」标题', type: 'text' },
+                {
+                  key: 'home.citiesLead',
+                  label: '「城市与指南」引言',
+                  type: 'textarea',
+                  wide: true,
+                  hint: '写 {cityCount} 会自动换成城市总数，城市增删后不用回来改数字。',
+                },
+
+                { key: 'home.eventsEyebrow', label: '「活动日历」小标题', type: 'text' },
+                { key: 'home.eventsTitle', label: '「活动日历」标题', type: 'text' },
+
+                { key: 'home.membershipEyebrow', label: '「会员」小标题', type: 'text' },
+                { key: 'home.membershipTitle', label: '「会员」标题', type: 'text' },
+                { key: 'home.membershipLead', label: '「会员」引言', type: 'textarea', wide: true },
+
+                { key: 'home.whyJoinEyebrow', label: '「为什么加入」小标题', type: 'text' },
+                { key: 'home.whyJoinTitle', label: '「为什么加入」标题', type: 'text' },
+                {
+                  key: 'home.whyJoinNote',
+                  label: '「为什么加入」底部一行小字',
+                  type: 'textarea',
+                  wide: true,
+                  hint: '可写 {name}、{socialLine}、{wechat}，构建时会自动替换成品牌名、平台名单和微信号。',
+                },
+              ],
+            },
+            {
+              title: '品牌',
+              fields: [
+                { key: 'site.name', label: '品牌名', type: 'text' },
+                { key: 'site.nameZh', label: '中文名', type: 'text' },
+                { key: 'site.legalName', label: '法定名称', type: 'text' },
+                { key: 'site.wechat', label: '微信号', type: 'text' },
+                { key: 'site.tagline', label: '一句话简介', type: 'textarea', wide: true },
+                { key: 'site.description', label: 'SEO 描述', type: 'textarea', wide: true },
+                { key: 'site.intro', label: '社群介绍（正文）', type: 'textarea', wide: true },
+                {
+                  key: 'site.keywords',
+                  label: '关键词，一行一个',
+                  type: 'list',
+                  wide: true,
+                  hint:
+                    '默认来自代码里写好的一组词。一行一个关键词：改某一行就是修改，删掉某一行就是删除，在最后补一行就是新增。' +
+                    '这些词只用于页面 <meta name="keywords">，不影响页面可见内容。',
+                },
+              ],
+            },
+            {
+              title: '条款与条目',
+              fields: [
+                { key: 'refundTerms', label: '退款条款', type: 'textarea', wide: true },
+                { key: 'whyJoin', label: '为什么加入，一行一条', type: 'list', wide: true },
+                { key: 'rules', label: '社群规则，一行一条', type: 'list', wide: true },
+                { key: 'orgMethods', label: '活动组织方式，一行一条', type: 'list', wide: true },
+                {
+                  key: 'eventCategories',
+                  label: '活动分类，一行一个',
+                  type: 'list',
+                  wide: true,
+                  hint:
+                    '活动列表页的分类筛选按钮、以及活动编辑页「分类」的可点选项都来自这里。' +
+                    '一行一个：改行＝改名，删行＝删除该分类，补一行＝新增分类。' +
+                    '已经有活动在用的分类被删掉后，那些活动仍然保留原分类，只是筛选栏不再显示它。',
+                },
+                {
+                  key: 'eventCadences',
+                  label: '活动频率，一行一个',
+                  type: 'list',
+                  wide: true,
+                  hint:
+                    '活动编辑页「频率」的下拉与可点选项来自这里。频率是自由文本（可填“每周三”），' +
+                    '这里是常用项。一行一个：改行＝改名，删行＝删除该频率，补一行＝新增。',
+                },
+              ],
+            },
+            {
+              title: '结构化数据（JSON）',
+              fields: [
+                { key: 'nav', label: '导航', type: 'json', wide: true },
+                { key: 'services', label: '四大服务', type: 'json', wide: true },
+              ],
+            },
+            {
+              title: '活动形式（/events/ 页面的十类排序）',
+              fields: [
+                {
+                  key: 'formats',
+                  label: '十类活动形式，改一行就改一处',
+                  type: 'plaintext',
+                  codec: 'formats',
+                  wide: true,
+                  hint:
+                    '这一块决定活动页「The formats we run, ranked」的分组和顺序，也决定这套排序在 FAQ、城市指南、llms.txt 里怎么被复述。' +
+                    '排序不是按"哪个最好玩"，而是按五个维度加权：聊天自然度 × 文化熟悉度 × 重复参加意愿 × 在华独特性 × 独自参加门槛。' +
+                    '越靠前的，越应该在别的地方被反复写。' +
+                    '改 tier 会换分组，改 rank 会换组内顺序；不建议删条目，删了会让已经引用它的页面少一块内容。',
+                },
+              ],
+            },
+          ],
+        },
+        contact: {
+          label: '联系与关注',
+          pageTitle: '联系与关注',
+          single: true,
+          title: () => 'Contact 页面 / Find us',
+          heading: 'Contact 页面文案 + Find us 文案',
+          groups: [
+            {
+              title: 'Contact 页面（/contact/）',
+              fields: [
+                { key: 'eyebrow', label: '小标题', type: 'text' },
+                { key: 'title', label: '主标题 H1', type: 'text' },
+                {
+                  key: 'lead',
+                  label: '开头段落',
+                  type: 'textarea',
+                  wide: true,
+                  hint: '可写 {wechat}，构建时会自动替换成微信号。',
+                },
+                { key: 'waysTitle', label: '「其他找到我们的方式」标题', type: 'text' },
+                { key: 'websiteTitle', label: '官网小标题', type: 'text' },
+                { key: 'socialsTitle', label: '社交账号小标题', type: 'text' },
+                {
+                  key: 'socialsNote',
+                  label: '社交账号说明',
+                  type: 'textarea',
+                  wide: true,
+                  hint: '可写 {name}，会自动替换成品牌名。',
+                },
+                { key: 'askTitle', label: '「告诉我们什么」标题', type: 'text' },
+                { key: 'askItems', label: '告诉我们什么，一行一条', type: 'list', wide: true },
+                { key: 'meetTitle', label: '「我们在哪里聚会」标题', type: 'text' },
+                {
+                  key: 'meetNote',
+                  label: '聚会说明',
+                  type: 'textarea',
+                  wide: true,
+                  hint: '下面的城市名单自动来自城市列表，不用在这里写。',
+                },
+              ],
+            },
+            {
+              title: 'Find us（About 页面 + 全站页脚）',
+              fields: [
+                { key: 'findUsTitle', label: '标题', type: 'text', hint: 'About 页的标题和页脚这一列的标题共用' },
+                {
+                  key: 'findUsText',
+                  label: 'About 页正文',
+                  type: 'textarea',
+                  wide: true,
+                  hint: '可写 {socialLine} 和 {wechat}，会自动替换成当前版本的平台名单和微信号。',
+                },
+                {
+                  key: 'footerFindUs',
+                  label: '页脚第一行',
+                  type: 'textarea',
+                  wide: true,
+                  hint: '可写 {socialLine}。',
+                },
+                { key: 'footerWebsiteLabel', label: '页脚「官网」标签', type: 'text' },
+                { key: 'footerWechatLabel', label: '页脚「微信号」标签', type: 'text' },
+              ],
+            },
+            {
+              title: '微信二维码',
+              fields: [
+                {
+                  key: 'wechatQr',
+                  label: '联系二维码（全站 Join the Crew 弹窗都在用）',
+                  type: 'image',
+                  previewSrc: '/wechat-qr.png',
+                  maxSize: 1200,
+                  wide: true,
+                },
+              ],
+            },
+          ],
+        },
+        cities: {
+          label: '城市',
+          docId: (d) => d.slug,
+          title: (d) => d.name || d.slug,
+          // The identifier comes from the slug field itself, so no separate ID box.
+          idField: 'slug',
+          idNote: '这个字段就是数据标识，也决定 URL 里的城市名。改它等于换一条记录。',
+          fields: [
+            { key: 'slug', label: 'Slug（URL 用）', type: 'text' },
+            { key: 'name', label: '城市名', type: 'text' },
+            { key: 'province', label: '省 / 直辖市', type: 'text' },
+            { key: 'priority', label: '设为重点城市', type: 'boolean' },
+            { key: 'tagline', label: '一句话', type: 'textarea', wide: true },
+            { key: 'blurb', label: '详细介绍', type: 'textarea', wide: true },
+            { key: 'highlights', label: '亮点，一行一条', type: 'list', wide: true },
+            { key: 'livingNote', label: '生活成本提示', type: 'textarea', wide: true },
+          ],
+          blank: () => ({ slug: 'new-city', name: '新城市', province: '', priority: false, tagline: '', blurb: '', highlights: [], livingNote: '' }),
+        },
+        events: {
+          label: '活动',
+          docId: (d) => d.slug,
+          title: (d) => d.title || d.slug,
+          idField: 'slug',
+          idNote: '这个字段就是数据标识。改它等于换一条记录。',
+          fields: [
+            { key: 'slug', label: 'Slug（URL 用）', type: 'text' },
+            { key: 'title', label: '活动名', type: 'text' },
+            {
+              key: 'category',
+              label: '分类',
+              type: 'text',
+              // Chips come from the managed list in 站点内容 plus every value already in use.
+              optionsFrom: 'eventCategories',
+              suggestFrom: 'category',
+              hint: '点下面已有的分类即可选中；也可以自己写一个新的。分类列表在「站点内容 → 活动分类」里增删。',
+            },
+            { key: 'city', label: '城市', type: 'text' },
+            { key: 'cadence', label: '频率', type: 'text', optionsFrom: 'eventCadences', suggestFrom: 'cadence', hint: '点下面已有的频率即可选中；也可以自己写一个（如“每周三”）。频率列表在「站点内容 → 活动频率」里增删。' },
+            { key: 'startDate', label: '开始时间', type: 'datetime-local', hint: '点输入框右侧的日历图标直接选日期和时间' },
+            { key: 'endDate', label: '结束时间', type: 'datetime-local', hint: '同上，需晚于开始时间' },
+            { key: 'venue', label: '地点', type: 'text' },
+            { key: 'price', label: '费用', type: 'text' },
+            { key: 'description', label: '活动介绍', type: 'textarea', wide: true },
+          ],
+          blank: () => ({ slug: 'new-event', title: '新活动', category: 'Social', city: 'Guangzhou', cadence: '', startDate: '', endDate: '', venue: '', price: '', description: '' }),
+        },
+        faq: {
+          label: 'FAQ',
+          docId: (d) => slugify(d.q),
+          title: (d) => d.q,
+          // No slug field of its own: the identifier is generated from the question.
+          idField: null,
+          idPreview: (data) => slugify(data.q) || '（填好问题后自动生成）',
+          fields: [
+            { key: 'category', label: '分类', type: 'text', suggestFrom: 'category', hint: '可以直接选，也可以自己写一个新的' },
+            { key: 'q', label: '问题', type: 'textarea', wide: true },
+            { key: 'a', label: '答案', type: 'textarea', wide: true },
+          ],
+          blank: () => ({ category: 'About GFIC Crew', q: '', a: '' }),
+        },
+        plans: {
+          label: '会员套餐',
+          docId: (d) => d.id,
+          title: (d) => d.name,
+          idField: 'id',
+          idNote: '这个字段就是数据标识。改它等于换一条记录。',
+          fields: [
+            { key: 'id', label: 'ID（英文）', type: 'text' },
+            { key: 'name', label: '套餐名', type: 'text' },
+            { key: 'price', label: '人民币价格', type: 'number' },
+            { key: 'usd', label: '美元价格', type: 'number' },
+            { key: 'unit', label: '计价说明', type: 'text' },
+            { key: 'featured', label: '标为主推', type: 'boolean' },
+            { key: 'summary', label: '简介', type: 'textarea', wide: true },
+            { key: 'includes', label: '包含内容，一行一条', type: 'list', wide: true },
+          ],
+          blank: () => ({ id: 'new-plan', name: '新套餐', price: 0, usd: 0, unit: 'per person · lifetime', featured: false, summary: '', includes: [] }),
+        },
+        guides: {
+          label: '城市指南',
+          docId: (d) => d.slug,
+          title: (d) => d.title || d.slug,
+          idField: 'slug',
+          idNote: '这个字段就是数据标识，也决定指南的 URL。改它等于换一条记录。',
+          fields: [
+            { key: 'slug', label: 'Slug（URL 用）', type: 'text' },
+            { key: 'city', label: '城市名', type: 'text' },
+            { key: 'citySlug', label: '对应城市 Slug', type: 'text', hint: '要和城市列表里的 slug 一致' },
+            { key: 'title', label: '指南标题', type: 'text' },
+            { key: 'headline', label: '页面大标题', type: 'text' },
+            { key: 'updated', label: '更新日期', type: 'date', hint: '点输入框选日期，显示在指南页面顶部' },
+            { key: 'description', label: 'SEO 描述', type: 'textarea', wide: true },
+            { key: 'intro', label: '开篇段落，一行一段', type: 'list', wide: true },
+            { key: 'sections', label: '正文章节', type: 'plaintext', codec: 'sections', wide: true },
+            { key: 'faq', label: '指南 FAQ', type: 'plaintext', codec: 'faq', wide: true },
+          ],
+          blank: () => ({ slug: 'new-guide', city: '', citySlug: '', title: 'New city guide', headline: '', updated: '', description: '', intro: [], sections: [], faq: [] }),
+        },
+      };
+
+      /**
+       * SEO/GEO tools. These are views rather than collections: they hold no documents and
+       * have no editor, so everything the collection machinery owns (search, "new", the save
+       * bar) is switched off while one is open. See openTool().
+       */
+      const TOOLS = {
+        monitor: { label: 'AI 回答监测', title: 'AI 回答监测' },
+      };
+
+      const state = {
+        pw: sessionStorage.getItem(PW_KEY) || '',
+        collection: 'site',
+        // Which SEO/GEO tool is open. When set, the collection machinery is bypassed.
+        tool: null,
+        monitor: null,
+        docs: [],
+        editing: null,
+        busy: false,
+        counts: {},
+        filter: '',
+        // The 站点内容 document. Event categories (and any other shared option lists) live
+        // here, so editors for other collections can offer them as one-click chips.
+        siteData: null,
+      };
+
+      const $ = (id) => document.getElementById(id);
+      const els = {
+        gate: $('gate'), gateForm: $('gate-form'), gatePw: $('gate-pw'), gateGo: $('gate-go'), gateMsg: $('gate-msg'),
+        app: $('app'), side: $('side'), sideTools: $('side-tools'), pane: $('pane'), msg: $('msg'), warn: $('origin-warn'),
+        title: $('title'), search: $('search'), actionbar: $('actionbar'), saveHint: $('save-hint'),
+        progress: $('progress'), modal: $('modal'), modalTitle: $('modal-title'), modalText: $('modal-text'),
+      };
+
+      function show(node, text, kind) {
+        if (!node) return;
+        node.textContent = text || '';
+        node.className = 'msg' + (kind ? ' msg--' + kind : '');
+      }
+      function setProgress(pct) {
+        if (pct === null) { els.progress.classList.add('hidden'); return; }
+        els.progress.classList.remove('hidden');
+        els.progress.firstElementChild.style.width = pct + '%';
+      }
+
+      function confirmDialog(text, title) {
+        return new Promise((resolve) => {
+          els.modalTitle.textContent = title || '确认';
+          els.modalText.textContent = text;
+          els.modal.classList.add('is-open');
+          const done = (v) => {
+            els.modal.classList.remove('is-open');
+            $('modal-ok').onclick = null;
+            $('modal-cancel').onclick = null;
+            resolve(v);
+          };
+          $('modal-ok').onclick = () => done(true);
+          $('modal-cancel').onclick = () => done(false);
+        });
+      }
+
+      function fieldLabel(cfg, key) {
+        const all = (cfg.groups || [{ fields: cfg.fields }]).flatMap((g) => g.fields);
+        const f = all.find((x) => x.key === key);
+        return f ? f.label : key;
+      }
+
+      function getPath(obj, path) {
+        return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
+      }
+      function setPath(obj, path, value) {
+        const keys = path.split('.');
+        const last = keys.pop();
+        let cur = obj;
+        for (const k of keys) {
+          if (cur[k] == null || typeof cur[k] !== 'object') cur[k] = {};
+          cur = cur[k];
+        }
+        cur[last] = value;
+      }
+
+      async function rpc(name, args) {
+        const { data, error } = await db.rpc(name, args);
+        if (error) throw new Error(error.message || '请求失败');
+        return data;
+      }
+      async function list(collection) {
+        return (await rpc('cms_list', { p_password: state.pw, p_collection: collection })) || [];
+      }
+      async function save(collection, docId, data, sortOrder) {
+        await rpc('cms_save', { p_password: state.pw, p_collection: collection, p_doc_id: docId, p_data: data, p_sort_order: sortOrder || 0 });
+      }
+      async function remove(collection, docId) {
+        await rpc('cms_delete', { p_password: state.pw, p_collection: collection, p_doc_id: docId });
+      }
+
+      /* ---------- AI content generation (managed WorkBuddy LLM, keyless) ---------- */
+      // Compliance system prompt — hard guardrails against the four illegal categories we
+      // just purged from the site (visa agency / job placement for foreigners / VPN / illegal work).
+      const AI_SYSTEM = `You are a content editor for GFIC Crew (GFIC歪果社) — an English-language community for expats living in China. Our brand: warm, peer-to-peer, practical and reassuring. We help foreigners actually live day-to-day in China (housing, banking, transport, healthcare, food, social life, and visa/residence-permit facts). We are a community — NOT an agency, NOT a job board, NOT a visa service.
+
+BRAND & POSITIONING
+- Write for newcomers and recent arrivals; assume capable adults who just need clear, local, first-hand guidance.
+- Tone: friendly but concise; no corporate fluff, no hard selling. Say "expats in China" rather than "we" — and use the city from the working context, not a fixed default city.
+- Tie content to real life in China with concrete local specifics (cities, districts, apps, banks, institutions, price ranges) when relevant.
+- When a recent social trend or news item is provided, connect it to everyday expat life in a useful, non-clickbait way.
+
+WHAT WE ACTUALLY ARE — never contradict this, it is the difference between usable and unusable:
+- We run in-person meetups in Guangzhou and Shenzhen ONLY. Every other city is reached through our national online WeChat group; there is nothing in person there. Never write as if we hold events, meetups, chapters or offices in any other city — not as a future plan either.
+- Paid membership is not open yet and everything is free today. Write about membership as something planned, never as something a reader can buy right now.
+- Never name a company, chamber, venue or organisation we have not publicly partnered with.
+- Do not invent our own numbers, dates, partners or events. If a fact about GFIC itself is not in this brief or on the page being edited, do not state it.
+
+GEO — OPTIMIZE FOR GENERATIVE ENGINE CRAWLING (domestic + foreign LLMs)
+- Answer-first: open with a direct, self-contained answer to the implied question, then elaborate.
+- Use explicit named entities (city, district, app, bank, policy, department); disambiguate, avoid vague pronouns.
+- Structure with clear headings, short paragraphs, and "- " bullet lists so facts are extractable and quotable.
+- State verifiable facts; avoid unverifiable superlatives. Keep it machine-readable.
+- Neutral, standard English; minimal emoji, no clickbait, no AI clichés.
+
+STRICT COMPLIANCE RULES — never violate:
+1. Do NOT offer, imply, or advertise visa agency, visa application handling, immigration consultancy, or "we help with your visa". Explain visa/residence-permit rules factually only; never present the community as a visa service.
+2. Do NOT offer job placement, job leads, internships, freelance gigs, or employment referral for foreigners. Never say the community "shares curated openings" or similar.
+3. Do NOT promote, recommend, mention, or link any VPN or tool for circumventing the Great Firewall.
+4. Do NOT advise working on a tourist visa, or doing remote work for a foreign employer without a proper work permit.
+5. Output ONLY the requested content in the exact format requested. No preamble, no commentary.`;
+
+      // temperature 只在「选题建议」时显式抬高：同一个 prompt 多问几次要能拿到不同方向，
+      // 而不是同一句话重来。正文生成/润色不传，保持默认（要稳、要一致）。
+      async function aiStream(messages, onDelta, signal, temperature) {
+        const stream = await cloud.llm.chat.completions.create({
+          stream: true,
+          model: 'auto',
+          messages,
+          ...(temperature == null ? {} : { temperature }),
+        });
+        let buf = '';
+        for await (const chunk of stream) {
+          const d = chunk?.choices?.[0]?.delta?.content;
+          if (d) { buf += d; onDelta(buf); }
+        }
+        return buf;
+      }
+
+      /*
+       * 选题建议为什么要「角度 + 上下文」
+       *
+       * 原来那版 prompt 只写了一句「Based on the editor's recent trends/topics, propose 5 ...」，
+       * 而「趋势」输入框默认是空的 —— 于是每次点下去问的都是同一句话，模型给的自然是同一批建议；
+       * FAQ 页和城市指南页用的甚至是**逐字相同**的 prompt，换个城市也没有任何东西传进去。
+       * 两个修法：
+       *   1. aiContext() 把当前正在编辑的记录（城市 / 已写章节 / 站上已有 FAQ）真正喂进 prompt；
+       *   2. IDEA_ANGLES 每点一次换一个角度，并把已经建议过的内容记下来要求不要重复。
+       */
+
+      // 一轮一个角度。六条建议必须都出自当轮角度，且彼此是同一角度下的不同子话题。
+      // zh 只用于界面上告诉编辑「这批在问什么方向」，进 prompt 的是 en。
+      const IDEA_ANGLES = [
+        { zh: '落地第一周', en: 'first-week logistics — arrival, SIM card, bank account, deposit, what to sort out in the first 7 days' },
+        { zh: '住哪、怎么租', en: 'housing — which districts, what the price tiers really feel like, what to check before signing' },
+        { zh: '钱怎么转', en: 'money — banking apps, transfers, budgets, what everyday things actually cost' },
+        { zh: '吃什么、怎么点', en: 'food — what to eat, when to go, how to order, dietary needs' },
+        { zh: '怎么通勤', en: 'getting around — metro, ride-hailing, shared bikes, intercity trains, which apps' },
+        { zh: '看病', en: 'healthcare — public hospital vs clinic, booking, insurance, pharmacies' },
+        { zh: '怎么交到朋友', en: 'social life — how a newcomer actually makes friends here, and where' },
+        { zh: '一年里什么时候不一样', en: 'seasonal — what changes month to month: weather, holidays, peak travel, closures' },
+        { zh: '上班上学的规矩', en: 'work and study culture — office norms and language expectations (never job leads or visa advice)' },
+        { zh: '带家人、长住', en: 'family and long stays — schools, pets, long-term renting, renewing documents' },
+        { zh: '新手最容易搞错的事', en: 'mistakes and false expectations — what newcomers get wrong about this city' },
+        { zh: '周末去哪', en: 'weekends and day trips — what is within reach and how people get there' },
+      ];
+
+      // 同一「页面 + 记录」上已经用过哪些角度、已经建议过哪些选题。
+      const ideaMemo = new Map();
+      function ideaState(key) {
+        if (!ideaMemo.has(key)) ideaMemo.set(key, { round: 0, seen: [] });
+        return ideaMemo.get(key);
+      }
+      function ideaKeyOf() {
+        const doc = state.editing || {};
+        return [state.collection || '', doc.docId || '(new)'].join('|');
+      }
+
+      // 当前记录能提供的上下文。这部分以前完全没进 prompt，是「换城市也一样」的直接原因。
+      //
+      // ⚠️ 必须读**表单当前值**，不能用 state.editing.data：新增时 data 是空的，
+      // 用户刚在「选择城市」下拉里选了成都、还没点保存，旧数据里什么都没有 ——
+      // 于是上下文为空，模型没有城市可依据（system prompt 里又拿 Guangzhou 当例子），
+      // 结果成都那条也在讲白云机场和天河。这个坑实测踩到过。
+      function formDataNow() {
+        try {
+          const form = collectFormData();
+          if (form && form.data) return form.data;
+        } catch {
+          /* 表单还没渲染完整时，回落到原始数据 */
+        }
+        return (state.editing && state.editing.data) || {};
+      }
+
+      function aiContext() {
+        const doc = state.editing || {};
+        const data = formDataNow();
+        const lines = [];
+
+        if (state.collection === 'guides') {
+          const city = String(data.city || '').trim();
+          const citySlug = String(data.citySlug || '').trim();
+          const title = String(data.title || '').trim();
+          if (city) lines.push(`The guide being edited is for this city: ${city}${citySlug ? ' (' + citySlug + ')' : ''}. Everything must be specific to ${city}, not to China in general.`);
+          if (title) lines.push(`Its current page title is: "${title}".`);
+          const secs = (Array.isArray(data.sections) ? data.sections : [])
+            .map((s) => (s && s.title ? String(s.title).trim() : ''))
+            .filter(Boolean);
+          if (secs.length) lines.push(`Sections it already has, so do NOT propose them again: ${secs.join(' | ')}.`);
+          const faqN = (Array.isArray(data.faq) ? data.faq : []).filter((f) => f && f.q).length;
+          if (faqN) lines.push(`It already carries ${faqN} city-specific Q&As.`);
+        }
+
+        if (state.collection === 'faq') {
+          const qs = state.docs
+            .filter((d) => d.docId !== doc.docId)
+            .map((d) => (d.data && d.data.q ? String(d.data.q).trim() : ''))
+            .filter(Boolean);
+          if (qs.length) {
+            lines.push(`The site already publishes ${qs.length} FAQ questions. Do NOT repeat any of these, not even rephrased — a few of them to show the level of specificity we are after:`);
+            lines.push(qs.slice(0, 20).map((q) => '- ' + q).join('\n'));
+          }
+        }
+
+        return lines.length ? '\n\nWORKING CONTEXT — read from the page being edited right now, use it:\n' + lines.join('\n') : '';
+      }
+
+      // Attach the "✨ AI 助手" button to the FAQ answer field and the two guide codecs.
+      function maybeAddAiButton(wrap, control, field) {
+        const col = state.collection;
+        let mode = null;
+        if (field.type === 'plaintext' && field.codec === 'faq') mode = 'faq-block';
+        else if (field.type === 'plaintext' && field.codec === 'sections') mode = 'sections';
+        else if (col === 'faq' && field.key === 'a') mode = 'answer';
+        if (!mode) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn--ai btn--sm';
+        btn.textContent = '✨ AI 助手';
+        btn.addEventListener('click', () => openAiPanel(wrap, control, mode));
+        wrap.appendChild(btn);
+      }
+
+      function openAiPanel(wrap, control, mode) {
+        const existing = wrap.querySelector('.ai-panel');
+        if (existing) { existing.remove(); return; }
+        const panel = document.createElement('div');
+        panel.className = 'ai-panel';
+
+        const trends = document.createElement('textarea');
+        trends.className = 'ai-trends';
+        trends.rows = 2;
+        trends.placeholder = '近期热点 / 社媒话题 / 新闻 / 想借势的选题（可选，生成和选题都会参考）';
+        panel.appendChild(trends);
+
+        const row = document.createElement('div');
+        row.className = 'ai-row';
+        const topic = document.createElement('input');
+        const needTopic = (mode === 'faq-block' || mode === 'sections');
+        topic.placeholder = needTopic ? '输入主题 / 章节标题（生成时用）' : '生成时将使用上方「问题」作为主题';
+        topic.disabled = !needTopic;
+        row.appendChild(topic);
+
+        const gen = document.createElement('button');
+        gen.type = 'button'; gen.className = 'btn btn--primary btn--sm'; gen.textContent = '生成';
+        const imp = document.createElement('button');
+        imp.type = 'button'; imp.className = 'btn btn--ghost btn--sm'; imp.textContent = '润色/扩写';
+        const idea = document.createElement('button');
+        idea.type = 'button'; idea.className = 'btn btn--ghost btn--sm'; idea.textContent = '💡 选题建议';
+        const close = document.createElement('button');
+        close.type = 'button'; close.className = 'btn btn--ghost btn--sm'; close.textContent = '关闭';
+        row.append(gen, imp, idea, close);
+        panel.appendChild(row);
+
+        const status = document.createElement('div');
+        status.className = 'ai-status';
+        panel.appendChild(status);
+
+        const out = document.createElement('div');
+        out.className = 'ai-out';
+        out.style.display = 'none';
+        panel.appendChild(out);
+
+        const note = document.createElement('div');
+        note.className = 'ai-note';
+        note.textContent =
+          '选题建议会先读你正在编辑的这一条 —— 城市、已经写过的章节、站上已有的 FAQ —— 然后每点一次换一个角度，' +
+          '并且不会重复前面给过的建议；上方填了热点 / 新闻也会一并参考。' +
+          '生成与润色同样带着这些上下文，并受合规护栏与「广深线下、其余城市只在线上群」这两条事实约束。' +
+          '结果仅为草稿，请人工审核后再保存。';
+        panel.appendChild(note);
+
+        wrap.appendChild(panel);
+        close.addEventListener('click', () => panel.remove());
+
+        let abort = null;
+        // 这一面板对应的「角度轮换 + 已建议过」记录。按收藏在 Map 里，关闭面板再打开还在。
+        const memo = ideaState(ideaKeyOf());
+        const setBusy = (on, who) => {
+          gen.disabled = on; imp.disabled = on; idea.disabled = on;
+          if (who === 'gen') gen.textContent = on ? '生成中…' : '生成';
+          if (who === 'imp') imp.textContent = on ? '润色中…' : '润色/扩写';
+          if (who === 'idea') idea.textContent = on ? '思考中…' : memo.round > 0 ? '💡 换一批建议' : '💡 选题建议';
+        };
+
+        gen.addEventListener('click', async () => {
+          const t = topic.value.trim();
+          if (needTopic && !t) { status.textContent = '请先输入主题 / 章节标题。'; return; }
+          if (mode === 'answer') {
+            const qEl = els.pane.querySelector('[data-key="q"]');
+            if (!qEl || !qEl.value.trim()) { status.textContent = '请先在上方「问题」框填写主题。'; return; }
+          }
+          abort = new AbortController();
+          setBusy(true, 'gen'); status.textContent = '生成中…'; out.style.display = 'none';
+          const append = (mode === 'faq-block' || mode === 'sections');
+          const prefix = append ? (control.value.trim() ? control.value.trim() + '\n\n' : '') : '';
+          try {
+            const text = await aiStream(buildAiMessages(mode, 'gen', t, control.value, trends.value.trim()), (buf) => {
+              control.value = prefix + buf;
+            }, abort.signal);
+            control.value = (append ? prefix : '') + text.trim();
+            status.textContent = '已生成（草稿，请检查后保存）。';
+          } catch (e) {
+            status.textContent = '生成失败：' + (e?.message || e);
+          } finally { setBusy(false, 'gen'); }
+        });
+
+        imp.addEventListener('click', async () => {
+          const cur = control.value.trim();
+          if (!cur) { status.textContent = '文本框是空的，没有可润色的内容。'; return; }
+          abort = new AbortController();
+          setBusy(true, 'imp'); status.textContent = '润色中…'; out.style.display = 'none';
+          try {
+            const text = await aiStream(buildAiMessages(mode, 'imp', topic.value.trim(), cur, trends.value.trim()), (buf) => {
+              control.value = buf;
+            }, abort.signal);
+            control.value = text.trim();
+            status.textContent = '已润色（草稿，请检查后保存）。';
+          } catch (e) {
+            status.textContent = '润色失败：' + (e?.message || e);
+          } finally { setBusy(false, 'imp'); }
+        });
+
+        idea.addEventListener('click', async () => {
+          // 每次点击前进一格角度：连点两次拿到的是两个不同方向，不是同一句话重来。
+          const angle = IDEA_ANGLES[memo.round % IDEA_ANGLES.length];
+          const angleName = angle.zh;
+          memo.round += 1;
+          abort = new AbortController();
+          setBusy(true, 'idea');
+          status.textContent = `第 ${memo.round} 批 · 本轮角度：${angleName}`;
+          out.style.display = 'block'; out.textContent = '';
+          try {
+            const text = await aiStream(
+              buildAiMessages(mode, 'topic', topic.value.trim(), control.value, trends.value.trim(), {
+                angle,
+                seen: memo.seen,
+              }),
+              (buf) => { out.textContent = buf; },
+              abort.signal,
+              1.0,
+            );
+            out.textContent = text.trim();
+            // 记下这一批，下一批会明确要求「不要与这些重复」。
+            text
+              .split('\n')
+              .map((s) => s.replace(/^\s*\d+\s*[.、)]\s*/, '').trim())
+              .filter(Boolean)
+              .forEach((s) => memo.seen.push(s));
+            if (memo.seen.length > 60) memo.seen.splice(0, memo.seen.length - 60);
+            status.textContent = `第 ${memo.round} 批已生成（角度：${angleName}）。挑一个填到「主题」再点「生成」；再点一次会换角度。`;
+          } catch (e) {
+            memo.round -= 1;
+            status.textContent = '选题失败：' + (e?.message || e);
+          } finally { setBusy(false, 'idea'); }
+        });
+      }
+
+      function buildAiMessages(mode, action, topic, current, trends, idea) {
+        const ctx = aiContext();
+        // 选题建议：每轮换一个角度，并把已经建议过的明确列出来，避免「换个说法再来一遍」。
+        const ideaPrompt = (what) => {
+          const angle = (idea && idea.angle) || IDEA_ANGLES[0];
+          const avoid = idea && idea.seen && idea.seen.length
+            ? `\n\nALREADY SUGGESTED ON THIS PAGE — do NOT repeat or rephrase any of these:\n${idea.seen.slice(-24).map((s) => '- ' + s).join('\n')}`
+            : '';
+          const aim = what === 'sections' ? 'guide section topics, each with a one-line angle' : 'FAQ questions';
+          return `Propose 6 ${aim} for GFIC Crew that a foreigner actually living in China would search for.
+
+THIS ROUND'S ANGLE — all six must belong to this angle family, and each must be a distinct sub-topic inside it, not six rewordings of one idea:
+${angle.en}${ctx}${trendCtx}${avoid}
+
+Rules for every item:
+- Be specific and local: name a city or district, an app, a document, a season or a price bracket. An item that could apply to any country is a failure.
+- GEO-friendly: phrased the way someone would type it into a search box or an AI assistant.
+- Compliant: no visa agency, no job placement, no VPN, no working illegally.
+${what === 'sections' ? '- One line per item: the section title, then " — " and the angle it takes.\n' : ''}- Output a numbered list only. No preamble, no reasoning, no closing note.`;
+        };
+        const trendCtx = trends && trends.trim()
+          ? `\n\nEDITOR CONTEXT — recent trends / news / social topics the editor wants this tied to (use only if genuinely relevant and keep compliant):\n${trends.trim()}`
+          : '';
+        let user;
+        if (mode === 'faq-block') {
+          if (action === 'gen') {
+            user = `Write ONE FAQ entry about: "${topic}". Output exactly this format (nothing else):
+Q: <a clear question an expat might ask>
+A: <a concise, factual, helpful answer — lead with the direct answer, then elaborate; name concrete local specifics>
+The answer must be neutral everyday-life guidance only.${trendCtx}`;
+          } else if (action === 'topic') {
+            user = ideaPrompt('faq');
+          } else {
+            user = `Improve the following FAQ entry: keep the question, rewrite the answer to be clearer, more natural, concise and answer-first. Keep the "Q: ... / A: ..." format.
+${current}${ctx}${trendCtx}`;
+          }
+        } else if (mode === 'sections') {
+          if (action === 'gen') {
+            user = `Write ONE guide section titled "${topic}". Output exactly this format (nothing else):
+## ${topic}
+<paragraph 1 — lead with the direct point>
+
+<paragraph 2, if useful>
+- <bullet point if useful>
+Use plain paragraphs separated by blank lines; "- " for bullet lists. Neutral, factual expat-life content. Name concrete local specifics — districts, apps, documents, institutions — and stay inside the city named in the working context below.${ctx}${trendCtx}`;
+          } else if (action === 'topic') {
+            user = ideaPrompt('sections');
+          } else {
+            user = `Improve the following guide section: keep the "## Title" heading, rewrite/expand the paragraphs and bullets to be clearer, answer-first and more useful. Keep the "## Title / paragraphs / - bullets" format.
+${current}${ctx}${trendCtx}`;
+          }
+        } else {
+          const qEl = els.pane.querySelector('[data-key="q"]');
+          const q = qEl ? qEl.value.trim() : '';
+          if (action === 'gen') {
+            user = `Write a concise, factual, helpful answer to this FAQ question: "${q || topic}". Lead with the direct answer, then elaborate; name concrete local specifics. Plain English, no preamble.${ctx}${trendCtx}`;
+          } else if (action === 'topic') {
+            user = ideaPrompt('faq');
+          } else {
+            user = `Rewrite the following answer to be clearer, more natural, concise and answer-first. Keep it factual and neutral. Question: "${q}". Current answer:
+${current}${ctx}${trendCtx}`;
+          }
+        }
+        return [{ role: 'system', content: AI_SYSTEM }, { role: 'user', content: user }];
+      }
+
+      /* ---------- AI answer monitoring (GEO) ---------- */
+
+      /**
+       * Asks a model the questions real expats ask, then checks whether GFIC Crew comes up
+       * on its own. The value is in the trend across runs, not in any single number.
+       *
+       * What this does NOT measure: ChatGPT, Perplexity, Gemini or Doubao. Each of those
+       * answers from its own retrieval stack, and testing them needs accounts and API quota
+       * this page does not have. This uses the managed model behind the admin, so read it as
+       * an in-house baseline — "asked plainly, does a model think of us at all".
+       *
+       * The answer pass is never told who we are. Mention GFIC in the prompt and the result
+       * means nothing, so it gets the bare question and nothing else.
+       */
+      const MONITOR_COLLECTION = 'monitor';
+      const MONITOR_PROBES_ID = 'probes';
+      const MONITOR_KEEP = 20;
+      const MONITOR_ROTATION_ID = 'rotation';
+
+      /**
+       * 题库（`probe-bank.js`，随 seed 下发）与「本轮跑哪些」是两回事。
+       *
+       * 题库有 141 条，按 10 个分类整理，去重后剔掉了签证、职介这类我们不会去补内容的问法。
+       * 但一轮不可能跑 141 条：托管模型首字延迟 40–170 秒，8 路并发实测只有 2.2 倍加速，
+       * 141 条要排 18 波，远超一轮能接受的长度，浏览器还不能关。
+       *
+       * 更麻烦的是，题一多，那个「普通问题提及率」的百分比就失去意义 —— 它是各个分类的
+       * 平均值，我们天然不强的分类会长期把它压在低位，真正有进步的分类反而看不出来。
+       *
+       * 所以拆成两档：
+       *   core   —— 每轮必跑，固定不变。趋势线只看这一组，永远可比。
+       *   rotate —— 按分类轮换抽样，覆盖长尾，单个分类六轮左右能过完一遍（配额见下面的
+       *             ROUNDS_TO_COVER，改了那个常量就得同步改这句话）。
+       *
+       * 结果：core 11 条必跑 + rotate 按分类大小配额抽 26 条（10 类）= 一轮 37 题；
+       * 报告里再按分类分别统计提及率，哪个分类是 0 一眼看得出来。
+       */
+      const BANK = (SEED.probeBank || []).slice();
+      const CATEGORY_LABELS = new Map((SEED.probeCategories || []).map((c) => [c.id, c.label]));
+      const catLabel = (id) => CATEGORY_LABELS.get(id) || id || '未分类';
+
+      /** 把题库条目转成运行时探针对象。 */
+      function bankToProbe(p) {
+        return {
+          id: p.id,
+          kind: p.kind === 'brand' ? 'brand' : 'discovery',
+          q: p.q,
+          cat: p.cat || '',
+          tier: p.tier === 'core' ? 'core' : 'rotate',
+        };
+      }
+
+      const DEFAULT_PROBES = BANK.filter((p) => p.tier === 'core').map(bankToProbe);
+      const ROTATE_POOL = BANK.filter((p) => p.tier === 'rotate');
+
+      /**
+       * 从每个分类里抽若干条 rotate 题。
+       *
+       * 分类大小差很多（小的 4 条、大的 26 条），固定"每分类抽 1 条"会让大分类要 26 轮
+       * 才过完一遍。所以按大小配额：小分类 1 条，大分类多抽。
+       * 配额 = ceil(该分类题数 / ROUNDS_TO_COVER)，即"希望在这么多轮内过完这一分类"。
+       *
+       * 抽样仍用「分类内序号 + 轮次」取模，保证轮轮不重样、且不需要额外存游标。
+       */
+      const ROUNDS_TO_COVER = 6;
+
+      function rotationQuota(size) {
+        return Math.max(1, Math.ceil(size / ROUNDS_TO_COVER));
+      }
+
+      function pickRotation(round, perCat) {
+        const byCat = new Map();
+        for (const p of ROTATE_POOL) {
+          if (!byCat.has(p.cat)) byCat.set(p.cat, []);
+          byCat.get(p.cat).push(p);
+        }
+        const picked = [];
+        for (const [cat, items] of byCat) {
+          const n = Math.min(perCat && perCat > 0 ? perCat : rotationQuota(items.length), items.length);
+          // 步长取 n，让每轮各占一段互不重叠的区间；走完一圈再从头来。
+          // 若按 +1 递增（round%len + k），相邻两轮会大面积重叠，整池要几十轮才走完。
+          const base = (round * n) % items.length;
+          for (let k = 0; k < n; k += 1) {
+            picked.push(bankToProbe(items[(base + k) % items.length]));
+          }
+        }
+        // 避免和 core 撞题（core 不在 rotate 池里，这里只是保险）。
+        const coreQ = new Set(DEFAULT_PROBES.map((p) => p.q));
+        return picked.filter((p) => !coreQ.has(p.q));
+      }
+
+      const PROBE_SYSTEM = `You are a helpful assistant. Someone has asked you the question below about living in China.
+Answer the way you normally would: useful, specific and honest, in under 120 words.
+Name concrete communities, organizations, apps or resources when they are genuinely relevant — real names only. Never invent a name.`;
+
+      /**
+       * Detection is deliberately deterministic — no second model call to "judge" the first.
+       *
+       * A judge call would cost another 1–3 minutes of first-token latency, and it would make
+       * the numbers move whenever the model's mood changed. Counting fixed spellings against a
+       * fixed watchlist keeps every run comparable, which is the whole point of a trend line.
+       */
+      const BRAND_RE = /GFIC\s*Crew|GFIC歪果社|\bGFIC\b|歪果社/i;
+
+      const WATCHLIST = [
+        { name: 'InterNations', re: /internations/i },
+        { name: 'Meetup', re: /\bmeetup\b/i },
+        { name: "That's Guangzhou", re: /that'?s\s*guangzhou/i },
+        { name: 'GZStuff', re: /gzstuff/i },
+        { name: 'expat.com', re: /expat\.com/i },
+        { name: 'Couchsurfing', re: /couchsurfing/i },
+        { name: 'Bumble BFF', re: /bumble\s*bff/i },
+        { name: 'Facebook groups', re: /facebook/i },
+        { name: 'Reddit', re: /\breddit\b|\br\/[a-z0-9_]+/i },
+        { name: 'Quora', re: /\bquora\b/i },
+        { name: 'Xiaohongshu / 小红书', re: /xiaohongshu|小红书|red\s?note/i },
+        { name: 'Time Out', re: /time\s*out/i },
+        { name: 'City Weekend', re: /city\s*weekend/i },
+        { name: 'WeChat groups', re: /wechat\s*(group|community|account)|微信群|微信公众号/i },
+      ];
+
+      /**
+       * Brand probes cannot use the same test as discovery probes. When the question already
+       * contains "GFIC Crew", the model echoing the name back proves nothing. The first live
+       * run scored a confident "GFIC = Grace Family International Church, an English-speaking
+       * international church" as a hit; the second scored a hybrid of that same church plus
+       * our own city, as a hit again.
+       *
+       * Two defects were behind both, and both are fixed here.
+       *
+       * 1. **Generic words were worth as much as our own facts.** `expat`, `Guangzhou`,
+       *    `community` are true of a thousand organisations, so a fluent-sounding
+       *    hallucination about "an expat social community in Guangzhou" banked three points
+       *    for free and cleared the old `facts >= 3` bar. Scoring is now split: a fact is
+       *    either **strong** (something only we publish — our Chinese name, our WeChat
+       *    handle, our prices) or **generic** (true of everyone). Generic words alone can
+       *    never add up to knowledge again.
+       * 2. **"Answered about a different organisation" was not a category.** Guangzhou really
+       *    does have a `GICF` (Guangzhou International Christian Fellowship) and a
+       *    `Grace Family International Church` — one letter away from our abbreviation. That
+       *    deserves its own verdict, with the mistaken organisation named in the report, so
+       *    the next reader sees *who* we were confused with instead of a bare "wrong".
+       */
+      const CN_CITIES = [
+        'Guangzhou', 'Shanghai', 'Beijing', 'Shenzhen', 'Chengdu', 'Hangzhou', 'Chongqing',
+        'Suzhou', 'Qingdao', 'Xi’an', "Xi'an", 'Tianjin', 'Xiamen', 'Guilin', 'Yunnan',
+        'Kunming', 'Dali', 'Lijiang', '广州', '上海', '北京', '深圳', '成都', '杭州', '重庆',
+        '苏州', '青岛', '西安', '天津', '厦门', '桂林', '云南', '昆明', '大理', '丽江',
+      ];
+      const countCities = (t) => [...new Set(CN_CITIES.filter((c) => t.includes(c)))].length;
+
+      // Only we publish these. One hit is real recall of our entity, not a good guess.
+      const BRAND_STRONG = [
+        { label: '中文名「歪果社」', test: (t) => /歪果社/.test(t) },
+        { label: '微信 DN8117', test: (t) => /\bDN8117\b/i.test(t) },
+        { label: '会员价格 RMB/¥288·688·2888', test: (t) => /(RMB|¥|￥)\s*(288|688|2888)\b/i.test(t) },
+        { label: '终身会员 lifetime', test: (t) => /\blifetime\b/i.test(t) },
+        // A hallucinated church will name Guangzhou; it will not reel off five of our cities.
+        { label: '服务城市 ≥5 座', test: (t) => countCities(t) >= 5 },
+      ];
+
+      // True of hundreds of organisations. Kept as context, never as proof.
+      const BRAND_GENERIC = [
+        { label: 'expat', re: /\bexpat/i },
+        { label: '外国人 / foreigner', re: /foreigner|外国人|老外|在华/ },
+        { label: '广州 / Guangzhou', re: /广州|Guangzhou/i },
+        { label: '社群 / community', re: /社群|community|social/i },
+        { label: '会员 / membership', re: /会员|membership/i },
+        { label: '活动 / events', re: /活动|events|meetup/i },
+      ];
+
+      // Other real organisations with a similar name. Naming the wrong one is far more
+      // actionable than "答偏了" — it tells you what the model actually retrieved.
+      // `named` entries are specific enough to be decisive on their own; the vocabulary entries
+      // only count when the answer actually asserts religion (see below).
+      const FOREIGN_ENTITY = [
+        {
+          name: 'Grace Family International Church',
+          re: /grace\s*family/i,
+          named: true,
+          negRe: /(?:\bnot\b|\bisn'?t\b|\bno\b|不是)[^.!?。]{0,30}grace\s*family/i,
+        },
+        {
+          name: 'Guangzhou International Christian Fellowship (GICF)',
+          re: /\bGICF\b/i,
+          named: true,
+          negRe: /(?:\bnot\b|\bisn'?t\b|\bno\b|不是)[^.!?。]{0,30}\bGICF\b/i,
+        },
+        { name: '一个教会 / church', re: /\bchurch\b|教会|教堂/i },
+        { name: '事工机构 / ministry', re: /\bministry\b|事工/i },
+        { name: '礼拜 / worship', re: /\bworship\b|礼拜|敬拜|主日/i },
+        { name: '圣经 / Bible study', re: /\bbible\b|查经|圣经|门徒/i },
+        { name: '牧师 / pastor', re: /\bpastor\b|牧师|传道/i },
+        { name: '团契 / fellowship', re: /\bfellowship\b|团契/i },
+      ];
+
+      // A correct answer may legitimately mention religion ("it is not a church, it's a social
+      // community"). Counting denials instead of testing for one is deliberate: a first attempt
+      // suppressed everything on the first `isn't ... church`, which let a real
+      // "Grace Family International Church" slip through because one later clause happened to
+      // be a caveat. An answer that names a church four times and disclaims it once is still
+      // an answer about a church.
+      const RELIGIOUS_WORD_RE = /\bchurch\b|\bministry\b|\bworship\b|\breligious\b|\bbible\b|\bpastor\b|\bfellowship\b|\bsermon\b|教会|教堂|宗教|传教|礼拜|敬拜|主日|查经|圣经|门徒|牧师|传道|团契/gi;
+      const NOT_RELIGIOUS_RE = /(?:\bnot\b|\bisn'?t\b|\bno\b|\bnever\b)[^.!?]{0,40}?(?:church|ministry|worship|religious|bible|pastor|fellowship)|不是[^。！？]{0,12}(?:教会|教堂|宗教)|非(?:教会|宗教)/gi;
+
+      // "通常是…" / "likely" / "almost certainly" / "based on the acronym" all mean the model
+      // is inferring from the letters, not recalling a fact. That is not knowledge.
+      const HEDGE_RE =
+        /通常是|通常指|一般来说|应该是一个|可能是|可能是一个|大概|大致|推测|不确定|无法确认|据我所知|不是很有名|没有公开|未找到|我不确定|我的知识|not\s+sure|likely|probably|typically|generally\s+refers|almost\s+certainly|arguably|roughly|appears?\s+to\s+be|seems?\s+to\s+be|as\s+far\s+as\s+I\s+know|based\s+on\s+the\s+acronym|check\s+the\s+acronym|\bnames?\s+var|if\s+your\s+reference|I\s+do\s?n'?t\s+have|no\s+information|couldn'?t\s+find|not\s+familiar|as\s+of\s+my\s+knowledge|unclear|is\s+not\s+widely/i;
+
+      // Deterministic check, no model involved: are the load-bearing facts machine-readable
+      // in the first place? An engine cannot quote a fact that is not published in text.
+      const SELF_CHECKS = [
+        { label: '英文品牌名出现在全文', test: (t) => /GFIC Crew/.test(t) },
+        { label: '中文品牌名出现', test: (t) => t.includes('歪果社') },
+        { label: '列明服务城市', test: (t) => /Guangzhou/.test(t) && /Shanghai/.test(t) && /Shenzhen/.test(t) },
+        { label: '写明会员价格', test: (t) => /RMB\s*\d/.test(t) },
+        { label: '含微信联系方式', test: (t) => /\bDN8117\b/.test(t) },
+        { label: '含成对的问答', test: (t) => /^Q: /m.test(t) && /^A: /m.test(t) },
+        { label: '声明与镜像站的关系', test: (t) => /mirror is https:\/\//.test(t) },
+      ];
+
+      function monEl(tag, cls, text) {
+        const el = document.createElement(tag);
+        if (cls) el.className = cls;
+        if (text !== undefined && text !== null) el.textContent = String(text);
+        return el;
+      }
+
+      function monCard(title) {
+        const card = monEl('div', 'card');
+        const head = monEl('div', 'card-title');
+        head.appendChild(monEl('span', null, title));
+        card.appendChild(head);
+        return card;
+      }
+
+      function statCard(big, label, sub) {
+        const el = monEl('div', 'mon-stat');
+        el.appendChild(monEl('b', null, big));
+        el.appendChild(monEl('span', null, label));
+        if (sub) el.appendChild(monEl('em', null, sub));
+        return el;
+      }
+
+      async function llmOnce(messages) {
+        const stream = await cloud.llm.chat.completions.create({ stream: true, model: 'auto', messages });
+        let buf = '';
+        for await (const chunk of stream) {
+          const d = chunk?.choices?.[0]?.delta?.content;
+          if (d) buf += d;
+        }
+        return buf;
+      }
+
+      /**
+       * 腾讯云 WAF 会把「同一来源、短时间、同一接口的大量 POST」当成 CC 攻击拦掉，
+       * 返回一页 403 HTML。SDK 的 `if (!response.ok)` 直接把响应体当 error.message 抛出，
+       * 而它的重试白名单是 `RETRYABLE_STATUS_CODES = [520, 503]` 且 `RETRYABLE_METHODS`
+       * 只收 GET/HEAD/OPTIONS —— **LLM 走的是 POST，403 又不在名单里，所以一次都不会重试**，
+       * 整页 HTML 就直接糊到界面上了。
+       *
+       * 这里用「响应体是不是 HTML」来认它（比抠状态码稳：WAF 页、网关错误页都会被这条捞住），
+       * 认出来就退避重试，而不是把 HTML 当答案或当错误抛出去。
+       */
+      function isWafOrHtmlError(err) {
+        const s = String((err && (err.message || err)) || '');
+        return /<!DOCTYPE|<html|WAF拦截|您的请求已中断|CloudStudio Gateway|Request blocked/i.test(s);
+      }
+
+      const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+      /** 带退避重试的单次探针调用。WAF 拦截退避后重试，其余错误原样抛。 */
+      async function llmWithRetry(messages, { onRetry } = {}) {
+        const MAX_TRIES = 4;
+        let last = null;
+        for (let attempt = 1; attempt <= MAX_TRIES; attempt += 1) {
+          try {
+            return await llmOnce(messages);
+          } catch (err) {
+            last = err;
+            if (!isWafOrHtmlError(err) || attempt === MAX_TRIES) throw err;
+            // 指数退避 + 抖动：2s, 5s, 12s 上下。退避是给 WAF 一个"你不是攻击者"的证据。
+            const base = [2000, 5000, 12000][attempt - 1] ?? 12000;
+            const wait = base + Math.floor(Math.random() * 1500);
+            if (onRetry) onRetry(attempt, wait);
+            await sleep(wait);
+          }
+        }
+        throw last;
+      }
+
+      /** 把 SDK 抛出来的原始错误（可能是整页 HTML）压成一句人话。 */
+      function humanError(err) {
+        if (isWafOrHtmlError(err)) {
+          return '请求被站点安全策略（腾讯云 WAF）拦截。通常是短时间内请求太多，把这一轮当成攻击了。建议：把并发调低、隔几分钟再跑，或分批跑。';
+        }
+        return String((err && (err.message || err)) || err);
+      }
+
+      function monitorProbes(raw) {
+        // 排好的本轮探针（云端存过就用自己的，否则回落到 core 全量）。
+        const list = Array.isArray(raw) && raw.length ? raw : DEFAULT_PROBES;
+        const out = list
+          .map((p, i) => ({
+            id: String((p && p.id) || 'p' + (i + 1)),
+            kind: p && p.kind === 'brand' ? 'brand' : 'discovery',
+            q: String((p && p.q) || '').trim(),
+            cat: String((p && p.cat) || ''),
+            tier: p && p.tier === 'rotate' ? 'rotate' : 'core',
+          }))
+          .filter((p) => p.q);
+        return out.length ? out : DEFAULT_PROBES.map((p) => ({ ...p }));
+      }
+
+      /** 当前轮次。首轮 0，每跑完一轮 +1，用于 rotate 抽样错开。 */
+      function currentRound() {
+        return Number(state.monitor && state.monitor.round) || 0;
+      }
+
+      /**
+       * 本轮要跑的题 = core 全部 + rotate 按分类配额抽样。
+       * perCat 传 0 表示用自动配额（分类越大抽越多，见 rotationQuota）。
+       * 用户手改过的探针（编辑器里加/删/改）会被 collectProbes 收进 state，
+       * 这里只在首轮载入、点「换一批轮换题」或「重置为题库首轮」时重建。
+       */
+      function composeRound(round, perCat) {
+        return DEFAULT_PROBES.concat(pickRotation(round, perCat));
+      }
+
+      async function openMonitor() {
+        els.pane.innerHTML = '';
+        setProgress(null);
+        show(els.msg, '载入中…', '');
+
+        const boot = monCard('AI 回答监测');
+        boot.appendChild(monEl('p', 'mon-note', '正在读取历史报告…'));
+        els.pane.appendChild(boot);
+
+        let probes = composeRound(0, 0).map((p) => ({ ...p }));
+        let history = [];
+        let round = 0;
+        try {
+          const rows = await list(MONITOR_COLLECTION);
+          const probeRow = rows.find((r) => r.docId === MONITOR_PROBES_ID);
+          const rotRow = rows.find((r) => r.docId === MONITOR_ROTATION_ID);
+          if (rotRow && rotRow.data) round = Number(rotRow.data.round) || 0;
+          // 云端存过排好的题就用它，否则按题库重新排一轮（首轮 / 首次升级时）。
+          if (probeRow && probeRow.data) probes = monitorProbes(probeRow.data.list);
+          else probes = composeRound(round, 0).map((p) => ({ ...p }));
+          history = rows
+            .filter((r) => r.docId !== MONITOR_PROBES_ID && r.docId !== MONITOR_ROTATION_ID && r.data)
+            .sort((a, b) => String(a.docId).localeCompare(String(b.docId)));
+        } catch (err) {
+          show(els.msg, '读取历史失败：' + (err.message || err), 'err');
+        }
+        state.monitor = { probes, history, running: false, log: '', round };
+        renderMonitor();
+        show(els.msg, '', '');
+      }
+
+      function renderMonitor() {
+        const m = state.monitor;
+        if (!m) return;
+        const pane = els.pane;
+        pane.innerHTML = '';
+        pane.appendChild(monitorControls(m));
+        monitorReportNodes(m).forEach((n) => pane.appendChild(n));
+        if (m.history.length > 1) pane.appendChild(monitorHistory(m));
+        pane.appendChild(monitorSelfCheckCard());
+        pane.appendChild(monitorCaveatCard());
+      }
+
+      function probeRow(p, i) {
+        const row = monEl('div', 'mon-probe');
+        row.dataset.id = p.id;
+        row.dataset.i = String(i);
+        if (p.tier !== 'rotate' && p.cat !== 'brand') row.dataset.tier = 'core';
+        if (p.tier === 'rotate') row.dataset.tier = 'rotate';
+
+        const sel = document.createElement('select');
+        [['discovery', '普通问题'], ['brand', '品牌问题']].forEach(([v, label]) => {
+          const o = document.createElement('option');
+          o.value = v;
+          o.textContent = label;
+          if (p.kind === v) o.selected = true;
+          sel.appendChild(o);
+        });
+
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.value = p.q;
+        inp.placeholder = '例如：Where can I meet other foreigners in Guangzhou?';
+
+        // 分类 + 档位标签：一眼看出这条是固定核心还是本轮轮换，属于哪一类。
+        const tag = monEl('span', 'mon-tag', p.cat === 'brand' ? '品牌' : catLabel(p.cat));
+        tag.title = p.tier === 'rotate' ? '轮换题（每轮换一批）' : '固定核心题（每轮必跑）';
+        if (p.tier === 'rotate') tag.classList.add('mon-tag--rot');
+
+        const del = monEl('button', 'btn btn--ghost btn--sm', '移除');
+        del.type = 'button';
+        del.addEventListener('click', () => {
+          const dropped = collectProbes();
+          state.monitor.probes = state.monitor.probes.filter((x) => x.id !== p.id);
+          if (!state.monitor.probes.length) state.monitor.probes = DEFAULT_PROBES.map((x) => ({ ...x }));
+          renderMonitor();
+          if (dropped) show(els.msg, `已忽略 ${dropped} 条空问题。`, 'warn');
+        });
+        row.append(tag, sel, inp, del);
+        return row;
+      }
+
+      /** Reads the probe editor back into state, dropping blank rows. Returns how many went. */
+      function collectProbes() {
+        const m = state.monitor;
+        if (!m) return 0;
+        const byId = new Map(m.probes.map((p) => [p.id, p]));
+        els.pane.querySelectorAll('#mon-probes .mon-probe').forEach((row) => {
+          const p = byId.get(row.dataset.id);
+          if (!p) return;
+          const sel = row.querySelector('select');
+          const inp = row.querySelector('input');
+          if (sel) p.kind = sel.value === 'brand' ? 'brand' : 'discovery';
+          if (inp) p.q = inp.value.trim();
+        });
+        const before = m.probes.length;
+        m.probes = m.probes.filter((p) => !!p.q);
+        return before - m.probes.length;
+      }
+
+      function monitorControls(m) {
+        const coreN = m.probes.filter((p) => p.tier !== 'rotate').length;
+        const rotN = m.probes.length - coreN;
+        const card = monCard(`本轮探针（${m.probes.length}）`);
+        card.appendChild(
+          monEl(
+            'p',
+            'mon-note',
+            `题库共 ${BANK.length} 条，本轮跑 ${m.probes.length} 条：固定核心 ${coreN} 条 + 分类轮换 ${rotN} 条（分类越大抽越多）。` +
+              `点「开始监测」：每个问题先让模型按平时的样子回答一遍（不告诉它我们是谁），再统一评审有没有提到 GFIC Crew。` +
+              `8 路并发，等的是模型首字延迟（实测 40–170 秒），一轮约 8–12 分钟，走开就行，页面每 10 秒报一次进度。` +
+              `「换一批轮换题」会跳到下一组，不动固定的核心题；约 ${ROUNDS_TO_COVER} 轮过完整个轮换池。`,
+          ),
+        );
+
+        const list = monEl('div');
+        list.id = 'mon-probes';
+        m.probes.forEach((p, i) => list.appendChild(probeRow(p, i)));
+        card.appendChild(list);
+
+        const row = monEl('div', 'mon-actions');
+
+        const run = monEl('button', 'btn btn--primary', '开始监测');
+        run.type = 'button';
+        run.id = 'mon-run';
+        run.disabled = !!m.running;
+        run.addEventListener('click', () => runMonitor());
+
+        const shuffle = monEl('button', 'btn btn--ghost btn--sm', '换一批轮换题');
+        shuffle.type = 'button';
+        shuffle.addEventListener('click', () => {
+          const dropped = collectProbes();
+          const next = (currentRound() + 1) % 997;
+          state.monitor.round = next;
+          state.monitor.probes = composeRound(next, 0).map((p) => ({ ...p }));
+          renderMonitor();
+          show(els.msg, `已换一批轮换题（第 ${next + 1} 组）${dropped ? `，忽略 ${dropped} 条空问题` : ''}。`, 'warn');
+        });
+
+        const add = monEl('button', 'btn btn--ghost btn--sm', '+ 添加问题');
+        add.type = 'button';
+        add.addEventListener('click', () => {
+          const dropped = collectProbes();
+          m.probes.push({ id: 'p' + Date.now().toString(36), kind: 'discovery', q: '' });
+          renderMonitor();
+          const inputs = els.pane.querySelectorAll('#mon-probes input');
+          if (inputs.length) inputs[inputs.length - 1].focus();
+          if (dropped) show(els.msg, `已忽略 ${dropped} 条空问题。`, 'warn');
+        });
+
+        const saveSet = monEl('button', 'btn btn--ghost btn--sm', '保存问题集');
+        saveSet.type = 'button';
+        saveSet.addEventListener('click', async () => {
+          const dropped = collectProbes();
+          saveSet.disabled = true;
+          saveSet.textContent = '保存中…';
+          try {
+            await save(MONITOR_COLLECTION, MONITOR_PROBES_ID, { list: m.probes, updated: new Date().toISOString() }, 0);
+            await save(MONITOR_COLLECTION, MONITOR_ROTATION_ID, { round: currentRound(), updated: new Date().toISOString() }, 0);
+            saveSet.textContent = '已保存';
+            show(els.msg, `本轮题目已存到云端${dropped ? `（忽略 ${dropped} 条空问题）` : ''}。`, 'ok');
+          } catch (err) {
+            saveSet.textContent = '保存失败';
+            show(els.msg, '问题集保存失败：' + (err.message || err), 'err');
+          }
+          setTimeout(() => {
+            saveSet.disabled = false;
+            saveSet.textContent = '保存问题集';
+          }, 1800);
+        });
+
+        const reset = monEl('button', 'btn btn--ghost btn--sm', '重置为题库首轮');
+        reset.type = 'button';
+        reset.addEventListener('click', () => {
+          m.round = 0;
+          m.probes = composeRound(0, 0).map((p) => ({ ...p }));
+          renderMonitor();
+          show(els.msg, '已重置为题库首轮（还没保存到云端）。', 'warn');
+        });
+
+        row.append(run, shuffle, add, saveSet, reset);
+        card.appendChild(row);
+
+        const log = monEl('div', 'mon-log');
+        log.id = 'mon-log';
+        log.textContent = m.log || '尚未运行。';
+        card.appendChild(log);
+        return card;
+      }
+
+      function monitorReportNodes(m) {
+        if (!m.history.length) {
+          const card = monCard('最新报告');
+          card.appendChild(monEl('p', 'mon-note', '还没有报告。点上面的「开始监测」跑一次，之后每次运行都会留一份在这里。'));
+          return [card];
+        }
+        return reportNodes(m.history[m.history.length - 1].data, m.history);
+      }
+
+      function reportNodes(r, history) {
+        const s = r.summary || {};
+        const out = [];
+
+        const ov = monCard('最新报告');
+        const head = monEl('div', 'mon-head');
+        // 大数字只报固定核心题 —— 这才是能跨轮比较的那个。全量数字放副标题里。
+        const coreN = s.coreTotal ?? s.discoveryTotal ?? 0;
+        head.appendChild(
+          statCard(
+            `${s.coreRate ?? s.discoveryRate ?? 0}%`,
+            `核心题提及率 ${s.coreHit ?? s.discoveryHit ?? 0}/${coreN}`,
+            `固定题，跨轮可比。本轮全部普通题（含轮换）为 ${s.discoveryHit ?? 0}/${s.discoveryTotal ?? 0}`,
+          ),
+        );
+        head.appendChild(
+          statCard(
+            `${s.brandRate ?? 0}%`,
+            `品牌问题「真认识」 ${s.brandHit ?? 0}/${s.brandTotal ?? 0}`,
+            s.brandWrong
+              ? `有 ${s.brandWrong} 题答的是同名但不同的东西 —— 这类"假命中"不能算认识`
+              : '直接问「GFIC Crew 是什么」，看它真知道还是在猜',
+          ),
+        );
+        if (history && history.length > 1) {
+          const prev = ((history[history.length - 2].data || {}).summary) || {};
+          const prevRate = prev.coreRate ?? prev.discoveryRate ?? 0;
+          const d = (s.coreRate ?? s.discoveryRate ?? 0) - prevRate;
+          head.appendChild(
+            statCard(`${d > 0 ? '+' : ''}${d}`, '与上次相比（百分点）', d > 0 ? '有进步' : d < 0 ? '退步了' : '没有变化'),
+          );
+        }
+        ov.appendChild(head);
+
+        const meta = [];
+        if (r.at) meta.push('生成时间 ' + new Date(r.at).toLocaleString('zh-CN'));
+        if (r.model) meta.push('模型 ' + r.model);
+        if (s.failed) meta.push(`${s.failed} 题调用失败，未计入比例`);
+        const metaP = monEl('p', 'mon-note', meta.join(' · '));
+        metaP.style.marginTop = '12px';
+        ov.appendChild(metaP);
+        out.push(ov);
+
+        const tb = monCard(`逐题结果（${(r.rows || []).length} 题）`);
+        const table = monEl('table', 'mon-table');
+        const thead = monEl('thead');
+        const htr = monEl('tr');
+        ['问题', '我们', 'AI 更愿意点名的', '原话 / 说明'].forEach((h) => htr.appendChild(monEl('th', null, h)));
+        thead.appendChild(htr);
+        table.appendChild(thead);
+        const tbody = monEl('tbody');
+        for (const row of r.rows || []) {
+          const tr = monEl('tr');
+          tr.appendChild(monEl('td', 'q', (row.kind === 'brand' ? '[品牌] ' : '') + row.q));
+          const cell = monEl('td');
+          // Reports written by an older build have no `status` — fall back rather than throw.
+          const st = row.status || { tone: row.mentioned ? 'part' : 'miss', label: row.mentioned ? '提及' : '未提及' };
+          cell.appendChild(monEl('span', 'mon-tag ' + st.tone, st.label));
+          tr.appendChild(cell);
+          tr.appendChild(monEl('td', 'who', row.alternatives && row.alternatives.length ? row.alternatives.join('、') : '—'));
+          const ev = monEl('td');
+          // Why this row got its verdict. Without it a mis-judgement is invisible and you have
+          // to come back and ask. Brand rows only — discovery rows have no facts to show.
+          if (row.kind === 'brand') {
+            const reason = row.brandEntity
+              ? '被认成：' + row.brandEntity
+              : row.brandFacts && row.brandFacts.length
+                ? '命中我们独有的事实：' + row.brandFacts.join('、')
+                : '命中我们独有的事实：无' +
+                  (row.brandGeneric && row.brandGeneric.length
+                    ? ` —— 只有 ${row.brandGeneric.join('、')} 这类换个机构也成立的词`
+                    : '');
+            const note = monEl('div', 'mon-note', reason);
+            note.style.marginTop = '2px';
+            ev.appendChild(note);
+          }
+          if (row.quote) ev.appendChild(monEl('div', null, '「' + row.quote + '」'));
+          else if (row.error) ev.appendChild(monEl('div', null, row.error));
+          if (row.answer) {
+            const det = document.createElement('details');
+            const sum = document.createElement('summary');
+            sum.textContent = '看完整回答（' + row.chars + ' 字）';
+            det.appendChild(sum);
+            const pre = monEl('div', 'mon-answer', row.answer);
+            det.appendChild(pre);
+            ev.appendChild(det);
+          }
+          if (!ev.childNodes.length) ev.textContent = '—';
+          tr.appendChild(ev);
+          tbody.appendChild(tr);
+        }
+        table.appendChild(tbody);
+        // 手机上这表有 4 列，直接放会把整页撑出横向滚动条 —— 装进可横滑的容器里。
+        const tscroll = monEl('div', 'mon-scroll mon-scroll--wide');
+        tscroll.appendChild(table);
+        tb.appendChild(tscroll);
+
+        // 分类提及率：总数字是平均值，这个才是"哪个入口是 0"的答案。
+        if (Array.isArray(s.byCategory) && s.byCategory.length) {
+          const cb = monCard('按提问分类看提及率');
+          cb.appendChild(
+            monEl(
+              'p',
+              'mon-note',
+              '每个分类只跑了少数几题，看的是「哪一类入口我们完全不存在」，不要拿单题的百分比当结论。提及率低且站内也没有对应内容的分类，就是下一批该写的东西。',
+            ),
+          );
+          const ctable = monEl('table', 'mon-table');
+          const cthead = monEl('thead');
+          const chtr = monEl('tr');
+          ['分类', '提及', '提及率'].forEach((h) => chtr.appendChild(monEl('th', null, h)));
+          cthead.appendChild(chtr);
+          ctable.appendChild(cthead);
+          const ctbody = monEl('tbody');
+          for (const b of s.byCategory) {
+            const tr = monEl('tr');
+            tr.appendChild(monEl('td', 'q', b.label));
+            tr.appendChild(monEl('td', 'who', `${b.hit}/${b.total}`));
+            const td = monEl('td');
+            const tone = b.rate === 0 ? 'miss' : b.rate >= 50 ? 'hit' : 'part';
+            td.appendChild(monEl('span', 'mon-tag ' + tone, `${b.rate}%`));
+            tr.appendChild(td);
+            ctbody.appendChild(tr);
+          }
+          ctable.appendChild(ctbody);
+          const cscroll = monEl('div', 'mon-scroll');
+          cscroll.appendChild(ctable);
+          cb.appendChild(cscroll);
+          out.push(cb);
+        }
+
+        if (Array.isArray(s.alternatives) && s.alternatives.length) {
+          const lead = monEl('p', 'mon-note', 'AI 更愿意点名的替代来源（在几道题里出现过）：');
+          lead.style.marginTop = '16px';
+          tb.appendChild(lead);
+          const chips = monEl('div', 'mon-chips');
+          for (const c of s.alternatives) {
+            const chip = monEl('span', 'mon-chip');
+            chip.appendChild(document.createTextNode(c.name + ' '));
+            chip.appendChild(monEl('b', null, String(c.count)));
+            chips.appendChild(chip);
+          }
+          tb.appendChild(chips);
+        }
+
+        const tools = monEl('div', 'mon-actions');
+        const btn = monEl('button', 'btn btn--ghost btn--sm', '导出 Markdown');
+        btn.type = 'button';
+        btn.addEventListener('click', () => downloadMonitorMarkdown(r));
+        tools.appendChild(btn);
+        tb.appendChild(tools);
+        out.push(tb);
+
+        if (Array.isArray(r.advice) && r.advice.length) {
+          const adv = monCard('下一步建议');
+          const ul = monEl('ul', 'mon-list');
+          r.advice.forEach((a) => ul.appendChild(monEl('li', null, String(a))));
+          adv.appendChild(ul);
+          const prov = monEl('p', 'mon-note', r.adviceBy === 'ai' ? '由模型读完报告后写的。' : '按规则生成的（跑一轮探针就要几分钟，这一步不再额外等模型）。');
+          prov.style.marginTop = '12px';
+          adv.appendChild(prov);
+          const acts = monEl('div', 'mon-actions');
+          const ai = monEl('button', 'btn btn--ghost btn--sm', r.adviceBy === 'ai' ? '重新让 AI 写一版' : '让 AI 写一版更具体的');
+          ai.type = 'button';
+          ai.addEventListener('click', () => {
+            ai.disabled = true;
+            ai.textContent = '生成中…';
+            aiAdviceFor(m.history[m.history.length - 1] && m.history[m.history.length - 1].docId);
+          });
+          acts.appendChild(ai);
+          adv.appendChild(acts);
+          out.push(adv);
+        }
+        return out;
+      }
+
+      function monitorHistory(m) {
+        const card = monCard(`历史趋势（最近 ${m.history.length} 次）`);
+        const bars = monEl('div', 'mon-hist');
+        for (const row of m.history) {
+          const s = (row.data || {}).summary || {};
+          // 柱子一律用核心题比率。旧报告没有 coreRate，回落到全量比率，柱子仍可读。
+          const pct = s.coreRate ?? s.discoveryRate ?? 0;
+          const bar = monEl('div', 'mon-bar');
+          const fill = monEl('i');
+          fill.style.height = Math.max(2, Math.min(100, pct)) + '%';
+          bar.appendChild(fill);
+          bar.title = `${String(row.docId).replace(/^run-/, '').slice(0, 10)} · 核心题提及率 ${pct}%（${s.coreHit ?? s.discoveryHit ?? 0}/${s.coreTotal ?? s.discoveryTotal ?? 0}）`;
+          bars.appendChild(bar);
+        }
+        card.appendChild(bars);
+        card.appendChild(
+          monEl('p', 'mon-note', '每根柱子 = 一次报告里「固定核心题被提及的比例」（跨轮可比），鼠标悬停看具体数字。一直贴底，说明内容还没进入模型答案池。'),
+        );
+        return card;
+      }
+
+      function monitorSelfCheckCard() {
+        const card = monCard('机器可读性体检（/llms-full.txt）');
+        card.appendChild(
+          monEl(
+            'p',
+            'mon-note',
+            '这一项不靠模型：直接读线上的 llms-full.txt，检查关键事实在不在里面。引擎引用我们的前提，是这些事实先能被读到。',
+          ),
+        );
+        const box = monEl('div');
+        box.textContent = '检查中…';
+        card.appendChild(box);
+        selfCheck().then((res) => {
+          box.innerHTML = '';
+          if (!res.ok) {
+            box.appendChild(
+              monEl('p', 'mon-note', `读不到 /llms-full.txt（${res.error}）。这个页面可能不是从已发布的站点打开的。`),
+            );
+            return;
+          }
+          res.checks.forEach((c) => {
+            const line = monEl('div', 'mon-check');
+            line.appendChild(monEl('i', null, c.pass ? '✓' : '✗'));
+            line.appendChild(monEl('span', null, c.label));
+            box.appendChild(line);
+          });
+          const fails = res.checks.filter((c) => !c.pass).length;
+          box.appendChild(
+            monEl(
+              'p',
+              'mon-note',
+              `共 ${res.checks.length} 项，${fails ? fails + ' 项缺失' : '全部通过'}。文件 ${res.size.toLocaleString()} 字符。`,
+            ),
+          );
+        });
+        return card;
+      }
+
+      function monitorCaveatCard() {
+        const card = monCard('这份报告能说明什么、不能说明什么');
+        const ul = monEl('ul', 'mon-list');
+        [
+          '能说明：一个模型被直接提问时，会不会自己想到 GFIC Crew。这是站内基线，用来和不同时间的自己比。',
+          '不能说明：ChatGPT / Perplexity / Gemini / 豆包 的真实回答。它们各有自己的检索与索引，要测需要那些服务的账号和额度。',
+          '所以看趋势，不看单次数字。持续为 0 = 内容还没进入任何模型的答案池；突然跳高，先怀疑是提示词或模型换了。',
+          '跨轮比较只看「固定核心题」那一组 —— 轮换题每轮不一样，总百分比会跟着题目走。分类表同理：每类只跑了少数几题，看的是哪一类是 0，不是精确比例。',
+          '真正拉动这个数字的动作在站外（Reddit / Quora / 媒体报道 / 维基）。站内把内容做扎实只是必要条件，不是充分条件。',
+        ].forEach((t) => ul.appendChild(monEl('li', null, t)));
+        card.appendChild(ul);
+        return card;
+      }
+
+      async function selfCheck() {
+        try {
+          const res = await fetch(new URL('/llms-full.txt', location.origin).href, { cache: 'no-store' });
+          if (!res.ok) return { ok: false, error: 'HTTP ' + res.status, size: 0, checks: [] };
+          const text = await res.text();
+          return { ok: true, size: text.length, checks: SELF_CHECKS.map((c) => ({ label: c.label, pass: c.test(text) })) };
+        } catch (err) {
+          return { ok: false, error: err?.message || String(err), size: 0, checks: [] };
+        }
+      }
+
+      /** The sentence around the mention — the evidence for *why* it named us. */
+      function sentenceAround(text, index) {
+        if (index < 0) return '';
+        const marks = ['.', '\n', '。', '!', '?'];
+        let before = -1;
+        for (const m of marks) before = Math.max(before, text.lastIndexOf(m, index - 1));
+        let after = -1;
+        const tail = text.slice(index);
+        for (const m of marks) {
+          const at = tail.indexOf(m);
+          if (at >= 0 && (after < 0 || at < after)) after = at;
+        }
+        const s = text.slice(before + 1, after < 0 ? text.length : index + after + 1).replace(/\s+/g, ' ').trim();
+        return s.length > 240 ? s.slice(0, 240) + '…' : s;
+      }
+
+      /**
+       * Deterministic scoring. Kept model-free on purpose: a second "judge" call would add
+       * another 1–3 minutes of latency and would make the numbers drift whenever the model
+       * felt differently. Fixed spellings against a fixed watchlist stay comparable.
+       */
+      function analyseAnswers(results) {
+        return results.map((r) => {
+          const answer = r.answer || '';
+          const idx = answer ? answer.search(BRAND_RE) : -1;
+          const mentioned = idx >= 0;
+
+          // Discovery probes: the question never names us, so a hit is a real, unprompted
+          // mention. Brand probes: the question names us, so a hit means nothing on its own.
+          //
+          // Brand verdicts, applied in order. Order matters: being answered about a different
+          // organisation outranks everything — such an answer is fluent and confident, so the
+          // hedge check would miss it and the fact check could be fooled by the words we share.
+          let brand = null;
+          let brandFacts = [];
+          let brandGeneric = [];
+          let brandEntity = '';
+          if (!r.error && r.kind === 'brand') {
+            const strongLabels = BRAND_STRONG.filter((f) => f.test(answer)).map((f) => f.label);
+            const genericLabels = BRAND_GENERIC.filter((f) => f.re.test(answer)).map((f) => f.label);
+            brandGeneric = genericLabels;
+
+            // Naming a specific other organisation is decisive on its own — you do not type
+            // "Grace Family International Church" by accident. The loose religious vocabulary
+            // only counts when it is truly asserted: total mentions minus explicitly denied ones.
+            const namedOrg = FOREIGN_ENTITY.filter(
+              (f) => f.named && f.re.test(answer) && !(f.negRe && f.negRe.test(answer)),
+            );
+            const asserted = (answer.match(RELIGIOUS_WORD_RE) || []).length - (answer.match(NOT_RELIGIOUS_RE) || []).length > 0;
+            const foreign = namedOrg.length
+              ? namedOrg
+              : asserted
+                ? FOREIGN_ENTITY.filter((f) => !f.named && f.re.test(answer))
+                : [];
+
+            brandEntity = foreign.map((f) => f.name).join('、');
+
+            if (foreign.length) brand = 'wrong';
+            else if (strongLabels.length >= 2) brand = 'known';
+            else if (HEDGE_RE.test(answer)) brand = 'guessed';
+            else if (strongLabels.length >= 1 && genericLabels.length >= 2) brand = 'known';
+            else brand = 'wrong';
+
+            // Only the strong ones are listed as evidence when the verdict is "wrong": showing
+            // the generic matches there would reintroduce the illusion that "expat + Guangzhou"
+            // proves anything. When the verdict is "known" the generic words are real context.
+            brandFacts = brand === 'known' ? strongLabels.concat(genericLabels) : strongLabels;
+          }
+
+          const status = r.error
+            ? { tone: 'miss', label: '调用失败' }
+            : r.kind === 'brand'
+              ? brand === 'known'
+                ? { tone: 'hit', label: '真认识' }
+                : brand === 'guessed'
+                  ? { tone: 'part', label: '在猜，不是知识' }
+                  : {
+                      tone: 'miss',
+                      label: brandEntity
+                        ? `答偏了：讲的是「${brandEntity}」`
+                        : '没说出任何我们独有的事实',
+                    }
+              : mentioned
+                ? { tone: idx <= answer.length * 0.34 ? 'hit' : 'part', label: idx <= answer.length * 0.34 ? '提及 · 前段' : '提及 · 中后段' }
+                : { tone: 'miss', label: '未提及' };
+
+          return {
+            id: r.id,
+            kind: r.kind,
+            cat: r.cat || '',
+            tier: r.tier || 'core',
+            q: r.q,
+            error: r.error || null,
+            chars: answer.length,
+            // Answer kept, trimmed: the raw text is the actual evidence, and the label above
+            // is only a heuristic. Without it you cannot tell a real hit from a lucky match.
+            answer: answer.length > 1600 ? answer.slice(0, 1600) + '…' : answer,
+            mentioned,
+            brand,
+            brandFacts,
+            brandGeneric,
+            brandEntity,
+            status,
+            quote: mentioned ? sentenceAround(answer, idx) : '',
+            alternatives: WATCHLIST.filter((w) => w.re.test(answer)).map((w) => w.name),
+          };
+        });
+      }
+
+      function buildReport(rows) {
+        const counted = rows.filter((r) => !r.error);
+        const rate = (arr) => (arr.length ? Math.round((arr.filter((r) => r.mentioned).length / arr.length) * 100) : 0);
+        const discovery = counted.filter((r) => r.kind === 'discovery');
+        const brand = counted.filter((r) => r.kind === 'brand');
+        const brandKnown = brand.filter((r) => r.brand === 'known').length;
+
+        // 跨轮可比的那一组：只算固定核心题。轮换题每轮不同，混进去百分比就跟着题目走。
+        const discoveryCore = discovery.filter((r) => r.tier !== 'rotate');
+
+        const freq = new Map();
+        for (const r of rows) for (const c of r.alternatives) freq.set(c, (freq.get(c) || 0) + 1);
+
+        // 按分类统计提及率。总数字是 10 类的平均，看不出哪个入口是 0；
+        // 分类数字才是"该补哪块内容"的直接依据。
+        const catMap = new Map();
+        for (const r of discovery) {
+          const key = r.cat || 'other';
+          if (!catMap.has(key)) catMap.set(key, { id: key, label: catLabel(key), hit: 0, total: 0 });
+          const bucket = catMap.get(key);
+          bucket.total += 1;
+          if (r.mentioned) bucket.hit += 1;
+        }
+        const byCategory = [...catMap.values()]
+          .map((b) => ({ ...b, rate: b.total ? Math.round((b.hit / b.total) * 100) : 0 }))
+          .sort((a, b) => a.rate - b.rate || a.label.localeCompare(b.label));
+
+        const summary = {
+          discoveryRate: rate(discovery),
+          discoveryHit: discovery.filter((r) => r.mentioned).length,
+          discoveryFront: discovery.filter((r) => r.mentioned && r.status.tone === 'hit').length,
+          discoveryTotal: discovery.length,
+          // 只含固定核心题的比率 —— 趋势线用它。
+          coreRate: rate(discoveryCore),
+          coreHit: discoveryCore.filter((r) => r.mentioned).length,
+          coreTotal: discoveryCore.length,
+          brandRate: brand.length ? Math.round((brandKnown / brand.length) * 100) : 0,
+          brandHit: brandKnown,
+          brandGuess: brand.filter((r) => r.brand === 'guessed').length,
+          brandWrong: brand.filter((r) => r.brand === 'wrong').length,
+          brandTotal: brand.length,
+          failed: rows.length - counted.length,
+          byCategory,
+          alternatives: [...freq.entries()]
+            .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+            .map(([name, count]) => ({ name, count })),
+        };
+
+        return { rows, summary, advice: deriveAdvice(rows, summary), adviceBy: 'rules' };
+      }
+
+      /** Rule-based, instant. The optional AI pass can replace this afterwards. */
+      function deriveAdvice(rows, s) {
+        const out = [];
+        const missed = rows.filter((r) => !r.error && r.kind === 'discovery' && !r.mentioned);
+        const top = s.alternatives.slice(0, 3);
+
+        const wrongRows = rows.filter((r) => r.kind === 'brand' && r.brand === 'wrong');
+        const confused = [...new Set(wrongRows.filter((r) => r.brandEntity).map((r) => r.brandEntity))];
+        const bareWrong = wrongRows.filter((r) => !r.brandEntity).length;
+
+        if (confused.length) {
+          out.push(
+            `模型把 "GFIC" 认成了**同名但不同的机构**：${confused.join(' / ')}。` +
+              `这不是文案问题 —— 是 "GFIC" 这几个字母在我们的语料里，抢不过一个真实存在的教会缩写。` +
+              `对策：凡是出现品牌名的地方一律写全 "GFIC Crew（GFIC歪果社）"，缩写绝不单独出现；` +
+              `并紧挨着给可验证的实锤（城市清单、会员价、微信 DN8117），让"我们"成为这个词最强的那条关联。`,
+          );
+        }
+        if (bareWrong) {
+          out.push(
+            `另有 ${bareWrong} 道品牌题：模型答得很流畅，但**说不出任何一个我们独有的事实**（中文名、DN8117、会员价、城市清单），` +
+              `全是 "expat / community / Guangzhou" 这类换个机构也成立的话。这不算认识 —— 它只是在按字面编一个像样的答案。`,
+          );
+        }
+        if (!s.brandWrong && s.brandGuess) {
+          out.push(`模型对品牌名只能靠猜（原话里有"通常 / 可能是 / almost certainly"这类措辞），说明它的语料里没有这个实体。这是"有没有第三方来源"的问题，不是文案问题。`);
+        } else if (!s.brandWrong && !s.brandGuess && s.brandTotal && s.brandHit === s.brandTotal) {
+          out.push(`品牌题 ${s.brandHit}/${s.brandTotal} 答对。但注意：这是一道"送分题"——问题里就带着我们的名字，能答对只说明"看着名字能说出像样的话"，不等于它会在被问到别的时会想到我们。`);
+        }
+
+        // 分类里提及率为 0 的，是这份报告里最有行动指向的信息。
+        const zeroCats = (Array.isArray(s.byCategory) ? s.byCategory : []).filter((b) => b.rate === 0);
+        if (zeroCats.length) {
+          out.push(
+            `这些入口我们一次都没被提到：${zeroCats.map((b) => b.label).join('、')}。` +
+              `对照站内看这一类有没有成篇的内容 —— 没有的，就是下一批该写的（写成"能被整段摘出来"的问答，第一句给结论）。`,
+          );
+        }
+
+        if (s.discoveryTotal && s.discoveryHit === 0) {
+          out.push(`普通问题 ${s.discoveryTotal} 题、我们 0 次出现。这是最该盯的数字：说明"在华外国人社交"这类答案池里，目前没有我们的位置。`);
+        } else if (s.discoveryHit > 0) {
+          out.push(`普通问题被提到 ${s.discoveryHit}/${s.discoveryTotal}，其中 ${s.discoveryFront} 次落在答案前段。前段才算真的被推荐，只在中后段出现容易被划过去。`);
+        }
+
+        if (top.length) {
+          out.push(
+            `模型更愿意点名：${top.map((t) => `${t.name}（${t.count} 次）`).join('、')}。这些地方有真实、可被引用的存在感，先看它们在同类问题下写的内容长什么样。`,
+          );
+        }
+
+        if (missed.length) {
+          out.push(
+            `针对"${missed[0].q}"这类问法，官网需要一段能被直接摘出来的答案 —— 第一句就是结论，带具体城市、具体做法。目前 llms-full.txt 里没有以这种问句为入口的段落。`,
+          );
+        }
+
+        out.push('站外是胜负手：Reddit / Quora 上真实、持续、有上下文的回答，比在自家站点再加十段文案有用。这里始终只是个基线数字。');
+        return out.slice(0, 5);
+      }
+
+      async function pruneMonitor() {
+        const rows = await list(MONITOR_COLLECTION);
+        const runs = rows
+          .filter((r) => r.docId !== MONITOR_PROBES_ID && r.docId !== MONITOR_ROTATION_ID)
+          .sort((a, b) => String(a.docId).localeCompare(String(b.docId)));
+        const excess = runs.slice(0, Math.max(0, runs.length - MONITOR_KEEP));
+        for (const old of excess) await remove(MONITOR_COLLECTION, old.docId);
+        return excess.length;
+      }
+
+      async function runMonitor() {
+        const m = state.monitor;
+        if (!m || m.running) return;
+
+        const dropped = collectProbes();
+        if (!m.probes.length) m.probes = DEFAULT_PROBES.map((p) => ({ ...p }));
+        m.running = true;
+        m.log = '';
+        renderMonitor();
+
+        const logEl = $('mon-log');
+        const runBtn = $('mon-run');
+        if (runBtn) {
+          runBtn.disabled = true;
+          runBtn.textContent = '监测中…';
+        }
+        const log = (line) => {
+          m.log += (m.log ? '\n' : '') + line;
+          if (logEl) {
+            logEl.textContent = m.log;
+            logEl.scrollTop = logEl.scrollHeight;
+          }
+        };
+        if (dropped) log(`（已忽略 ${dropped} 条空问题）`);
+        setProgress(4);
+
+        // The model takes 40–170 s just to emit its first token, so the first log line after
+        // "已发出" can be minutes away. Tick every 10 s so a long wait never looks like a hang.
+        let ticker = null;
+        let elapsed = 0;
+        const stopTicker = () => {
+          if (ticker) clearInterval(ticker);
+          ticker = null;
+        };
+
+        try {
+          const probes = m.probes.slice();
+          const results = new Array(probes.length);
+          let done = 0;
+
+          // 并发不能开太高：题库扩容后一轮 37 题，之前提到 12 路，结果被腾讯云 WAF
+          // 当成 CC 攻击拦了（返回整页 403 HTML）。降到 4 路，并给每次请求加抖动间隔，
+          // 让流量看起来像正常使用而不是扫描。
+          // 并发只是同时发多少请求，服务端照样排队，实测 4 路已有约 2.2 倍加速，再往上收益递减。
+          const CONCURRENCY = Math.min(probes.length, 4);
+          const JITTER_MS = 400; // 每个请求前的随机等待上限，避免同一毫秒齐发
+          log(`${probes.length} 个探针（固定核心 + 本轮轮换），并发 ${CONCURRENCY}。每个问题都要等模型把话说完才开始返回，整轮通常 8–15 分钟，可以走开。`);
+          log('');
+          ticker = setInterval(() => {
+            elapsed += 10;
+            if (logEl) logEl.textContent = `${m.log}\n… 已等待 ${elapsed}s（已完成 ${done}/${probes.length}）`;
+          }, 10000);
+
+          const queue = probes.map((p, i) => ({ p, i }));
+          const worker = async () => {
+            for (;;) {
+              const job = queue.shift();
+              if (!job) return;
+              const { p, i } = job;
+              const label = `${p.kind === 'brand' ? '品牌题' : '普通题'}：${p.q}`;
+              // 抖动：错开发车时间，别在同一毫秒齐发一堆请求。
+              await sleep(Math.floor(Math.random() * JITTER_MS));
+              log(`↑ 已发出 ${label}`);
+              try {
+                const answer = (
+                  await llmWithRetry(
+                    [
+                      { role: 'system', content: PROBE_SYSTEM },
+                      { role: 'user', content: p.q },
+                    ],
+                    {
+                      onRetry: (attempt, wait) =>
+                        log(`  ↻ 被安全策略拦下，${Math.round(wait / 1000)}s 后重试（第 ${attempt} 次）— ${label}`),
+                    },
+                  )
+                ).trim();
+                results[i] = { id: p.id, kind: p.kind, q: p.q, cat: p.cat || '', tier: p.tier || 'core', answer };
+                log(`  ✓ [${++done}/${probes.length}] 返回 ${answer.length} 字 — ${label}`);
+              } catch (err) {
+                const msg = humanError(err);
+                results[i] = { id: p.id, kind: p.kind, q: p.q, cat: p.cat || '', tier: p.tier || 'core', answer: '', error: msg };
+                log(`  ✗ [${++done}/${probes.length}] 失败：${msg}`);
+              }
+              setProgress(4 + Math.round((done / probes.length) * 88));
+            }
+          };
+          await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+          stopTicker();
+
+          const rows = analyseAnswers(results.filter(Boolean));
+          const answered = rows.filter((r) => !r.error);
+          if (!answered.length) throw new Error('所有探针都调用失败了，无法生成报告');
+
+          const report = buildReport(rows);
+          report.at = new Date().toISOString();
+          report.model = 'auto（WorkBuddy 托管模型）';
+
+          report.round = currentRound();
+          setProgress(94);
+          await save(MONITOR_COLLECTION, 'run-' + report.at, report, 0);
+          m.history.push({ docId: 'run-' + report.at, data: report });
+          m.history.sort((a, b) => String(a.docId).localeCompare(String(b.docId)));
+          if (m.history.length > MONITOR_KEEP) m.history = m.history.slice(-MONITOR_KEEP);
+
+          // 轮次游标推进一格，下一轮换一组 rotate 题。存云端，换设备/刷新后接着走。
+          const nextRound = (currentRound() + 1) % 997;
+          m.round = nextRound;
+          try {
+            await save(MONITOR_COLLECTION, MONITOR_ROTATION_ID, { round: nextRound, updated: new Date().toISOString() }, 0);
+          } catch (err) {
+            log(`（轮次游标保存失败，下一轮可能重复本组轮换题：${err?.message || err}）`);
+          }
+
+          try {
+            const removed = await pruneMonitor();
+            if (removed) log(`已清理 ${removed} 份旧报告（只保留最近 ${MONITOR_KEEP} 份）。`);
+          } catch (err) {
+            log(`（旧报告清理失败，不影响本次结果：${err?.message || err}）`);
+          }
+
+          log('');
+          log(
+            `完成：核心题提及率 ${report.summary.coreRate}%（${report.summary.coreHit}/${report.summary.coreTotal}），` +
+              `本轮全部普通题 ${report.summary.discoveryRate}%（${report.summary.discoveryHit}/${report.summary.discoveryTotal}），` +
+              `品牌题 ${report.summary.brandHit}/${report.summary.brandTotal}。`,
+          );
+          show(els.msg, '报告已生成并保存到云端。', 'ok');
+        } catch (err) {
+          const msg = humanError(err);
+          log('✗ ' + msg);
+          show(els.msg, '监测失败：' + msg, 'err');
+        } finally {
+          stopTicker();
+          m.running = false;
+          setProgress(null);
+          renderMonitor();
+        }
+      }
+
+      /**
+       * Optional second pass. Only runs when asked, because it costs the same 1–3 minutes as
+       * a probe. Replaces the rule-based advice with something specific to the answers.
+       */
+      async function aiAdviceFor(runId) {
+        const row = state.monitor.history.find((h) => h.docId === runId);
+        if (!row) return;
+        const r = row.data;
+        const s = r.summary || {};
+        show(els.msg, '正在让模型读报告并写建议…（1–3 分钟）', '');
+        const digest = (r.rows || [])
+          .map((x) => `${x.kind === 'brand' ? '[品牌]' : '[普通]'} ${x.q}\n  结果：${x.error ? '调用失败' : x.mentioned ? '提到了我们' : '没提到'}｜AI 提到的替代：${(x.alternatives || []).join('、') || '无'}${x.quote ? `\n  原话：${x.quote}` : ''}`)
+          .join('\n');
+        const catLines = (Array.isArray(s.byCategory) ? s.byCategory : [])
+          .map((b) => `${b.label}：${b.hit}/${b.total}（${b.rate}%）`)
+          .join('\n');
+        const user = `这是 GFIC Crew (GFIC歪果社) 的 AI 回答监测报告 —— 我们让模型回答外国人常问的"在中国怎么认识人/有哪些外国人社群"等问题，然后看它有没有自然提到我们。
+
+汇总：核心题提及率 ${s.coreRate}%（${s.coreHit}/${s.coreTotal}），本轮全部普通题 ${s.discoveryRate}%（${s.discoveryHit}/${s.discoveryTotal}），品牌题「真认识」${s.brandHit}/${s.brandTotal}（靠猜 ${s.brandGuess} 题、答偏 ${s.brandWrong} 题）。
+
+按分类：
+${catLines || '（本轮报告没有分类数据）'}
+
+逐题：
+${digest}
+
+请给出 5 条具体、可执行的改进建议，简体中文，每条一到两句。要求：
+- 优先针对**提及率为 0 的分类**：那是最明确的"这个入口我们完全不存在"。
+- 针对上面实际出现的缺口，不要泛泛的 SEO 套话。
+- 区分"站内能做的"和"必须在站外做的"，并在每条开头标出【站内】或【站外】。
+- 涉及"让内容更容易被引用"时，要具体到该写什么形式的段落，并说明对应哪个分类的哪类问法。
+- 不要建议任何违法违规内容（代办签证、介绍工作、VPN、旅游签打工）。`;
+        try {
+          const raw = await llmWithRetry([
+            { role: 'system', content: '你是 GEO（生成式引擎优化）顾问，为一家在华外国人社群做内容与站外能见度诊断。只输出建议列表，不要前言。' },
+            { role: 'user', content: user },
+          ]);
+          const lines = raw
+            .split('\n')
+            .map((l) => l.replace(/^\s*(?:\d+[.、)]|[-*])\s*/, '').trim())
+            .filter((l) => l.length > 8);
+          if (!lines.length) throw new Error('模型没有返回可用的建议');
+          r.advice = lines.slice(0, 6);
+          r.adviceBy = 'ai';
+          await save(MONITOR_COLLECTION, runId, r, 0);
+          show(els.msg, '建议已更新并保存。', 'ok');
+        } catch (err) {
+          show(els.msg, 'AI 建议生成失败：' + humanError(err), 'err');
+        }
+        renderMonitor();
+      }
+
+      function monitorMarkdown(r) {
+        const s = r.summary || {};
+        const L = [];
+        L.push('# GFIC Crew · AI 回答监测报告');
+        L.push('');
+        L.push(`- 生成时间：${r.at ? new Date(r.at).toLocaleString('zh-CN') : '未知'}`);
+        L.push(`- 使用模型：${r.model || '未知'}`);
+        L.push(`- 探针数：${(r.rows || []).length}（固定核心 ${s.coreTotal ?? 0} + 轮换 ${(r.rows || []).length - (s.coreTotal ?? 0)}）`);
+        if (r.round !== undefined) L.push(`- 轮次：第 ${(Number(r.round) || 0) + 1} 组`);
+        L.push('');
+        L.push('## 结论');
+        L.push('');
+        L.push(`- 核心题提及率（跨轮可比）：**${s.coreRate ?? 0}%**（${s.coreHit ?? 0}/${s.coreTotal ?? 0}）`);
+        L.push(`- 本轮全部普通题提及率：**${s.discoveryRate ?? 0}%**（${s.discoveryHit ?? 0}/${s.discoveryTotal ?? 0}）`);
+        L.push(`- 品牌问题「真认识」：**${s.brandRate ?? 0}%**（${s.brandHit ?? 0}/${s.brandTotal ?? 0}）`);
+        if (s.brandGuess) L.push(`- 品牌问题靠猜：${s.brandGuess} 题（名字里有我们的字，但它说不出实情）`);
+        if (s.brandWrong) {
+          const confused = [...new Set((r.rows || []).filter((x) => x.brandEntity).map((x) => x.brandEntity))];
+          L.push(
+            `- 品牌问题答偏：${s.brandWrong} 题${confused.length ? `，被认成了 **${confused.join(' / ')}**` : '（说不出任何我们独有的事实）'} —— 这类"假命中"不能算认识`,
+          );
+        }
+        if (s.failed) L.push(`- 调用失败：${s.failed} 题（未计入比例）`);
+        L.push('');
+        if (Array.isArray(s.byCategory) && s.byCategory.length) {
+          L.push('## 按提问分类看提及率');
+          L.push('');
+          L.push('> 每类只跑少数几题；看的是"哪一类入口我们完全不存在"，不是单题百分比。');
+          L.push('');
+          L.push('| 分类 | 提及 | 提及率 |');
+          L.push('| --- | --- | --- |');
+          for (const b of s.byCategory) L.push(`| ${b.label} | ${b.hit}/${b.total} | ${b.rate}% |`);
+          L.push('');
+        }
+        L.push('## 逐题结果');
+        L.push('');
+        L.push('| 问题 | 类型 | 结果 | AI 更愿意点名的 | 判定依据 | 原话 |');
+        L.push('| --- | --- | --- | --- | --- | --- |');
+        const cell = (v) => String(v === undefined || v === null ? '' : v).replace(/\|/g, '\\|').replace(/\n/g, ' ');
+        for (const row of r.rows || []) {
+          const basis =
+            row.kind !== 'brand'
+              ? ''
+              : row.brandEntity
+                ? '被认成 ' + row.brandEntity
+                : (row.brandFacts || []).length
+                  ? (row.brandFacts || []).join('、')
+                  : '无独有事实' + ((row.brandGeneric || []).length ? `（只有 ${(row.brandGeneric || []).join('、')}）` : '');
+          L.push(
+            `| ${cell(row.q)} | ${row.kind === 'brand' ? '品牌' : '普通'} | ${cell((row.status || {}).label)} | ${cell((row.alternatives || []).join('、') || '—')} | ${cell(basis)} | ${cell(row.quote)} |`,
+          );
+        }
+        L.push('');
+        L.push('### 完整回答原文');
+        L.push('');
+        for (const row of r.rows || []) {
+          L.push(`**${row.kind === 'brand' ? '[品牌]' : '[普通]'} ${row.q}** — ${(row.status || {}).label}`);
+          L.push('');
+          L.push(row.answer ? '> ' + row.answer.replace(/\n/g, '\n> ') : '（调用失败）');
+          L.push('');
+        }
+        L.push('');
+        if (Array.isArray(s.alternatives) && s.alternatives.length) {
+          L.push('## AI 提到的替代来源');
+          L.push('');
+          for (const c of s.alternatives) L.push(`- ${c.name}（在 ${c.count} 题里出现）`);
+          L.push('');
+        }
+        if (Array.isArray(r.advice) && r.advice.length) {
+          L.push(`## 下一步建议（${r.adviceBy === 'ai' ? '模型生成' : '规则生成'}）`);
+          L.push('');
+          r.advice.forEach((a, i) => L.push(`${i + 1}. ${a}`));
+          L.push('');
+        }
+        L.push('---');
+        L.push('');
+        L.push('说明：本报告由站内托管模型生成，用于观察趋势，不等于 ChatGPT / Perplexity / Gemini / 豆包 的真实回答。');
+        L.push('判定方式是固定的，不依赖模型自评，所以每次运行可比：品牌题按顺序判 —— ① 认成别的机构（点名 or 断言宗教语境）→ 答偏；② 说出 ≥2 个我们独有的事实 → 真认识；③ 有"大概/可能是/almost certainly"这类措辞 → 在猜；④ ≥1 个独有事实 + ≥2 个通用词 → 真认识；其余 → 答偏。');
+        L.push('注意：`expat`、`Guangzhou`、`community` 这类词任何机构都成立，**单靠它们不算认识**。');
+        L.push('');
+        return L.join('\n');
+      }
+
+      function downloadMonitorMarkdown(r) {
+        const md = monitorMarkdown(r);
+        const stamp = String(r.at || new Date().toISOString()).slice(0, 10);
+        const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `gfic-ai-monitor-${stamp}.md`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      }
+
+      /* ---------- theme ---------- */
+      function applyTheme(t) {
+        document.documentElement.dataset.theme = t;
+        localStorage.setItem(THEME_KEY, t);
+      }
+      applyTheme(localStorage.getItem(THEME_KEY) || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+      $('btn-theme').addEventListener('click', () => {
+        applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+      });
+
+      /* ---------- login ---------- */
+
+      els.gateForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const pw = els.gatePw.value;
+        if (!pw) { show(els.gateMsg, '请输入管理口令', 'err'); return; }
+        els.gateGo.disabled = true;
+        els.gateGo.textContent = '验证中…';
+        try {
+          const ok = await rpc('cms_login', { p_password: pw });
+          if (ok !== true) throw new Error('口令不正确');
+          state.pw = pw;
+          sessionStorage.setItem(PW_KEY, pw);
+          enter();
+        } catch (err) {
+          show(els.gateMsg, err.message || '登录失败', 'err');
+        } finally {
+          els.gateGo.disabled = false;
+          els.gateGo.textContent = '登录';
+        }
+      });
+
+      /** Loads the single 站点内容 document used to feed shared option lists. */
+      async function loadSiteData() {
+        try {
+          const docs = await list('site');
+          state.siteData = (docs[0] && docs[0].data) || null;
+        } catch (err) {
+          state.siteData = null;
+        }
+      }
+
+      function enter() {
+        els.gate.classList.add('hidden');
+        els.app.classList.remove('hidden');
+        renderSide();
+        loadSiteData();
+        openCollection(state.collection);
+      }
+
+      function logout() {
+        sessionStorage.removeItem(PW_KEY);
+        state.pw = '';
+        els.app.classList.add('hidden');
+        els.gate.classList.remove('hidden');
+        els.gatePw.value = '';
+        els.actionbar.classList.add('hidden');
+        show(els.gateMsg, '', '');
+      }
+
+      /* ---------- sidebar ---------- */
+
+      function renderSide() {
+        els.side.innerHTML = '';
+        Object.keys(COLLECTIONS).forEach((key) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.dataset.collection = key;
+          const text = document.createElement('span');
+          text.textContent = COLLECTIONS[key].label;
+          b.appendChild(text);
+          const n = state.counts[key];
+          if (typeof n === 'number') {
+            const c = document.createElement('span');
+            c.className = 'count';
+            c.textContent = n;
+            b.appendChild(c);
+          }
+          if (!state.tool && key === state.collection) b.className = 'is-active';
+          b.addEventListener('click', () => openCollection(key));
+          els.side.appendChild(b);
+        });
+
+        els.sideTools.innerHTML = '';
+        Object.keys(TOOLS).forEach((key) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.dataset.tool = key;
+          const text = document.createElement('span');
+          text.textContent = TOOLS[key].label;
+          b.appendChild(text);
+          if (state.tool === key) b.className = 'is-active';
+          b.addEventListener('click', () => openTool(key));
+          els.sideTools.appendChild(b);
+        });
+      }
+
+      /**
+       * Opens one of the SEO/GEO tools. These are views, not collections — they have no
+       * documents and no editor, so everything the collection machinery owns (search, the
+       * "new" button, the save bar) is switched off while one is open.
+       */
+      function openTool(key) {
+        if (state.tool === key) return;
+        state.tool = key;
+        state.editing = null;
+        state.filter = '';
+        els.search.value = '';
+        els.search.disabled = true;
+        els.actionbar.classList.add('hidden');
+        $('btn-new').classList.add('hidden');
+        $('btn-seed').classList.add('hidden');
+        els.title.textContent = TOOLS[key].title;
+        renderSide();
+        if (key === 'monitor') openMonitor();
+      }
+
+      /* ---------- list ---------- */
+
+      async function openCollection(key) {
+        state.collection = key;
+        state.tool = null;
+        state.editing = null;
+        state.filter = '';
+        els.search.value = '';
+        els.search.disabled = false;
+        $('btn-seed').classList.remove('hidden');
+        els.actionbar.classList.add('hidden');
+        els.title.textContent = COLLECTIONS[key].pageTitle || COLLECTIONS[key].label;
+        renderSide();
+        show(els.msg, '载入中…', '');
+        try {
+          state.docs = await list(key);
+          state.counts[key] = state.docs.length;
+          if (key === 'site') state.siteData = (state.docs[0] && state.docs[0].data) || null;
+          renderSide();
+          renderList();
+        } catch (err) {
+          show(els.msg, '读取失败：' + (err.message || err), 'err');
+        }
+      }
+
+      function renderList() {
+        const cfg = COLLECTIONS[state.collection];
+        if (cfg.single) {
+          state.editing = state.docs[0] || { docId: 'main', data: SEED[state.collection] || {}, sortOrder: 0 };
+          $('btn-new').classList.add('hidden');
+          renderEditor();
+          return;
+        }
+
+        const q = state.filter.trim().toLowerCase();
+        const rows = state.docs
+          .map((doc, i) => ({ doc, i }))
+          .filter(({ doc }) => {
+            if (!q) return true;
+            const hay = (String(cfg.title(doc.data) || '') + ' ' + doc.docId).toLowerCase();
+            return hay.includes(q);
+          });
+
+        els.pane.innerHTML = '';
+        const head = document.createElement('div');
+        head.className = 'list-head';
+        head.innerHTML = '<span style="width:22px"></span><span style="flex:1">' + cfg.label + '</span><span>标识 ID</span>';
+        els.pane.appendChild(head);
+
+        const ul = document.createElement('ul');
+        ul.className = 'list';
+        if (!rows.length) {
+          const empty = document.createElement('li');
+          empty.className = 'empty';
+          empty.textContent = q ? '没有匹配的条目' : '这个集合还没有内容，点下面「新增」开始。';
+          ul.appendChild(empty);
+        }
+        rows.forEach(({ doc, i }) => {
+          const li = document.createElement('li');
+          const idx = document.createElement('span');
+          idx.className = 'idx';
+          idx.textContent = i + 1;
+          const b = document.createElement('button');
+          b.type = 'button';
+          const label = document.createElement('span');
+          label.textContent = cfg.title(doc.data) || doc.docId;
+          b.appendChild(label);
+          b.addEventListener('click', () => { state.editing = doc; renderEditor(); });
+          const id = document.createElement('span');
+          id.className = 'sub';
+          id.textContent = doc.docId;
+
+          // Delete straight from the list — every list-backed collection gets one.
+          const del = document.createElement('button');
+          del.className = 'row-del';
+          del.type = 'button';
+          del.textContent = '删除';
+          del.addEventListener('click', async (ev) => {
+            ev.stopPropagation();
+            const name = cfg.title(doc.data) || doc.docId;
+            if (!(await confirmDialog('「' + name + '」将从云端永久删除，无法撤销。', '删除确认'))) return;
+            try {
+              await remove(state.collection, doc.docId);
+              await openCollection(state.collection);
+              show(els.msg, '已删除「' + name + '」', 'ok');
+            } catch (err) {
+              show(els.msg, '删除失败：' + (err.message || err), 'err');
+            }
+          });
+
+          li.appendChild(idx);
+          li.appendChild(b);
+          li.appendChild(id);
+          li.appendChild(del);
+          ul.appendChild(li);
+        });
+        els.pane.appendChild(ul);
+
+        // The "new" action lives in the top bar next to import/export, not at the bottom.
+        const nb = $('btn-new');
+        nb.classList.remove('hidden');
+        nb.textContent = '+ 新增' + cfg.label;
+        show(els.msg, '', '');
+      }
+
+      els.search.addEventListener('input', () => {
+        state.filter = els.search.value;
+        if (!COLLECTIONS[state.collection].single) renderList();
+      });
+
+      /* ---------- editor ---------- */
+
+      function switchMode(wrap, mode, field) {
+        const el = wrap.querySelector('[data-key]');
+        const cur = el.dataset.type;
+        if ((mode === 'text' && cur === 'plaintext') || (mode === 'json' && cur === 'json')) return;
+        try {
+          if (mode === 'json') {
+            el.value = JSON.stringify(codecFromText(el.value, field.codec), null, 2);
+            el.dataset.type = 'json';
+          } else {
+            el.value = codecToText(el.value.trim() ? JSON.parse(el.value) : [], field.codec);
+            el.dataset.type = 'plaintext';
+          }
+          wrap.querySelectorAll('.seg button').forEach((b) => {
+            b.classList.toggle('is-on', b.dataset.mode === mode);
+          });
+          show(els.msg, '', '');
+        } catch (err) {
+          show(els.msg, mode === 'json' ? '转 JSON 失败：' + err.message : 'JSON 解析失败，已保留原文：' + err.message, 'err');
+        }
+      }
+
+      /**
+       * Downscales an image data URI so a phone photo doesn't bloat the database row.
+       * Kept as PNG: QR edges have to stay sharp, and these files are small anyway.
+       */
+      function shrinkImage(dataUri, max) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            const scale = Math.min(1, max / Math.max(img.width, img.height));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(img.width * scale));
+            canvas.height = Math.max(1, Math.round(img.height * scale));
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/png'));
+          };
+          img.onerror = () => reject(new Error('图片无法解码，换一张试试'));
+          img.src = dataUri;
+        });
+      }
+
+      function renderEditor() {
+        const cfg = COLLECTIONS[state.collection];
+        const doc = state.editing;
+        const data = doc.data || {};
+        // Single documents saved before a field was introduced would otherwise render blank.
+        const fallback = cfg.single ? SEED[state.collection] || {} : null;
+
+        els.pane.innerHTML = '';
+        els.title.textContent = cfg.single
+          ? (cfg.pageTitle || cfg.label)
+          : doc.isNew
+            ? '新增' + cfg.label
+            : (cfg.title(doc.data) || doc.docId);
+
+        const head = document.createElement('div');
+        head.className = 'editor-head';
+        const h3 = document.createElement('h3');
+        h3.textContent = cfg.single
+          ? (cfg.heading || '全站通用内容')
+          : (cfg.title(doc.data) || '新' + cfg.label);
+        head.appendChild(h3);
+        if (cfg.single) {
+          const chip = document.createElement('span');
+          chip.className = 'chip';
+          chip.textContent = '单一文档';
+          head.appendChild(chip);
+        }
+        els.pane.appendChild(head);
+
+        if (!cfg.single) {
+          // Identification card. Most collections derive their id from a field (slug / id),
+          // so there is no separate box to fill in — only FAQ, which has no such field,
+          // shows a live preview of the id that will be generated from the question.
+          const meta = document.createElement('div');
+          meta.className = 'card';
+          const mt = document.createElement('div');
+          mt.className = 'card-title';
+          const mspan = document.createElement('span');
+          mspan.className = 'eyebrow';
+          mspan.textContent = '标识与排序';
+          mt.appendChild(mspan);
+          meta.appendChild(mt);
+
+          const grid = document.createElement('div');
+          grid.className = 'grid2';
+
+          const sortWrap = document.createElement('div');
+          sortWrap.className = 'field';
+          const sortLabel = document.createElement('label');
+          sortLabel.textContent = '排序（数字小的排前面）';
+          sortWrap.appendChild(sortLabel);
+          const sortInput = document.createElement('input');
+          sortInput.id = 'f-sort';
+          sortInput.type = 'number';
+          sortInput.value = String(doc.sortOrder || 0);
+          sortWrap.appendChild(sortInput);
+          grid.appendChild(sortWrap);
+
+          if (cfg.idField) {
+            const noteWrap = document.createElement('div');
+            noteWrap.className = 'field';
+            const note = document.createElement('p');
+            note.className = 'idnote';
+            note.textContent = '标识 ID 取自「' + fieldLabel(cfg, cfg.idField) + '」字段：' + (cfg.idNote || '');
+            noteWrap.appendChild(note);
+            grid.appendChild(noteWrap);
+          } else {
+            const prevWrap = document.createElement('div');
+            prevWrap.className = 'field';
+            const pl = document.createElement('label');
+            pl.textContent = '标识 ID（自动生成，不用填）';
+            prevWrap.appendChild(pl);
+            const prev = document.createElement('div');
+            prev.className = 'idpreview';
+            prev.id = 'id-preview';
+            prev.textContent = cfg.idPreview ? cfg.idPreview(data) : doc.docId;
+            prevWrap.appendChild(prev);
+            grid.appendChild(prevWrap);
+          }
+
+          meta.appendChild(grid);
+          els.pane.appendChild(meta);
+        }
+
+        const groups = cfg.groups || [{ title: '内容', fields: cfg.fields }];
+        groups.forEach((group) => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          const ct = document.createElement('div');
+          ct.className = 'card-title';
+          const t = document.createElement('span');
+          t.className = 'eyebrow';
+          t.textContent = group.title;
+          ct.appendChild(t);
+          card.appendChild(ct);
+
+          const grid = document.createElement('div');
+          grid.className = 'grid2';
+          group.fields.forEach((field) => {
+            // 城市指南专用：选一次城市，就把必须彼此一致的三项（Slug / 城市名 /
+            // 对应城市 Slug）一次填好。下拉里列出全部城市，已经写过指南的城市会标出来
+            // —— 因为记录 ID 就是 Slug，选中已存在的城市，保存时会覆盖那一篇。
+            if (field.key === 'slug' && state.collection === 'guides') {
+              // 城市表来自随页面下发的 seed（客户端脚本拿不到 frontmatter 里的 import）。
+              const allCities = Array.isArray(SEED.cities) ? SEED.cities : [];
+              // guided：有指南的城市，用来打「✓ 已有指南」标记 —— 包含正在编辑的这一篇。
+              // conflict：会被覆盖的别的记录（= 别的指南占用的 ID），用来决定要不要报红。
+              // 分开是因为「编辑广州那篇时下拉里选中广州」不算冲突（就是它自己）。
+              const guided = new Set();
+              const conflict = new Set();
+              state.docs.forEach((d) => {
+                const isSelf = String(d.docId || '') === String(doc.docId || '');
+                if (d.docId) {
+                  guided.add(String(d.docId));
+                  if (!isSelf) conflict.add(String(d.docId));
+                }
+                const cs = getPath(d.data || {}, 'citySlug');
+                if (cs) {
+                  guided.add(String(cs));
+                  if (!isSelf) conflict.add(String(cs));
+                }
+              });
+
+              const pick = document.createElement('div');
+              pick.className = 'field field--wide';
+              const plabel = document.createElement('label');
+              plabel.textContent = '选择城市（自动填好下面三项）';
+              pick.appendChild(plabel);
+
+              const sel = document.createElement('select');
+              const ph = document.createElement('option');
+              ph.value = '';
+              ph.textContent = '— 点这里选择城市 —';
+              sel.appendChild(ph);
+              allCities.forEach((c) => {
+                const o = document.createElement('option');
+                o.value = c.slug;
+                o.textContent = guided.has(String(c.slug)) ? c.name + '　✓ 已有指南' : c.name;
+                sel.appendChild(o);
+              });
+              const currentCity = String(getPath(data, 'citySlug') || '');
+              if (currentCity && allCities.some((c) => String(c.slug) === currentCity)) sel.value = currentCity;
+              pick.appendChild(sel);
+
+              const phint = document.createElement('span');
+              phint.className = 'hint';
+              phint.textContent =
+                '选中后会自动填好「Slug（URL 用）」「城市名」「对应城市 Slug」。' +
+                '标了「✓ 已有指南」的城市，直接新建会覆盖原来那一篇。';
+              pick.appendChild(phint);
+
+              sel.addEventListener('change', () => {
+                const c = allCities.find((x) => String(x.slug) === sel.value);
+                if (!c) return;
+                const setVal = (key, val) => {
+                  const el = grid.querySelector('[data-key="' + key + '"]');
+                  if (el) el.value = val;
+                };
+                setVal('slug', c.slug);
+                setVal('city', c.name);
+                setVal('citySlug', c.slug);
+                if (conflict.has(String(c.slug))) {
+                  show(els.msg, '「' + c.name + '」已经有一篇指南了。直接保存会覆盖那一篇，请先改 Slug 或确认要覆盖。', 'err');
+                } else {
+                  show(els.msg, '已按「' + c.name + '」填好三个字段，可以继续修改。', 'ok');
+                }
+              });
+
+              grid.appendChild(pick);
+            }
+
+            const wrap = document.createElement('div');
+            wrap.className = 'field' + (field.wide ? ' field--wide' : '');
+            let raw = getPath(data, field.key);
+            if (raw === undefined && fallback) raw = getPath(fallback, field.key);
+            let control;
+
+            if (field.type === 'boolean') {
+              control = document.createElement('div');
+              control.className = 'switch';
+              const cb = document.createElement('input');
+              cb.type = 'checkbox';
+              cb.checked = !!raw;
+              cb.dataset.key = field.key;
+              cb.dataset.type = 'boolean';
+              const lb = document.createElement('label');
+              lb.textContent = '启用';
+              control.appendChild(cb);
+              control.appendChild(lb);
+              wrap.appendChild(control);
+            } else if (field.type === 'image') {
+              // Images travel as data URIs so they ride along with the content export and
+              // reach the static build — no separate asset host needed.
+              const current = typeof raw === 'string' && raw.startsWith('data:image') ? raw : '';
+              const ilabel = document.createElement('label');
+              ilabel.textContent = field.label;
+              wrap.appendChild(ilabel);
+
+              const box = document.createElement('div');
+              box.className = 'imgbox';
+              const img = document.createElement('img');
+              img.className = 'imgprev';
+              img.alt = field.label;
+              img.src = current || (field.previewSrc || '');
+              img.style.display = img.getAttribute('src') ? '' : 'none';
+              box.appendChild(img);
+
+              const holder = document.createElement('input');
+              holder.type = 'hidden';
+              holder.value = current;
+              holder.dataset.key = field.key;
+              holder.dataset.type = 'image';
+              box.appendChild(holder);
+
+              const file = document.createElement('input');
+              file.type = 'file';
+              file.accept = 'image/png,image/jpeg,image/webp,image/gif';
+              file.className = 'fileinput';
+              file.addEventListener('change', () => {
+                const f = file.files && file.files[0];
+                file.value = '';
+                if (!f) return;
+                if (!/^image\//.test(f.type)) {
+                  show(els.msg, '请选择图片文件（PNG / JPG / WebP）', 'err');
+                  return;
+                }
+                const reader = new FileReader();
+                reader.onerror = () => show(els.msg, '图片读取失败', 'err');
+                reader.onload = () => {
+                  shrinkImage(String(reader.result), field.maxSize || 1200)
+                    .then((uri) => {
+                      if (uri.length > 1200000) {
+                        show(els.msg, '这张图处理后仍有 ' + Math.round(uri.length / 1024) + ' KB，太大了，换一张小一点的', 'err');
+                        return;
+                      }
+                      holder.value = uri;
+                      img.src = uri;
+                      img.style.display = '';
+                      show(els.msg, '图片已读取（' + Math.round(uri.length / 1024) + ' KB），记得点「保存」', 'ok');
+                    })
+                    .catch((err) => show(els.msg, '图片处理失败：' + (err.message || err), 'err'));
+                };
+                reader.readAsDataURL(f);
+              });
+              box.appendChild(file);
+
+              const clear = document.createElement('button');
+              clear.type = 'button';
+              clear.className = 'btn btn--ghost btn--sm';
+              clear.textContent = '移除图片';
+              clear.addEventListener('click', () => {
+                holder.value = '';
+                img.removeAttribute('src');
+                img.style.display = 'none';
+                show(els.msg, '已移除，记得点「保存」', 'ok');
+              });
+              box.appendChild(clear);
+
+              const ihint = document.createElement('span');
+              ihint.className = 'hint';
+              ihint.textContent =
+                (current ? '当前：后台上传的图片。' : '当前：代码内的默认图片。') +
+                '上传后需「导出内容 JSON」并重新构建才会出现在官网上。';
+              box.appendChild(ihint);
+              wrap.appendChild(box);
+              grid.appendChild(wrap);
+              return;
+            } else {
+              const label = document.createElement('label');
+              label.textContent = field.label;
+              wrap.appendChild(label);
+
+              // Rich fields (guide sections / faq) default to readable plain text and can
+              // be flipped to raw JSON and back without losing anything.
+              if (field.type === 'plaintext') {
+                const seg = document.createElement('div');
+                seg.className = 'seg';
+                [['text', '纯文本'], ['json', 'JSON']].forEach(([mode, text], i) => {
+                  const b = document.createElement('button');
+                  b.type = 'button';
+                  b.textContent = text;
+                  b.dataset.mode = mode;
+                  if (i === 0) b.className = 'is-on';
+                  b.addEventListener('click', () => switchMode(wrap, mode, field));
+                  seg.appendChild(b);
+                });
+                wrap.appendChild(seg);
+              }
+
+              if (
+                field.type === 'text' ||
+                field.type === 'number' ||
+                field.type === 'date' ||
+                field.type === 'datetime-local'
+              ) {
+                control = document.createElement('input');
+                control.type = field.type;
+                control.value = raw == null ? '' : String(raw);
+              } else {
+                control = document.createElement('textarea');
+                let v = raw;
+                if (field.type === 'list') v = Array.isArray(raw) ? raw.join('\n') : '';
+                else if (field.type === 'plaintext') v = codecToText(raw, field.codec);
+                else if (field.type === 'json') v = raw == null ? '' : JSON.stringify(raw, null, 2);
+                control.value = v == null ? '' : String(v);
+                if (field.type === 'plaintext') control.style.minHeight = '260px';
+              }
+              control.dataset.key = field.key;
+              control.dataset.type = field.type;
+              if (field.codec) control.dataset.codec = field.codec;
+              wrap.appendChild(control);
+              maybeAddAiButton(wrap, control, field);
+              const hintText = field.hint || (field.codec ? CODEC_HINT[field.codec] : '');
+              if (hintText) {
+                const hint = document.createElement('span');
+                hint.className = 'hint';
+                hint.textContent = hintText;
+                wrap.appendChild(hint);
+              }
+
+              // Free-text field backed by a known value list: native autocomplete plus
+              // one-click chips, so typos don't create new values. Sources are the managed
+              // list in 站点内容 (optionsFrom) and every value already in use (suggestFrom).
+              if (field.optionsFrom || field.suggestFrom) {
+                const values = new Set();
+                if (field.optionsFrom && state.siteData) {
+                  const managed = getPath(state.siteData, field.optionsFrom);
+                  if (Array.isArray(managed)) {
+                    managed.forEach((v) => {
+                      if (v && typeof v === 'string') values.add(v);
+                    });
+                  }
+                }
+                if (field.suggestFrom) {
+                  state.docs
+                    .map((d) => getPath(d.data || {}, field.suggestFrom))
+                    .filter((v) => v && typeof v === 'string')
+                    .forEach((v) => values.add(v));
+                }
+                const sorted = [...values].sort((a, b) => a.localeCompare(b));
+                if (sorted.length) {
+                  const listId = 'dl-' + field.key.replace(/[^a-z0-9]/gi, '-');
+                  const dl = document.createElement('datalist');
+                  dl.id = listId;
+                  sorted.forEach((v) => {
+                    const o = document.createElement('option');
+                    o.value = v;
+                    dl.appendChild(o);
+                  });
+                  wrap.appendChild(dl);
+                  control.setAttribute('list', listId);
+
+                  const chips = document.createElement('div');
+                  chips.className = 'chips';
+                  sorted.forEach((v) => {
+                    const c = document.createElement('button');
+                    c.type = 'button';
+                    c.className = 'chip-btn';
+                    c.textContent = v;
+                    c.addEventListener('click', () => { control.value = v; });
+                    chips.appendChild(c);
+                  });
+                  wrap.appendChild(chips);
+                }
+              }
+            }
+            grid.appendChild(wrap);
+          });
+          card.appendChild(grid);
+          els.pane.appendChild(card);
+        });
+
+        // For collections with no id field of their own (FAQ), show the id that will be
+        // generated and keep it in sync while the question is typed.
+        const preview = $('id-preview');
+        if (preview && cfg.idPreview) {
+          els.pane.querySelectorAll('[data-key]').forEach((el) => {
+            el.addEventListener('input', () => {
+              preview.textContent = cfg.idPreview(collectFormData().data);
+            });
+          });
+        }
+
+        els.actionbar.classList.remove('hidden');
+        $('btn-del').classList.toggle('hidden', !!cfg.single || !!doc.isNew);
+        show(els.msg, '', '');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      $('btn-back').addEventListener('click', () => {
+        if (!COLLECTIONS[state.collection].single) renderList();
+      });
+
+      $('btn-new').addEventListener('click', () => {
+        const cfg = COLLECTIONS[state.collection];
+        if (cfg.single) return;
+        state.editing = { docId: '', data: cfg.blank(), sortOrder: state.docs.length, isNew: true };
+        renderEditor();
+      });
+
+      /* ---------- save / delete ---------- */
+
+      /** Reads every rendered field back into a data object. */
+      function collectFormData() {
+        const doc = state.editing;
+        const data = JSON.parse(JSON.stringify(doc.data || {}));
+        let jsonError = null;
+        els.pane.querySelectorAll('[data-key]').forEach((el) => {
+          const { key, type } = el.dataset;
+          let value;
+          if (type === 'boolean') value = el.checked;
+          else if (type === 'number') value = el.value === '' ? 0 : Number(el.value);
+          else if (type === 'list') value = el.value.split('\n').map((s) => s.trim()).filter(Boolean);
+          else if (type === 'plaintext') value = codecFromText(el.value, el.dataset.codec);
+          else if (type === 'json') {
+            const t = el.value.trim();
+            if (!t) value = [];
+            else {
+              try { value = JSON.parse(t); } catch (e) { jsonError = key + ' 不是合法 JSON，已停止保存'; }
+            }
+          } else value = el.value;
+          setPath(data, key, value);
+        });
+        return { data, jsonError };
+      }
+
+      async function doSave() {
+        const cfg = COLLECTIONS[state.collection];
+        const doc = state.editing;
+        if (state.busy || !doc) return;
+        state.busy = true;
+        const btn = $('btn-save');
+        btn.disabled = true;
+        btn.textContent = '保存中…';
+
+        const { data, jsonError } = collectFormData();
+
+        if (jsonError) {
+          show(els.msg, jsonError, 'err');
+          btn.disabled = false;
+          btn.textContent = '保存';
+          state.busy = false;
+          return;
+        }
+
+        let docId = doc.docId;
+        let renamedFrom = '';
+        if (!cfg.single) {
+          docId = cfg.docId(data);
+          if (!docId) {
+            show(els.msg, '标识 ID 生成不出来，请检查「' + (cfg.idField ? fieldLabel(cfg, cfg.idField) : '问题') + '」是否已填写', 'err');
+            btn.disabled = false;
+            btn.textContent = '保存';
+            state.busy = false;
+            return;
+          }
+          // Renaming the identifying field would otherwise orphan the old record.
+          if (!doc.isNew && doc.docId && doc.docId !== docId) renamedFrom = doc.docId;
+          doc.docId = docId;
+        }
+        const sortInput = $('f-sort');
+        const sortOrder = sortInput ? Number(sortInput.value || 0) : 0;
+
+        try {
+          await save(state.collection, docId, data, sortOrder);
+          if (renamedFrom) await remove(state.collection, renamedFrom);
+          doc.data = data;
+          doc.isNew = false;
+          // 站点内容 holds shared option lists (event categories), so keep the local copy fresh.
+          if (state.collection === 'site') await loadSiteData();
+          $('btn-del').classList.remove('hidden');
+          show(
+            els.msg,
+            '已保存到云端' + (renamedFrom ? '（原标识 ' + renamedFrom + ' 已替换）' : '') + '。要让官网生效，还需要重新构建并发布两个版本。',
+            'ok',
+          );
+        } catch (err) {
+          show(els.msg, '保存失败：' + (err.message || err), 'err');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = '保存';
+          state.busy = false;
+        }
+      }
+
+      $('btn-save').addEventListener('click', doSave);
+
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+          e.preventDefault();
+          if (!els.actionbar.classList.contains('hidden')) doSave();
+        }
+      });
+
+      $('btn-del').addEventListener('click', async () => {
+        const cfg = COLLECTIONS[state.collection];
+        const doc = state.editing;
+        const ok = await confirmDialog('「' + (cfg.title(doc.data) || doc.docId) + '」将从云端永久删除，无法撤销。', '删除确认');
+        if (!ok) return;
+        try {
+          await remove(state.collection, doc.docId);
+          await openCollection(state.collection);
+          show(els.msg, '已删除', 'ok');
+        } catch (err) {
+          show(els.msg, '删除失败：' + (err.message || err), 'err');
+        }
+      });
+
+      /* ---------- topbar actions ---------- */
+
+      $('btn-out').addEventListener('click', logout);
+
+      $('btn-pw').addEventListener('click', async () => {
+        const next = prompt('新的管理口令（至少 8 位）：');
+        if (!next) return;
+        try {
+          await rpc('cms_set_password', { p_password: state.pw, p_new_password: next });
+          state.pw = next;
+          sessionStorage.setItem(PW_KEY, next);
+          show(els.msg, '口令已更新，下次登录请用新口令', 'ok');
+        } catch (err) {
+          show(els.msg, '修改失败：' + (err.message || err), 'err');
+        }
+      });
+
+      $('btn-seed').addEventListener('click', async () => {
+        const ok = await confirmDialog('把代码里的现有内容写入云端数据库？同名条目会被覆盖，云端已有的自定义内容不会被删除。', '导入初始数据');
+        if (!ok) return;
+        const total = Object.entries(SEED).reduce(
+          (n, [k, v]) => n + (COLLECTIONS[k] && COLLECTIONS[k].single ? 1 : (Array.isArray(v) ? v.length : 0)),
+          0,
+        );
+        let done = 0;
+        show(els.msg, `导入中… 0/${total}`, '');
+        setProgress(0);
+        try {
+          for (const [collection, value] of Object.entries(SEED)) {
+            if (COLLECTIONS[collection] && COLLECTIONS[collection].single) {
+              await save(collection, 'main', value, 0);
+              done += 1;
+              show(els.msg, `导入中… ${done}/${total}`, '');
+              setProgress(Math.round((done / total) * 100));
+              continue;
+            }
+            const cfg = COLLECTIONS[collection];
+            for (let i = 0; i < value.length; i += 1) {
+              await save(collection, cfg.docId(value[i]), value[i], i);
+              done += 1;
+              show(els.msg, `导入中… ${done}/${total}`, '');
+              setProgress(Math.round((done / total) * 100));
+            }
+          }
+        } catch (err) {
+          setProgress(null);
+          show(els.msg, '导入失败：' + (err.message || err), 'err');
+          return;
+        }
+        setProgress(null);
+        // openCollection clears the status line, so write the confirmation afterwards.
+        await openCollection(state.collection);
+        show(els.msg, `初始数据已导入云端（共 ${total} 条）。`, 'ok');
+      });
+
+      $('btn-export').addEventListener('click', async () => {
+        show(els.msg, '导出中…', '');
+        try {
+          const out = {};
+          for (const key of Object.keys(COLLECTIONS)) out[key] = await list(key);
+          const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'gfic-content-' + new Date().toISOString().slice(0, 10) + '.json';
+          a.click();
+          URL.revokeObjectURL(url);
+          show(els.msg, '已下载。把文件放到项目根目录并运行 npm run content:import 即可写回代码。', 'ok');
+        } catch (err) {
+          show(els.msg, '导出失败：' + (err.message || err), 'err');
+        }
+      });
+
+      /* ---------- boot ---------- */
+
+      if (location.origin !== ENDPOINT) {
+        els.warn.classList.remove('hidden');
+        els.warn.textContent =
+          '当前域名是 ' + location.origin + '，与云服务绑定的 ' + ENDPOINT +
+          ' 不一致，云端读写会被拒绝。请从 ' + ENDPOINT + '/admin/ 打开本页。';
+      }
+
+      if (state.pw) {
+        rpc('cms_login', { p_password: state.pw })
+          .then((ok) => { if (ok === true) enter(); else logout(); })
+          .catch(() => logout());
+      }
+    </script>
+    <script
+      type="application/json"
+      id="seed-payload"
+      is:inline
+      set:html={JSON.stringify(SEED).replace(/</g, '\\u003c')}
+    ></script>
+  </body>
+</html>

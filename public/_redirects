@@ -1,0 +1,30 @@
+# Redirect rules for whichever host serves gficcrew.com.
+#
+# GitHub Pages reads NEITHER this file nor `_headers`, so the host no longer executes
+# the rules below. They stay because they are now the single source of truth:
+# scripts/prepare-gh-pages.mjs parses the 301/302 lines here and materialises each one
+# as a real stub page (HTTP 200 + canonical + 0-second meta refresh) in the GitHub
+# artifact. Editing a rule here still changes what gets deployed.
+#
+# The 404 rewrites at the bottom need no stub: GitHub Pages answers any unmatched path
+# with the root 404.html, and /admin is kept out of the artifact entirely.
+
+# The previous site served the Guangzhou page at /guangzhou. This build moved it under
+# /guides/ -- keep the old link alive so inbound links and search results don't 404.
+/guangzhou   /guides/guangzhou/  301
+/guangzhou/  /guides/guangzhou/  301
+
+# /homepage/ was a CMS placeholder ("Homepage content is managed via frontmatter fields
+# above.") that leaked into the previous build and therefore into the sitemap that was
+# submitted to Google. That route does not exist in this build, so without this rule the
+# switch to a new host would turn an indexed URL into a 404. Send it to the homepage:
+# that keeps the URL alive and consolidates a thin, content-free page into the real one.
+/homepage   /  301
+/homepage/  /  301
+
+# The admin panel is served by the WorkBuddy cloud service and only accepts calls from
+# its own origin (https://gficcrew.app.workbuddy.host). On gficcrew.com it would render
+# a shell that cannot reach its backend, so answer 404 instead of shipping a dead page.
+# Content management always happens at https://gficcrew.app.workbuddy.host/admin/
+/admin      /404.html  404
+/admin/*    /404.html  404

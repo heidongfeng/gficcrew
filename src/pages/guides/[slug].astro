@@ -1,0 +1,132 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FaqList from '../../components/FaqList.astro';
+import JoinDropdown from '../../components/JoinDropdown.astro';
+import { SITE } from '../../data/site.js';
+import { GUIDES, howtosForGuide, isStepSection, metaDescriptionFor } from '../../data/guides.js';
+import { CITIES } from '../../data/cities.js';
+import {
+  articleSchema,
+  faqSchema,
+  breadcrumbSchema,
+  webPageSchema,
+  orgSchema,
+  localCommunitySchema,
+  howToSchema,
+} from '../../data/schema.js';
+
+export function getStaticPaths() {
+  return GUIDES.map((guide) => ({ params: { slug: guide.slug }, props: { guide } }));
+}
+
+const { guide } = Astro.props;
+const url = new URL(`/guides/${guide.slug}/`, SITE.url).href;
+const cityInfo = CITIES.find((c) => c.slug === guide.citySlug);
+const howtos = howtosForGuide(guide, url);
+
+const schema = [
+  orgSchema(),
+  webPageSchema({ url, name: guide.title, description: guide.description }),
+  articleSchema({
+    url,
+    headline: guide.headline || guide.title,
+    description: guide.description,
+    datePublished: guide.updated,
+    dateModified: guide.updated,
+    city: guide.city,
+  }),
+  faqSchema(guide.faq, url),
+  ...howtos.map((h) => howToSchema({ url, id: h.id, ...h })),
+  localCommunitySchema({
+    url,
+    city: guide.city,
+    description: guide.description,
+    areaServed: [guide.city],
+  }),
+  breadcrumbSchema([
+    { name: 'Home', url: SITE.url + '/' },
+    { name: 'Cities & Guides', url: `${SITE.url}/cities/` },
+    { name: guide.city, url },
+  ]),
+];
+---
+
+<BaseLayout
+  /* headline carries every keyword and runs past the ~65 chars a result shows, so the meta
+     title takes the shorter guide.title. The headline still owns the visible H1. */
+  title={`${guide.title} | GFIC Crew`}
+  description={metaDescriptionFor(guide)}
+  schema={schema}
+>
+  <section class="section section--tight">
+    <div class="wrap wrap--measure">
+      <p class="breadcrumb">
+        <a href="/">Home</a> / <a href="/cities/">Cities &amp; Guides</a> / {guide.city}
+      </p>
+      <h1>{guide.title}</h1>
+      {guide.intro.map((p) => <p class="lead">{p}</p>)}
+      <p class="note">
+        Last updated {guide.updated} · By GFIC Crew
+      </p>
+
+      <nav class="toc" aria-label="Guide contents">
+        <h2>Contents</h2>
+        <ol>
+          {guide.sections.map((s) => <li><a href={`#${s.id}`}>{s.title}</a></li>)}
+          <li><a href="#faq">{guide.city} FAQ</a></li>
+        </ol>
+      </nav>
+    </div>
+  </section>
+
+  <article class="section" style="padding-top:0">
+    <div class="wrap prose" style="max-width:800px">
+      {
+        guide.sections.map((section) => {
+          // Step sections render as <ol>: the order is the point, and it is also what the
+          // HowTo markup is derived from.
+          const ListTag = isStepSection(section.id) ? 'ol' : 'ul';
+          return (
+            <section id={section.id}>
+              <h2>{section.title}</h2>
+              {section.paragraphs.map((p) => <p>{p}</p>)}
+              {section.list ? (
+                <ListTag>
+                  {section.list.map((item) => <li>{item}</li>)}
+                </ListTag>
+              ) : null}
+            </section>
+          );
+        })
+      }
+
+      <h2 id="faq">{guide.city} FAQ</h2>
+      <FaqList items={guide.faq} />
+
+      <h2>Join the {guide.city} crew</h2>
+      <p>
+        {cityInfo ? cityInfo.blurb : `What makes ${guide.city} feel like home is showing up.`}
+        Every group is free to join right now; when paid membership opens it is lifetime, from RMB
+        288.
+      </p>
+      <p style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <JoinDropdown label={`Join ${guide.city}`} size="lg" align="left" />
+        <a class="btn btn--ghost" href="/events/">See events</a>
+      </p>
+      <p>
+        Search “GFIC Crew” on {SITE.socialLine}.
+        WeChat ID: <strong>{SITE.wechat}</strong>.
+      </p>
+    </div>
+  </article>
+
+  <section class="section section--soft">
+    <div class="wrap wrap--measure">
+      <h2>Other city guides</h2>
+      <p>
+        <a href="/guides/" style="color:var(--accent)">All city guides</a> ·
+        <a href="/cities/" style="color:var(--accent)">All {CITIES.length} crew cities</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>

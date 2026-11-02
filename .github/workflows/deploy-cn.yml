@@ -1,0 +1,56 @@
+name: Deploy China site (gficcrew.cn)
+
+# 手动触发专用 —— 说明见下。
+#
+# 国内站（gficcrew.cn）不走 GitHub 部署。它由腾讯云轻量服务器
+# （CentOS 7.6 + 宝塔 + Apache）直接从 /www/wwwroot/gficcrew.cn/ 提供，
+# 而服务器自己按计划拉取预构建好的包：
+#
+#   scripts/server-pull.sh  ←  拉 https://gficcrew.com/cn-bundle.txt
+#
+# 注意这个地址是 .com，不是 gficcrew.app.workbuddy.host。.app 那份 384,277 B 的包
+# 是 2026-11-01 16:21 那次定时任务留下的旧版（dist-app，40 条 FAQ 时代），
+# .app 的静态托管只增量覆盖不删文件，所以它至今仍能下载到，但已经没人用、也不该再用。
+# server-pull.sh 里没有任何指向 .app 的分支，这条注释此前是错的，已改正。
+#
+# 这个包由本机在每次构建后执行 `npm run cn:zip` 生成（dist-cn → cn-bundle.txt），
+# 并随境外版一起发布，全程不经过 GitHub Runner。
+#
+# 所以本 workflow 不再监听 push：否则每次 push main 都会因为缺少腾讯云密钥而失败，
+# 让 Actions 页面看起来像是坏的。下面的 CloudBase 路线保留作为备用方案
+# （万一将来轻量服务器退役），需要时在 Actions 页面手动 Run workflow。
+#
+# 启用前提：gficcrew.cn 已完成 ICP 备案，且 .env.cn 里填了真实的 PUBLIC_ICP。
+# 需要的仓库 Secrets：TENCENTCLOUD_SECRETID、TENCENTCLOUD_SECRETKEY、CLOUDBASE_ENV_ID
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build China variant (gficcrew.cn)
+        run: npm run build:cn
+
+      - name: Deploy to Tencent Cloud static hosting
+        env:
+          CLOUDBASE_ENV_ID: ${{ secrets.CLOUDBASE_ENV_ID }}
+          TENCENTCLOUD_SECRETID: ${{ secrets.TENCENTCLOUD_SECRETID }}
+          TENCENTCLOUD_SECRETKEY: ${{ secrets.TENCENTCLOUD_SECRETKEY }}
+        run: |
+          npm install -g @cloudbase/cli
+          tcb login --apiKeyId "$TENCENTCLOUD_SECRETID" --apiKey "$TENCENTCLOUD_SECRETKEY"
+          tcb hosting deploy dist-cn / -e "$CLOUDBASE_ENV_ID"

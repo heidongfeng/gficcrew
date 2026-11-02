@@ -1,0 +1,79 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import JoinDropdown from '../components/JoinDropdown.astro';
+import { SITE } from '../data/site.js';
+import { CONTACT, fill } from '../data/contact.js';
+import { CITIES } from '../data/cities.js';
+import { breadcrumbSchema, webPageSchema, orgSchema } from '../data/schema.js';
+
+const url = `${SITE.url}/contact/`;
+const description =
+  `Contact ${SITE.name} (${SITE.nameZh}): add WeChat ${SITE.wechat}, or search “${SITE.name}” on ${SITE.socialLine}.`;
+
+const schema = [
+  orgSchema(),
+  webPageSchema({ url, name: 'Contact GFIC Crew', description }),
+  breadcrumbSchema([{ name: 'Home', url: SITE.url + '/' }, { name: 'Contact', url }]),
+];
+---
+
+<BaseLayout title={`Contact ${SITE.name} — WeChat ${SITE.wechat}`} description={description} schema={schema}>
+  <section class="section section--tight">
+    <div class="wrap wrap--measure">
+      <p class="breadcrumb"><a href="/">Home</a> / Contact</p>
+      <h1>{CONTACT.title}</h1>
+      <p class="lead">{fill(CONTACT.lead)}</p>
+      <div style="margin-top:22px">
+        <JoinDropdown align="left" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap wrap--measure">
+      <h2>{CONTACT.waysTitle}</h2>
+      <div class="block">
+        <h3>{CONTACT.websiteTitle}</h3>
+        <p style="margin:0">
+          <a href={SITE.url} style="color:var(--accent)">{SITE.url.replace('https://', '')}</a>
+        </p>
+      </div>
+      <div class="block" style="margin-top:26px">
+        <h3>{CONTACT.socialsTitle}</h3>
+        <p class="note">{fill(CONTACT.socialsNote)}</p>
+        <ul style="margin:0">
+          {SITE.socials.map((s) => (
+            <li>
+              {s.label}{s.labelZh ? <> / <span lang="zh-CN">{s.labelZh}</span></> : null}
+              {s.handle ? ` · ${s.handle}` : ''}{s.note ? ` · ${s.note}` : ''}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div class="block" style="margin-top:26px">
+        <h3>{CONTACT.askTitle}</h3>
+        <ul style="margin:0">
+          {(CONTACT.askItems || []).map((i) => <li>{i}</li>)}
+        </ul>
+      </div>
+      <div class="block" style="margin-top:26px">
+        <h3>What happens after you message</h3>
+        <ol style="margin:0;padding-left:20px;color:var(--body)">
+          <li>Tell us which city group or the national group you want to join.</li>
+          <li>We reply and help you join the right WeChat group.</li>
+          <li>There is nothing to pay: every group is free while paid membership remains closed.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--soft">
+    <div class="wrap wrap--measure">
+      <h2>{CONTACT.meetTitle}</h2>
+      <p>
+        {CITIES.map((c) => c.name).join(' · ')}
+      </p>
+      <p class="note">{fill(CONTACT.meetNote)}</p>
+    </div>
+  </section>
+</BaseLayout>

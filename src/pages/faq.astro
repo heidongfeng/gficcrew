@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBand from '../components/CtaBand.astro';
+import FaqList from '../components/FaqList.astro';
+import { SITE } from '../data/site.js';
+import { FAQ } from '../data/faq.js';
+import { faqSchema, breadcrumbSchema, webPageSchema } from '../data/schema.js';
+
+const url = `${SITE.url}/faq/`;
+// Two lengths, two jobs. The long string is keyword-rich prose and feeds the WebPage
+// JSON-LD node, where nothing truncates it. Handing the same string to <meta
+// name="description"> produced 170 characters where a SERP snippet is cut near 155, so
+// the visible sentence stopped mid-clause. Same split as the other content pages.
+const description =
+  'Frequently asked questions about GFIC Crew: membership plans (not open yet), refunds, events, apartment rental, WeChat Pay, healthcare, language exchange and living in China as an expat.';
+const metaDescription =
+  'Answers about GFIC Crew membership plans (not open yet), refunds, events, apartment rental, WeChat Pay, healthcare and language exchange for expats in China.';
+
+const schema = [
+  webPageSchema({ url, name: 'GFIC Crew FAQ', description }),
+  faqSchema(FAQ, url),
+  breadcrumbSchema([{ name: 'Home', url: SITE.url + '/' }, { name: 'FAQ', url }]),
+];
+---
+
+<BaseLayout title="FAQ — GFIC Crew, Expat Community in China" description={metaDescription} schema={schema}>
+  <section class="section section--tight">
+    <div class="wrap wrap--measure">
+      <p class="breadcrumb"><a href="/">Home</a> / FAQ</p>
+      <h1>Frequently asked questions</h1>
+      <p class="lead">
+        {FAQ.length} answers about joining GFIC Crew, the membership plans (not open yet) and refunds, events, and
+        practical life in China: housing, WeChat Pay, healthcare and language exchange.
+      </p>
+
+      <div class="field" role="search" style="margin:24px 0 8px;max-width:420px">
+        <label for="faq-search">Search the FAQ</label>
+        <input id="faq-search" name="q" type="search" role="searchbox" autocomplete="off" placeholder="e.g. rent, WeChat Pay, refund" />
+      </div>
+      <p class="note" id="faq-count"></p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:24px">
+    <div class="wrap wrap--measure">
+      <h2>Browse answers by topic</h2>
+      <FaqList items={FAQ} />
+      <p id="faq-empty" class="note" style="display:none">Nothing matches that search.</p>
+
+      <div style="margin-top:40px">
+        <h2>Still have a question?</h2>
+        <p>
+          Message us on WeChat <strong>{SITE.wechat}</strong> or use the
+          <a href="/contact/" style="color:var(--accent)">contact page</a>. We reply within 24 hours.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<script>
+  const search = document.getElementById('faq-search');
+  const items = Array.from(document.querySelectorAll('details.faq'));
+  const groups = Array.from(document.querySelectorAll('.faq-group'));
+  const count = document.getElementById('faq-count');
+  const empty = document.getElementById('faq-empty');
+
+  function filter() {
+    const q = (search && search.value ? search.value : '').trim().toLowerCase();
+    let visible = 0;
+    items.forEach((item) => {
+      const text = (item.textContent || '').toLowerCase();
+      const show = q === '' || text.includes(q);
+      item.style.display = show ? '' : 'none';
+      if (show) visible += 1;
+    });
+    groups.forEach((group) => {
+      const hasVisible = Array.from(group.querySelectorAll('details.faq')).some(
+        (d) => d.style.display !== 'none',
+      );
+      group.style.display = hasVisible ? '' : 'none';
+    });
+    if (count) count.textContent = q ? `${visible} of ${items.length} questions match “${search.value}”.` : '';
+    if (empty) empty.style.display = visible === 0 ? 'block' : 'none';
+  }
+
+  if (search) {
+    const initialQuery = new URLSearchParams(window.location.search).get('q') || '';
+    search.value = initialQuery;
+    filter();
+    search.addEventListener('input', () => {
+      filter();
+      const next = new URL(window.location.href);
+      if (search.value.trim()) next.searchParams.set('q', search.value);
+      else next.searchParams.delete('q');
+      window.history.replaceState(null, '', next);
+    });
+  }
+</script>

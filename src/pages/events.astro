@@ -1,0 +1,229 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBand from '../components/CtaBand.astro';
+import JoinDropdown from '../components/JoinDropdown.astro';
+import { SITE, EVENT_CATEGORIES, FORMATS, FORMAT_TIERS } from '../data/site.js';
+import { upcomingEvents } from '../data/events.js';
+import { itemListSchema, eventSchema, breadcrumbSchema, webPageSchema } from '../data/schema.js';
+
+const url = `${SITE.url}/events/`;
+
+// Only what has not finished yet reaches the page, the calendar filters and the Event markup.
+// The formats are a separate, evergreen block below: they stay on the page with or without a
+// confirmed date, and unlike the sample events we cleared out in October 2026 the ranking is
+// something we can actually stand behind, because it is editorial policy rather than a claim
+// about what has already happened. See docs/meetup-format-ranking.md.
+const calendar = upcomingEvents();
+const eventCities = ['All cities', ...Array.from(new Set(calendar.map((e) => e.city)))];
+const byTier = (tier) => FORMATS.filter((f) => f.tier === tier).sort((a, b) => a.rank - b.rank);
+
+const schema = [
+  webPageSchema({
+    url,
+    name: 'GFIC Crew events — expat meetups in China',
+      description: 'The meetup formats GFIC Crew runs for expats in China: parties and socials, networking mixers, food crawls and shared meals, language exchange, hikes and weekend getaways, sports leagues and Chinese cultural experiences. In person in Guangzhou and Shenzhen, plus online groups nationwide.',
+  }),
+  breadcrumbSchema([{ name: 'Home', url: SITE.url + '/' }, { name: 'Events', url }]),
+  itemListSchema({
+    id: `${url}#format-list`,
+    name: 'GFIC Crew meetup formats',
+    description: 'Evergreen meetup formats planned by GFIC Crew, independent of dated event announcements.',
+    items: FORMATS.map((f) => ({ name: f.name, url: `${url}#${f.id}`, description: f.tagline })),
+  }),
+  // An empty ItemList would tell search engines the crew runs no events at all, so when the
+  // calendar is empty we publish no list and no Event nodes rather than an empty promise.
+  ...(calendar.length
+    ? [
+        itemListSchema({
+          id: `${url}#event-list`,
+          name: 'GFIC Crew upcoming events',
+          description: 'Rolling calendar of crew events across Chinese cities.',
+          items: calendar.map((e) => ({ name: e.title, url: `${SITE.url}/events/${e.slug}/`, description: e.description })),
+        }),
+        ...calendar.map((e) => eventSchema(e, `${SITE.url}/events/${e.slug}/`)),
+      ]
+    : []),
+];
+---
+
+<BaseLayout
+  title="GFIC Crew Events — Expat Meetups in Guangzhou & Shenzhen"
+  description="Ten expat meetup formats: parties and socials, networking mixers, food crawls, language exchange, hikes, sports leagues and more. In Guangzhou and Shenzhen."
+  schema={schema}
+>
+  <section class="section section--tight">
+    <div class="wrap wrap--measure">
+      <p class="breadcrumb"><a href="/">Home</a> / Events</p>
+      <h1>What the crew does together</h1>
+      <p class="lead">
+        We keep ten meetup formats on the board, from parties and networking mixers through to food
+        crawls, language exchange, hikes, sports leagues and Chinese cultural experiences. We meet up
+        in person in Guangzhou and Shenzhen, and expats anywhere in China can join the online groups
+        and our national group.
+      </p>
+    </div>
+  </section>
+
+  {/* The evergreen half of the page. Answerable today, unlike "when is the next one". */}
+  <section class="section" style="padding-top:0">
+    <div class="wrap wrap--measure">
+      <h2>The formats we run</h2>
+      <p style="margin-bottom:30px">
+        Nothing sits on a fixed calendar yet. These are the formats we build meetups around, and
+        each one works a little differently depending on whether you have just landed or have been
+        here for years.
+      </p>
+
+      {FORMAT_TIERS.map((group) => (
+        <div class="tier">
+          <h3 class="tier-head">{group.label}</h3>
+          <p class="tier-note">{group.note}</p>
+
+          {byTier(group.tier).map((f) => (
+            <article class="block format" id={f.id}>
+              <div class="format-head">
+                <h4>{f.name}</h4>
+              </div>
+              <p class="format-tagline">{f.tagline}</p>
+              <dl class="format-detail">
+                <dt>Why it works</dt>
+                <dd>{f.why}</dd>
+                <dt>What changes in China</dt>
+                <dd>{f.inChina}</dd>
+                <dt>If you come on your own</dt>
+                <dd>{f.soloNote}</dd>
+              </dl>
+            </article>
+          ))}
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap wrap--measure">
+      <h2>Upcoming dates</h2>
+      {
+        /* Filters are pointless above an empty list, so they disappear with the last event. */
+        calendar.length ? (
+          <>
+            <div class="filters" role="group" aria-label="Filter events by category">
+              {
+                ['All', ...EVENT_CATEGORIES].map((cat) => (
+                  <button class="filter-btn" type="button" data-filter={cat} aria-pressed={cat === 'All' ? 'true' : 'false'}>
+                    {cat}
+                  </button>
+                ))
+              }
+            </div>
+
+            <div class="field" style="max-width:280px;margin-bottom:8px">
+              <label for="city-filter">Filter by city</label>
+              <select id="city-filter">
+                {eventCities.map((c) => <option value={c}>{c}</option>)}
+              </select>
+            </div>
+          </>
+        ) : null
+      }
+      <div id="event-list">
+        {
+          calendar.map((event) => (
+            <article
+              class="event"
+              id={event.slug}
+              data-category={event.category}
+              data-city={event.city}
+            >
+              <div class="event-body">
+                <h3><a href={`/events/${event.slug}/`}>{event.title}</a></h3>
+                <div class="event-meta">
+                  {new Date(event.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })},
+                  {event.startDate.slice(11, 16)}–{event.endDate.slice(11, 16)} · {event.city} ·{' '}
+                  {event.cadence} · {event.venue} · {event.price}
+                </div>
+                <p style="margin-bottom:14px">{event.description}</p>
+                <JoinDropdown align="left" />
+              </div>
+            </article>
+          ))
+        }
+      </div>
+      {
+        /* Only rendered when there is something to filter: with an empty calendar the hidden
+           "no events match" line would still sit in the HTML and read like a broken filter. */
+        calendar.length ? (
+          <p id="empty-state" class="note" style="display:none">No events match this filter.</p>
+        ) : null
+      }
+      {
+        calendar.length === 0 ? (
+          <div class="block">
+            <p>
+              We are a small, new crew, so there is no fixed schedule yet and no dates to publish
+              today. Each meetup gets announced inside the WeChat groups once it is confirmed, and
+              we add people to the event group the day before it happens.
+            </p>
+            <p style="margin-bottom:0">
+              Add us on WeChat <strong>{SITE.wechat}</strong> and tell us what you are after, and we
+              reply within 24 hours, and every group is free to join right now.
+            </p>
+          </div>
+        ) : null
+      }
+    </div>
+  </section>
+
+  <section class="section section--soft">
+    <div class="wrap wrap--measure">
+      <span class="eyebrow">How to join an event</span>
+      <h2>Add us on WeChat and tell us which event you want</h2>
+      <p class="lead">
+        Sign-ups happen on WeChat, which is where the event groups are and where we confirm your
+        spot. Scan the QR code from any Join the Crew button, or add <strong>{SITE.wechat}</strong>{' '}
+        directly and tell us which event you want.
+      </p>
+    </div>
+  </section>
+
+  <CtaBand
+    title="Want to start something yourself?"
+    text="Anyone in the crew can propose a meetup. Tell us what you want to run and we will announce it to the group."
+  />
+</BaseLayout>
+
+<script>
+  const buttons = Array.from(document.querySelectorAll('.filter-btn'));
+  const citySelect = document.getElementById('city-filter');
+  const cards = Array.from(document.querySelectorAll('#event-list .event'));
+  const empty = document.getElementById('empty-state');
+  let activeCategory = 'All';
+
+  function applyFilters() {
+    const city = citySelect ? citySelect.value : 'All cities';
+    let visible = 0;
+    cards.forEach((card) => {
+      const matchCat = activeCategory === 'All' || card.dataset.category === activeCategory;
+      const matchCity = city === 'All cities' || card.dataset.city === city;
+      const show = matchCat && matchCity;
+      card.style.display = show ? '' : 'none';
+      if (show) visible += 1;
+    });
+    if (empty) {
+      // With zero cards there is nothing to filter, so "no events match this filter" would be a
+      // confusing second opinion next to the calendar notice. That notice explains the real reason.
+      empty.style.display = cards.length === 0 || visible > 0 ? 'none' : 'block';
+    }
+  }
+
+  if (cards.length > 0) {
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        activeCategory = btn.dataset.filter;
+        buttons.forEach((b) => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+        applyFilters();
+      });
+    });
+    if (citySelect) citySelect.addEventListener('change', applyFilters);
+  }
+</script>

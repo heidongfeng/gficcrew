@@ -1,0 +1,246 @@
+{
+  "_comment": "云端契约快照。由人工通过云数据库只读接口抓取后写入，供 tools/audit/checks/cloud-contract.mjs 离线复验。任何一项与线上不符时，先重新抓取本文件，再看检查是否真的失败 —— 不要直接改这里的值去迁就代码。",
+  "_refresh": {
+    "applicationId": "wbapp_1uORfVuxR6GP7CtKSD3Ciw（工作区 .workbuddy/applications.yaml 里名为「GFIC歪果社官网」）",
+    "how": "用 cloudbase / genie-baas 的只读接口依次取：库表清单、RLS 策略清单、pg_proc 中 public schema 的函数定义、information_schema.columns、information_schema.role_table_grants、cms_docs 按 collection 分组的计数。",
+    "capturedAt": "2026-10-04（当日四次：02:26 初始、02:55 改完 RLS/KDF、13:00 Golden Week FAQ 30→35、2026-10-30 清空虚构活动后重抓）"
+  },
+  "tables": {
+    "cms_admin": {
+      "rls": true,
+      "policies": [],
+      "grantAnon": [
+        "SELECT"
+      ],
+      "columns": [
+        "id",
+        "username",
+        "password_hash",
+        "salt",
+        "failed_attempts",
+        "locked_until",
+        "updated_at"
+      ],
+      "rows": 1,
+      "accessedViaRpc": [
+        "cms_login",
+        "cms_set_password"
+      ],
+      "purpose": "后台单口令。RLS 开启且零策略 = 对 anon/authenticated 默认拒绝，只有 SECURITY DEFINER 的 cms_* 能读到。口令哈希 2026-10-04 从单轮 sha256 换成 bcrypt。"
+    },
+    "cms_docs": {
+      "rls": true,
+      "policies": [],
+      "grantAnon": [
+        "SELECT"
+      ],
+      "columns": [
+        "collection",
+        "doc_id",
+        "data",
+        "sort_order",
+        "updated_at"
+      ],
+      "rows": 67,
+      "accessedViaRpc": [
+        "cms_list",
+        "cms_save",
+        "cms_delete"
+      ],
+      "purpose": "站点内容的唯一云端副本。同样零策略，读只走 cms_list。"
+    },
+    "crew_requests": {
+      "rls": true,
+      "policies": [
+        {
+          "name": "crew_requests_insert_own",
+          "command": "INSERT",
+          "roles": "PUBLIC",
+          "using": null,
+          "withCheck": "(owner_id IS NULL OR owner_id = auth.uid())"
+        },
+        {
+          "name": "crew_requests_select_own",
+          "command": "SELECT",
+          "roles": "PUBLIC",
+          "using": "(owner_id = auth.uid())",
+          "withCheck": null
+        },
+        {
+          "name": "crew_requests_update_own",
+          "command": "UPDATE",
+          "roles": "PUBLIC",
+          "using": "(owner_id = auth.uid())",
+          "withCheck": "(owner_id = auth.uid())"
+        },
+        {
+          "name": "crew_requests_delete_own",
+          "command": "DELETE",
+          "roles": "PUBLIC",
+          "using": "(owner_id = auth.uid())",
+          "withCheck": null
+        }
+      ],
+      "grantAnon": [
+        "DELETE",
+        "INSERT",
+        "SELECT",
+        "UPDATE"
+      ],
+      "columns": [
+        "id",
+        "owner_id",
+        "kind",
+        "full_name",
+        "email",
+        "wechat",
+        "city",
+        "event_slug",
+        "event_title",
+        "plan",
+        "message",
+        "status",
+        "created_at",
+        "subject"
+      ],
+      "rows": 0,
+      "expect": {
+        "blanketSelect": false,
+        "why": "存放姓名/邮箱/微信，属于个人信息，绝不能对匿名读开放"
+      }
+    },
+    "crew_photos": {
+      "rls": true,
+      "policies": [
+        {
+          "name": "crew_photos_insert_own",
+          "command": "INSERT",
+          "roles": "PUBLIC",
+          "using": null,
+          "withCheck": "(owner_id = auth.uid())"
+        },
+        {
+          "name": "crew_photos_select_own",
+          "command": "SELECT",
+          "roles": "PUBLIC",
+          "using": "(owner_id = auth.uid())",
+          "withCheck": null
+        },
+        {
+          "name": "crew_photos_delete_own",
+          "command": "DELETE",
+          "roles": "PUBLIC",
+          "using": "(owner_id = auth.uid())",
+          "withCheck": null
+        }
+      ],
+      "grantAnon": [
+        "DELETE",
+        "INSERT",
+        "SELECT",
+        "UPDATE"
+      ],
+      "columns": [
+        "id",
+        "owner_id",
+        "owner_name",
+        "storage_path",
+        "caption",
+        "city",
+        "created_at"
+      ],
+      "rows": 0,
+      "expect": {
+        "blanketSelect": false,
+        "why": "2026-10-04 已修：原 SELECT 策略 crew_photos_select_all 是 USING (true)，与 anon 持有的 SELECT 权限叠加即匿名整表读。现改为 owner_id = auth.uid()，读写口径一致。"
+      }
+    }
+  },
+  "functions": [
+    {
+      "name": "cms_login",
+      "args": "p_password text",
+      "returns": "boolean",
+      "securityDefiner": true,
+      "executeGrantee": [
+        "anon",
+        "authenticated",
+        "service_role"
+      ]
+    },
+    {
+      "name": "cms_list",
+      "args": "p_password text, p_collection text",
+      "securityDefiner": true,
+      "executeGrantee": [
+        "anon",
+        "authenticated",
+        "service_role"
+      ]
+    },
+    {
+      "name": "cms_save",
+      "args": "p_password text, p_collection text, p_doc_id text, p_data jsonb, p_sort_order integer",
+      "securityDefiner": true,
+      "executeGrantee": [
+        "anon",
+        "authenticated",
+        "service_role"
+      ]
+    },
+    {
+      "name": "cms_delete",
+      "args": "p_password text, p_collection text, p_doc_id text",
+      "securityDefiner": true,
+      "executeGrantee": [
+        "anon",
+        "authenticated",
+        "service_role"
+      ]
+    },
+    {
+      "name": "cms_set_password",
+      "args": "p_password text, p_new_password text",
+      "securityDefiner": true,
+      "executeGrantee": [
+        "anon",
+        "authenticated",
+        "service_role"
+      ]
+    }
+  ],
+  "auth": {
+    "mechanism": "cms_admin.password_hash = crypt(p_password, password_hash) —— bcrypt，cost 10，盐内嵌在哈希里",
+    "kdf": "bcrypt",
+    "kdfRounds": 10,
+    "perPasswordSalt": true,
+    "saltStorage": "内嵌在 password_hash 中（$2a$10$ + 22 位盐 + 31 位哈希）。cms_admin.salt 列保留但为 NULL，只用于识别旧哈希；该列的 NOT NULL 约束已解除",
+    "rateLimited": true,
+    "lockout": true,
+    "lockoutPolicy": "连续 5 次失败 → 锁 15 分钟；锁定期内即使口令正确也返回 false；成功即清零。计数在 cms_admin.failed_attempts，解锁时间在 locked_until",
+    "legacyHashAccepted": true,
+    "legacyUpgrade": "旧 sha256 哈希验通过时，cms_login 就地把哈希改写成 bcrypt 并清空 salt —— 迁移不会把管理员锁在外面",
+    "minNewPasswordLength": 8,
+    "enforcedServerSide": true,
+    "pgcryptoAvailable": [
+      "crypt",
+      "gen_salt",
+      "digest",
+      "hmac",
+      "encrypt"
+    ],
+    "verifyCentralised": "cms_list / cms_save / cms_delete / cms_set_password 全部调用 cms_login 做校验，所以口令逻辑只有一处，换 KDF 不需要逐个函数改",
+    "why": "2026-10-04 已修。原为单轮 SHA-256 加单列固定盐，GPU 下每秒可试数十亿次；而 cms_login 对 anon 可执行且没有限速或锁定，两者叠加使口令成为可暴力破解的单点。现改用 bcrypt 并加失败计数与锁定。"
+  },
+  "collections": {
+    "site": 1,
+    "contact": 1,
+    "cities": 16,
+    "events": 1,
+    "faq": 42,
+    "plans": 3,
+    "guides": 1,
+    "monitor": 7
+  },
+  "collectionsNote": "cms_docs 共 72 条 = 上表之和。各集合条数：CITIES 16 / EVENTS 1 / FAQ 42 / PLANS 3 / GUIDES 1。2026-10-30 重新抓取：删除了全部虚构活动（EVENTS 变化）。2026-11-02 复核：登录后台逐集合点数，FAQ 实为 42 条（此前记的 40 已过期），其余一致 —— 只更新了这几个计数，schema 主体（表/函数/RLS）仍是 2026-10-04 那次抓取的。"
+}

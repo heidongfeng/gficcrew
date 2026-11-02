@@ -1,0 +1,25 @@
+# Normalise on commit so line endings never depend on who checked the repo out.
+# Shell scripts run on Linux (CentOS / GitHub Actions) — CRLF would break them with
+# "$'\r': command not found". Keep them LF even on a Windows checkout.
+*.sh   text eol=lf
+*.mjs  text eol=lf
+*.cjs  text eol=lf
+*.js   text eol=lf
+*.json text eol=lf
+*.yml  text eol=lf
+*.astro text eol=lf
+
+# Windows-only helpers keep CRLF.
+*.ps1  text eol=crlf
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.yaml text eol=lf
+
+# Binary assets — never touch.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.woff binary
+*.woff2 binary

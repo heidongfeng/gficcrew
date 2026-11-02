@@ -1,0 +1,18 @@
+# Kept OUT of the Cloudflare upload (Workers static assets reads this file).
+#
+# The admin panel is served by the WorkBuddy cloud service and only accepts calls
+# from its own origin (https://gficcrew.app.workbuddy.host). Rendered from
+# gficcrew.com it would load a shell that cannot talk to its backend — a page that
+# looks alive but does nothing. A plain 404 is the honest answer, same intent as
+# the RedirectMatch rule in .htaccess for the China site.
+#
+# Content management stays at https://gficcrew.app.workbuddy.host/admin/
+admin/
+
+# The admin page's own CSS/JS chunks (hashed names, so matched as a glob).
+# Nothing else references them — verified by grepping dist-global.
+_astro/admin.*
+
+# The China bundle is not needed here; the BT server pulls it from the WorkBuddy
+# host, and shipping it to Cloudflare would just add half a megabyte per deploy.
+cn-bundle.txt

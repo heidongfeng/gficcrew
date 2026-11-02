@@ -1,0 +1,55 @@
+name: Deploy global site (gficcrew.com)
+
+# STATUS: retired / manual-only.
+#
+# gficcrew.com is currently served by GitHub Pages, not by this Worker:
+#   A records 185.199.108.153 / .109.153 / .110.153 / .111.153
+#   response header: Server: GitHub.com
+# This repository has no Cloudflare secrets, so a push-triggered run would always
+# fail and leave a red X in Actions. Keep the file for reference; to use the
+# Cloudflare path again, add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in
+# repository secrets, attach the Worker to a domain, then run this workflow manually.
+#
+# Overseas build: Cloudflare Workers static assets + GitHub. No ICP filing needed, global CDN.
+#
+# NOTE: this deploys a WORKER, not a Pages project.
+# This Cloudflare account cannot create Pages projects at all — both the dashboard and
+# `wrangler pages project create` fail with error 8000030 "Subdomain is blocked. Enter a
+# new subdomain or contact abusereply@cloudflare.com.", regardless of the project name.
+# Worker creation works fine, and Cloudflare now recommends Workers static assets for new
+# static sites, so Workers is the supported path here. Config lives in wrangler.jsonc.
+#
+# Required repo secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
+# The token must be created from the "Edit Cloudflare Workers" template
+# (Workers Scripts: Edit + Account Settings: Read + User Details: Read).
+# A token scoped to "Cloudflare Pages: Edit" will NOT deploy a Worker — the two
+# products' permissions are not interchangeable.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build global variant (gficcrew.com)
+        run: npm run build:global
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy

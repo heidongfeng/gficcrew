@@ -1,0 +1,61 @@
+node_modules/
+
+# Build output (both variants, the WorkBuddy admin origin + Astro's default outDir)
+dist-global/
+dist-cn/
+dist-app/
+dist/
+.astro/
+
+# The GitHub Pages artifact (dist-global minus host metafiles, plus .nojekyll and
+# the redirect stubs). Derived, never committed -- it is pushed to a separate
+# branch by scripts/deploy-github-pages.mjs, not into this one.
+dist-ghpages/
+
+# Publish bookkeeping: hashes / baselines used by the publish gate
+.state/
+# Written by prepare-gh-pages.mjs, read by deploy-github-pages.mjs. It describes
+# THIS machine's build, so committing it would make a fresh clone claim its
+# artifact is current when it has none.
+.publish-stamp.json
+.adminpw
+content-export.json
+gfic-content-*.json
+
+# Netlify personal access token, used by scripts/deploy-netlify.mjs for direct
+# (pre-built) deploys. Kept out of the repo for the same reason as .adminpw.
+# Read it from this file instead of passing it on the command line so it never
+# lands in shell history.
+.netlify-token
+
+# GitHub personal access token, used by scripts/deploy-github-pages.mjs. Same
+# rule: read from the file, never passed as an argument. Revoke it on GitHub
+# once the migration is settled.
+.github-token
+
+# WorkBuddy runtime metadata (memory, app locator, deploy descriptor)
+.workbuddy/
+.wbapp_*.genie
+
+# Generated screenshots from tools/admin-shots.cjs (14 MB of PNGs)
+tools/_shots/
+
+# TTFB samples appended by tools/speedtest-cn.mjs --csv (one row per run)
+tools/_speedtest/
+
+# Audit run output. tools/audit writes the machine-readable report here on every
+# invocation, so tracking it means every commit carries someone else's last run.
+tools/audit/_out/
+
+# Wrangler's per-project scratch dir (transient bundles). The real wrangler
+# OAuth credentials live in the user's home, not here.
+.wrangler/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*~
+*.log
+
+# 口令轮换时的旧凭据备份，只在本机留一份用于回退
+.adminpw.*

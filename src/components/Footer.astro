@@ -1,0 +1,70 @@
+---
+import { SITE, NAV } from '../data/site.js';
+import { CONTACT, fill } from '../data/contact.js';
+import { CITIES } from '../data/cities.js';
+import { GUIDES, guideUrl } from '../data/guides.js';
+
+const year = new Date().getFullYear();
+const footerCities = CITIES;
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a class="brand" href="/" style="margin-bottom:12px">
+          <img class="brand-mark" src="/logo-mark.png" alt="" width="34" height="34" aria-hidden="true" />
+          <span>{SITE.name} <span class="zh" lang="zh-CN">歪果社</span></span>
+        </a>
+        <p class="note" style="margin-top:12px;max-width:32ch">
+          {SITE.tagline} Real-life events and practical support for expats across China.
+        </p>
+        <p class="note"><strong>WeChat:</strong> {SITE.wechat}</p>
+      </div>
+
+      <div>
+        <h2>Explore</h2>
+        <ul>
+          {NAV.slice(0, 5).map((i) => <li><a href={i.href}>{i.label}</a></li>)}
+        </ul>
+      </div>
+
+      <div>
+        <h2>City guides</h2>
+        <ul>
+          {GUIDES.map((g) => <li><a href={guideUrl(g.slug)}>{g.city} guide</a></li>)}
+          <li><a href="/cities/">All cities →</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2>{CONTACT.findUsTitle}</h2>
+        <ul>
+          <li>{fill(CONTACT.footerFindUs)}</li>
+          <li>
+            {CONTACT.footerWebsiteLabel}{' '}
+            <a href={SITE.url}>{SITE.url.replace('https://', '')}</a>
+          </li>
+          <li>{CONTACT.footerWechatLabel} {SITE.wechat}</li>
+        </ul>
+        <ul style="margin-top:10px">
+          {footerCities.map((c) => <li style="display:inline;margin-right:10px"><a href={`/cities/#${c.slug}`}>{c.name}</a></li>)}
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-hint">
+      <span>{SITE.searchHint}</span>
+      <span>
+        © {year} {SITE.legalName}. All rights reserved.
+        {
+          SITE.icp ? (
+            <span style="margin-left:10px">
+              <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">{SITE.icp}</a>
+            </span>
+          ) : null
+        }
+      </span>
+    </div>
+  </div>
+</footer>

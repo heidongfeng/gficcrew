@@ -1,0 +1,1082 @@
+{
+  "ranAt": "2026-11-02T16:27:11.822Z",
+  "counts": {
+    "fail": 0,
+    "warn": 5,
+    "pass": 192
+  },
+  "results": [
+    {
+      "id": "artifact-integrity",
+      "name": "构建产物完整性（必备文件 / sitemap 覆盖 / 不该上线的文件 / IndexNow 密钥）",
+      "findings": [
+        {
+          "level": "pass",
+          "title": "找到构建产物",
+          "detail": "dist-global（34 个顶层条目） / dist-cn（34 个顶层条目） / dist-ghpages（34 个顶层条目）"
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 必备文件齐全",
+          "detail": "15 项"
+        },
+        {
+          "level": "pass",
+          "title": "dist-global/robots.txt 的 sitemap 指向真实文件",
+          "detail": "https://gficcrew.com/sitemap-index.xml"
+        },
+        {
+          "level": "pass",
+          "title": "dist-global/sitemap 覆盖了全部应收录页面",
+          "detail": "11 条（跳转桩 3 个已排除）"
+        },
+        {
+          "level": "pass",
+          "title": "dist-global/sitemap 没有误收跳转桩",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global/sitemap 没有死链",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 必备文件齐全",
+          "detail": "15 项"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn/robots.txt 的 sitemap 指向真实文件",
+          "detail": "https://gficcrew.cn/sitemap-index.xml"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn/sitemap 覆盖了全部应收录页面",
+          "detail": "11 条（跳转桩 3 个已排除）"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn/sitemap 没有误收跳转桩",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn/sitemap 没有死链",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-ghpages 必备文件齐全",
+          "detail": "15 项"
+        },
+        {
+          "level": "pass",
+          "title": "dist-ghpages/robots.txt 的 sitemap 指向真实文件",
+          "detail": "https://gficcrew.com/sitemap-index.xml"
+        },
+        {
+          "level": "pass",
+          "title": "dist-ghpages/sitemap 覆盖了全部应收录页面",
+          "detail": "11 条（跳转桩 5 个已排除）"
+        },
+        {
+          "level": "pass",
+          "title": "dist-ghpages/sitemap 没有误收跳转桩",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-ghpages/sitemap 没有死链",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-ghpages 内容干净",
+          "detail": "无后台、无 zip、无 SSR 产物、无宿主配置"
+        },
+        {
+          "level": "pass",
+          "title": "dist-ghpages/cn-bundle.txt 是国内站可用更新包",
+          "detail": "0.27 MB"
+        },
+        {
+          "level": "pass",
+          "title": "cn-bundle.txt 与本地 dist-cn 打包逐字节一致",
+          "detail": "粤ICP备2023047612号"
+        },
+        {
+          "level": "pass",
+          "title": "dist-ghpages 有 .nojekyll",
+          "detail": "关闭 Jekyll 过滤，否则 _astro/ 目录会被吞掉"
+        },
+        {
+          "level": "pass",
+          "title": "dist-ghpages 有 CNAME",
+          "detail": "gficcrew.com"
+        },
+        {
+          "level": "pass",
+          "title": "IndexNow 密钥文件合规",
+          "detail": "5a83257216067620efa85a5fb9888f23.txt（文件名与内容逐字节相同）"
+        }
+      ]
+    },
+    {
+      "id": "client-static",
+      "name": "客户端脚本静态分析（语法 / 重复声明 / 未用导入 / 空 catch / innerHTML / Promise）",
+      "findings": [
+        {
+          "level": "pass",
+          "title": "客户端脚本已收集",
+          "detail": "18 个内联脚本 / JS 模块（另有 5 个 .ts 未纳入：acorn 不解析 TypeScript）"
+        },
+        {
+          "level": "pass",
+          "title": "全部脚本可作为 ES 模块解析",
+          "detail": "18 个"
+        },
+        {
+          "level": "pass",
+          "title": "没有 import 与本地声明同名的冲突",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "没有未使用的导入",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "catch 都不会静默失败",
+          "detail": "2 处空 catch 均带注释说明"
+        },
+        {
+          "level": "pass",
+          "title": "没有把变量拼进 innerHTML 的写法",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "Promise 链都有兜底",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "Web Storage 键位清单",
+          "detail": "gfic_admin_pw ⇐ src/pages/admin.astro（sessionStorage.getItem） + src/pages/admin.astro（sessionStorage.setItem） + src/pages/admin.astro（sessionStorage.removeItem）；gfic_admin_theme ⇐ src/pages/admin.astro（localStorage.setItem） + src/pages/admin.astro（localStorage.getItem）；gfic-theme ⇐ src/scripts/app-shell.js（localStorage.setItem）"
+        },
+        {
+          "level": "pass",
+          "title": "同一命名空间内没有键被多个文件共用",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "存储键全部可静态解析",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "产物中的 JS 全部可解析",
+          "detail": "2 个文件"
+        }
+      ]
+    },
+    {
+      "id": "cloud-contract",
+      "name": "云端契约（表/列/RPC/集合一致性 + 行级安全与口令强度断言）",
+      "findings": [
+        {
+          "level": "pass",
+          "title": "云端快照已载入",
+          "detail": "4 张表、5 个函数，抓取于 2026-10-04（29 天前）"
+        },
+        {
+          "level": "pass",
+          "title": "代码引用的表都存在",
+          "detail": "crew_photos, crew_requests"
+        },
+        {
+          "level": "pass",
+          "title": "快照里的表都有引用",
+          "detail": "cms_admin → 经 cms_login/cms_set_password 间接访问；cms_docs → 经 cms_list/cms_save/cms_delete 间接访问"
+        },
+        {
+          "level": "pass",
+          "title": "代码调用的 RPC 都存在",
+          "detail": "cms_delete, cms_list, cms_login, cms_save, cms_set_password"
+        },
+        {
+          "level": "pass",
+          "title": "RPC 的可执行角色",
+          "detail": "anon 可执行：cms_login, cms_list, cms_save, cms_delete, cms_set_password（鉴权靠 p_password 参数，不是靠角色）"
+        },
+        {
+          "level": "pass",
+          "title": "后台用到的集合云端都有数据",
+          "detail": "cities×16 contact×1 events×1 faq×42 guides×1 plans×3 site×1"
+        },
+        {
+          "level": "pass",
+          "title": "已配置的集合都不是空的",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "没有表对匿名开放整表读",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "cms_docs / cms_admin 均为「RLS 开启 + 零策略」",
+          "detail": "对 anon 默认拒绝，读只走 cms_list/cms_login（SECURITY DEFINER）"
+        },
+        {
+          "level": "pass",
+          "title": "后台口令使用带拉伸的 KDF",
+          "detail": "bcrypt"
+        },
+        {
+          "level": "warn",
+          "title": "登录限流/锁定：快照声称有，但未经实测证实",
+          "detail": "快照记的是 连续 5 次失败 → 锁 15 分钟；锁定期内即使口令正确也返回 false；成功即清零。计数在 cms_admin.failed_attempts，解锁时间在 locked_until —— 这是记录，不是观测",
+          "evidence": [
+            "2026-11-01 实测：连续 7 次错误口令均返回 200 且无任何锁定提示，随后正确口令也被拒",
+            "正确口令被拒通常意味着账号已被锁，但触发阈值与时长与快照不符",
+            "待办：读 cms_login 源码确认实际阈值/时长，实测通过后才可转 pass",
+            "在此之前，记住口令强度是唯一可依赖的防线"
+          ]
+        },
+        {
+          "level": "pass",
+          "title": "改口令时服务端强制最小长度",
+          "detail": "≥ 8 位（前端只是提示，后端 cms_set_password 也会拦）"
+        },
+        {
+          "level": "pass",
+          "title": "云端内容条数与 src/data 完全一致",
+          "detail": "cities×16 events×1 faq×42 plans×3 guides×1"
+        }
+      ]
+    },
+    {
+      "id": "crawl-policy",
+      "name": "robots.txt 策略（命名分组不得丢失通配限制 / 变体方向 / sitemap 声明）",
+      "findings": [
+        {
+          "level": "pass",
+          "title": "dist-global/robots.txt 每个命名分组都保留了通配分组的限制",
+          "detail": "通配 Disallow：/404.html、/admin/"
+        },
+        {
+          "level": "pass",
+          "title": "dist-global/robots.txt 无自相矛盾规则",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global/robots.txt 声明了 sitemap",
+          "detail": "https://gficcrew.com/sitemap-index.xml"
+        },
+        {
+          "level": "pass",
+          "title": ".com 变体放行 Googlebot",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global/robots.txt 分组统计",
+          "detail": "20 个分组、覆盖 20 个 user-agent"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn/robots.txt 每个命名分组都保留了通配分组的限制",
+          "detail": "通配 Disallow：/404.html、/admin/"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn/robots.txt 无自相矛盾规则",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn/robots.txt 声明了 sitemap",
+          "detail": "https://gficcrew.cn/sitemap-index.xml"
+        },
+        {
+          "level": "pass",
+          "title": ".cn 变体正确拒绝 Googlebot",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": ".cn 变体未拒绝 Baiduspider",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn/robots.txt 分组统计",
+          "detail": "27 个分组、覆盖 27 个 user-agent"
+        }
+      ]
+    },
+    {
+      "id": "crawl",
+      "name": "链接 / 资源 / 锚点可达性（逐页遍历两个产物）",
+      "findings": [
+        {
+          "level": "pass",
+          "title": "dist-global 内部页面链接全部可达",
+          "detail": "16 个页面"
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 静态资源引用全部存在",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 锚点链接全部命中真实 id",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 页面内 id 无重复",
+          "detail": "152 个 id"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 内部页面链接全部可达",
+          "detail": "16 个页面"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 静态资源引用全部存在",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 锚点链接全部命中真实 id",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 页面内 id 无重复",
+          "detail": "152 个 id"
+        }
+      ]
+    },
+    {
+      "id": "data-invariants",
+      "name": "源数据完整性（唯一性 / 引用 / 日期 / 价格 / 占位符）",
+      "findings": [
+        {
+          "level": "warn",
+          "title": "EVENTS 数量变了：1（此前基线 0）",
+          "detail": "数量本身可能是正常的，但页面上有硬编码引用数量的文案，需同步核对",
+          "evidence": []
+        },
+        {
+          "level": "warn",
+          "title": "FAQ 数量变了：42（此前基线 39）",
+          "detail": "数量本身可能是正常的，但页面上有硬编码引用数量的文案，需同步核对",
+          "evidence": []
+        },
+        {
+          "level": "pass",
+          "title": "四个集合均存在且为数组",
+          "detail": "CITIES 16 / EVENTS 1 / FAQ 42 / PLANS 3"
+        },
+        {
+          "level": "pass",
+          "title": "CITIES slug 唯一",
+          "detail": "16 个"
+        },
+        {
+          "level": "pass",
+          "title": "CITIES 城市名唯一",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "EVENTS slug 唯一",
+          "detail": "1 个"
+        },
+        {
+          "level": "pass",
+          "title": "PLANS id 唯一",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "FAQ 问题唯一",
+          "detail": "42 条"
+        },
+        {
+          "level": "pass",
+          "title": "CITIES 必备字段齐全",
+          "detail": "name, slug, blurb, province, highlights, livingNote（tagline 为可选，仅 16 个重点城市填写）"
+        },
+        {
+          "level": "pass",
+          "title": "所有重点城市都有 tagline",
+          "detail": "guangzhou, shanghai, shenzhen, chengdu"
+        },
+        {
+          "level": "pass",
+          "title": "EVENTS 必备字段齐全",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "EVENTS 日期均可解析",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "EVENTS 起止时间顺序正确",
+          "detail": ""
+        },
+        {
+          "level": "warn",
+          "title": "1 个活动已结束，已自动下架",
+          "detail": "canton-fair-phase-2 结束于 2026-10-27T22:30",
+          "evidence": [
+            "正常现象：活动页与首页都按结束时间过滤，过期不再展示。要在发觉日历变空之前补新日期"
+          ]
+        },
+        {
+          "level": "warn",
+          "title": "活动日历只剩 0 场未结束，最后一场到 2026-10-27",
+          "detail": "EVENTS 共 1 场，其中 1 场已结束",
+          "evidence": [
+            "活动页有空状态兜底，不会显示成坏页面，但对访客和搜索引擎来说等于「没有活动」",
+            "在数据里补上新的日期即可恢复"
+          ]
+        },
+        {
+          "level": "pass",
+          "title": "EVENTS 的 city 全部指向存在的城市或合法分组",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "EVENTS 分类均被筛选器覆盖",
+          "detail": "10 个分类"
+        },
+        {
+          "level": "pass",
+          "title": "FORMATS id 唯一",
+          "detail": "10 个"
+        },
+        {
+          "level": "pass",
+          "title": "FORMATS 字段齐全",
+          "detail": "id, tier, rank, name, tagline, why, inChina, soloNote（keywords 可空）"
+        },
+        {
+          "level": "pass",
+          "title": "FORMATS 的 tier 全部有对应分组",
+          "detail": "可用 tier 1, 2, 3"
+        },
+        {
+          "level": "pass",
+          "title": "FORMATS 的 rank 是 1..N 的连续序列",
+          "detail": "1,2,3,4,5,6,7,8,9,10"
+        },
+        {
+          "level": "pass",
+          "title": "每个 tier 内的 rank 连续",
+          "detail": "tier 1 ×4 · tier 2 ×3 · tier 3 ×3"
+        },
+        {
+          "level": "pass",
+          "title": "GUIDES slug 唯一",
+          "detail": "guangzhou"
+        },
+        {
+          "level": "pass",
+          "title": "GUIDES 均能对应到城市",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "PLANS 价格字段均为数字",
+          "detail": "national RMB 288 / USD 42 · city RMB 688 / USD 98 · business RMB 2888 / USD 420"
+        },
+        {
+          "level": "pass",
+          "title": "PLANS 每档都有权益列表",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "PLANS 恰好一个主推档位",
+          "detail": "city"
+        },
+        {
+          "level": "pass",
+          "title": "退款条款存在",
+          "detail": "234 字符"
+        },
+        {
+          "level": "pass",
+          "title": "导航链接全部有对应页面",
+          "detail": "7 项"
+        },
+        {
+          "level": "pass",
+          "title": "SERVICES 已定义",
+          "detail": "Organization of Social Activities / Cultural Experience Activities / Chinese Language Exchange and Learning / Daily Crew Communication"
+        },
+        {
+          "level": "pass",
+          "title": "源数据无占位符残留",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "dist-parity",
+      "name": "双变体差异（页面集合 / 资源集合 / 归一化后正文一致性）",
+      "findings": [
+        {
+          "level": "pass",
+          "title": "两个变体页面集合一致",
+          "detail": "16 个页面"
+        },
+        {
+          "level": "pass",
+          "title": "两侧都没有构建中间产物残留",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "非哈希站点资源完全一致",
+          "detail": "20 个"
+        },
+        {
+          "level": "pass",
+          "title": "_astro/ 资源两份完全同名",
+          "detail": "3 个"
+        },
+        {
+          "level": "pass",
+          "title": "归一化后两个变体正文完全一致",
+          "detail": "16 个页面逐一比对"
+        },
+        {
+          "level": "pass",
+          "title": "除 Google 外，两个变体的 robots 策略等价",
+          "detail": "27 个 user-agent 段 × 4 条路径"
+        },
+        {
+          "level": "pass",
+          "title": "Google 规则方向正确",
+          "detail": ".com 放行、.cn 拒绝"
+        }
+      ]
+    },
+    {
+      "id": "feed",
+      "name": "RSS 变更订阅与站点一致",
+      "findings": [
+        {
+          "level": "pass",
+          "title": "dist-global 订阅条目",
+          "detail": "11 条（可收录页 11 个）｜最新 Sat, 31 Oct 2026 19:06:28 GMT"
+        },
+        {
+          "level": "pass",
+          "title": "dist-global feed 只指向本域名",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global feed 链接都指向真实页面",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global feed 标题与页面 <title> 逐字一致",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global feed 描述与页面 meta description 逐字一致",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global feed 覆盖每个可收录页面",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global feed 无重复条目",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global guid 是永久链接且等于 link",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global pubDate 可解析且不在未来",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 条目按 pubDate 由新到旧",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global lastBuildDate 等于最新条目",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global feed 声明 atom:link rel=self",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 订阅条目",
+          "detail": "11 条（可收录页 11 个）｜最新 Sat, 31 Oct 2026 19:06:28 GMT"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn feed 只指向本域名",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn feed 链接都指向真实页面",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn feed 标题与页面 <title> 逐字一致",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn feed 描述与页面 meta description 逐字一致",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn feed 覆盖每个可收录页面",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn feed 无重复条目",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn guid 是永久链接且等于 link",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn pubDate 可解析且不在未来",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 条目按 pubDate 由新到旧",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn lastBuildDate 等于最新条目",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn feed 声明 atom:link rel=self",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "html-hygiene",
+      "name": "页面结构与头部元信息（按页面性质分档检查）",
+      "findings": [
+        {
+          "level": "pass",
+          "title": "dist-global 页面分档",
+          "detail": "可收录 11 个（/about/ /cities/guangzhou/ /cities/ /cities/shenzhen/ /contact/ /events/ /faq/ /guides/guangzhou/ /guides/ / /membership/）｜工具页/跳转桩/404 5 个"
+        },
+        {
+          "level": "pass",
+          "title": "dist-global sitemap 未收录 noindex 页面",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 每页恰好一个 <h1>",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 标题层级不跳级",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global img 都有 alt",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global html lang 与 viewport 齐备",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 标题长度合规",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 描述长度合规",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global canonical 指向自身与本站域名",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global OG 卡片完整",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 没有无文本链接",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 404 页声明 noindex",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 404 页不声明 canonical / hreflang",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 标题在可收录页内唯一",
+          "detail": "11 个"
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 描述在可收录页内唯一",
+          "detail": "11 个"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 页面分档",
+          "detail": "可收录 11 个（/about/ /cities/guangzhou/ /cities/ /cities/shenzhen/ /contact/ /events/ /faq/ /guides/guangzhou/ /guides/ / /membership/）｜工具页/跳转桩/404 5 个"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn sitemap 未收录 noindex 页面",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 每页恰好一个 <h1>",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 标题层级不跳级",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn img 都有 alt",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn html lang 与 viewport 齐备",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 标题长度合规",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 描述长度合规",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn canonical 指向自身与本站域名",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn OG 卡片完整",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 没有无文本链接",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 404 页声明 noindex",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 404 页不声明 canonical / hreflang",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 标题在可收录页内唯一",
+          "detail": "11 个"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 描述在可收录页内唯一",
+          "detail": "11 个"
+        }
+      ]
+    },
+    {
+      "id": "pure-functions",
+      "name": "纯函数性质测试（编解码往返 / slug 幂等 / 模糊输入不崩）",
+      "findings": [
+        {
+          "level": "pass",
+          "title": "slugify 输出合法、≤80 字符、且幂等",
+          "detail": "11 个样本"
+        },
+        {
+          "level": "pass",
+          "title": "sectionId 对任何非空标题都返回非空 id",
+          "detail": "含中文与 emoji 样本"
+        },
+        {
+          "level": "pass",
+          "title": "sectionId 在不同标题间不重复",
+          "detail": "10 个"
+        },
+        {
+          "level": "pass",
+          "title": "真实数据编解码往返无损",
+          "detail": "sections 10 段 / faq 8 条"
+        },
+        {
+          "level": "pass",
+          "title": "文本 → 数据 → 文本 是不动点",
+          "detail": "未编辑时保存不会产生额外改动"
+        },
+        {
+          "level": "pass",
+          "title": "400 组模糊输入下编解码不抛错、始终返回数组",
+          "detail": "含 ## / Q: / 表格 / 脚本片段 / 中文"
+        },
+        {
+          "level": "pass",
+          "title": "只有问题没有答案的条目会被保留",
+          "detail": "解析出 2 条"
+        }
+      ]
+    },
+    {
+      "id": "structured-data",
+      "name": "JSON-LD 结构化数据（shape / 必填项 / URL 域名 / 与源数据一致）",
+      "findings": [
+        {
+          "level": "pass",
+          "title": "dist-global 全部 JSON-LD 可解析",
+          "detail": "42 段"
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 全部节点 @context 正确",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global @type 全部在检查表内",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 各类型必填属性齐全",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 页内 @id 唯一",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 结构化数据中的 URL 均为本站 https 绝对地址",
+          "detail": "域名 gficcrew.com"
+        },
+        {
+          "level": "pass",
+          "title": "dist-global ItemList 数量自洽",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 面包屑 position 连续且都有 item",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global Event 日期合法且顺序正确",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global FAQPage 每题都有 name 与 acceptedAnswer.text",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-global 结构化数据数量与应渲染数据一致",
+          "detail": "城市 16 / FAQ 42 / 活动 0"
+        },
+        {
+          "level": "pass",
+          "title": "dist-global JSON-LD 类型分布",
+          "detail": "Organization×9 WebPage×10 BreadcrumbList×10 ListItem×75 ItemList×7 FAQPage×2 Question×50 Answer×50 Article×1 HowTo×2 HowToStep×10 WebSite×1"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 全部 JSON-LD 可解析",
+          "detail": "42 段"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 全部节点 @context 正确",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn @type 全部在检查表内",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 各类型必填属性齐全",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 页内 @id 唯一",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 结构化数据中的 URL 均为本站 https 绝对地址",
+          "detail": "域名 gficcrew.cn"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn ItemList 数量自洽",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 面包屑 position 连续且都有 item",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn Event 日期合法且顺序正确",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn FAQPage 每题都有 name 与 acceptedAnswer.text",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn 结构化数据数量与应渲染数据一致",
+          "detail": "城市 16 / FAQ 42 / 活动 0"
+        },
+        {
+          "level": "pass",
+          "title": "dist-cn JSON-LD 类型分布",
+          "detail": "Organization×9 WebPage×10 BreadcrumbList×10 ListItem×75 ItemList×7 FAQPage×2 Question×50 Answer×50 Article×1 HowTo×2 HowToStep×10 WebSite×1"
+        }
+      ]
+    },
+    {
+      "id": "text-claims",
+      "name": "文案与数据核对（城市数量 / 价格 / 微信 / 已下线功能 / 主权表述）",
+      "findings": [
+        {
+          "level": "pass",
+          "title": "文案语料已收集",
+          "detail": "506 段文本（源数据 + 两个构建产物）"
+        },
+        {
+          "level": "pass",
+          "title": "所有城市数量表述与 CITIES 一致",
+          "detail": "基线 16"
+        },
+        {
+          "level": "pass",
+          "title": "价格表述与 PLANS 完全一致",
+          "detail": "RMB 288=USD 42 / RMB 688=USD 98 / RMB 2888=USD 420"
+        },
+        {
+          "level": "pass",
+          "title": "全站只出现一个微信号",
+          "detail": "DN8117"
+        },
+        {
+          "level": "pass",
+          "title": "公开页面 0 个表单",
+          "detail": "全站唯一 <form> 是 /admin/ 的口令闸（两个产物各 1 个）"
+        },
+        {
+          "level": "pass",
+          "title": "没有指向已下线功能的文案",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "未发现把港澳台与国家并列的表述",
+          "detail": "仅作为目的地城市出现"
+        },
+        {
+          "level": "pass",
+          "title": "已知语法、拼写与品牌名硬伤均未回归",
+          "detail": ""
+        },
+        {
+          "level": "pass",
+          "title": "代码兜底文案与数据一致",
+          "detail": "853 条兜底字符串，0 处不一致"
+        }
+      ]
+    }
+  ]
+}

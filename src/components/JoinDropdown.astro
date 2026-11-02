@@ -1,0 +1,109 @@
+---
+import { qrSrc } from '../lib/qr';
+
+const {
+  label = 'Join the Crew',
+  size = 'sm',
+  align = 'right',
+  note = 'Scan in WeChat, or search the ID to add us.',
+} = Astro.props;
+
+const btnClass = size === 'lg' ? 'btn btn--primary' : size === 'ghost' ? 'btn btn--ghost btn--sm' : 'btn btn--primary btn--sm';
+---
+
+<details class="join" data-join data-align={align}>
+  <summary class={btnClass} data-join-toggle>{label}</summary>
+  <div class="join-panel" data-join-panel>
+    <img
+      class="join-qr"
+      src={qrSrc}
+      alt="GFIC Crew WeChat QR code"
+      width="811"
+      height="1200"
+      loading="lazy"
+    />
+    <p class="join-note">{note}</p>
+    <p class="join-id">WeChat: DN8117</p>
+  </div>
+</details>
+
+<script>
+  // Progressive enhancement only: <details> already opens without JavaScript.
+  function bindJoin() {
+    if (document.documentElement.dataset.joinDocBound) return;
+    document.documentElement.dataset.joinDocBound = '1';
+    document.addEventListener('click', (event) => {
+      document.querySelectorAll('details[data-join][open]').forEach((root) => {
+        if (!root.contains(event.target)) root.open = false;
+      });
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        document.querySelectorAll('details[data-join][open]').forEach((root) => { root.open = false; });
+      }
+    });
+  }
+  bindJoin();
+</script>
+
+<style>
+  .join {
+    position: relative;
+    display: inline-block;
+  }
+
+  .join > summary {
+    list-style: none;
+    user-select: none;
+  }
+
+  .join > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .join-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 80;
+    width: 216px;
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .join[data-align='left'] .join-panel {
+    right: auto;
+    left: 0;
+  }
+
+  .join-qr {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .join-note {
+    margin: 12px 0 4px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  .join-id {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  @media (max-width: 720px) {
+    .join-panel {
+      width: 190px;
+    }
+  }
+</style>

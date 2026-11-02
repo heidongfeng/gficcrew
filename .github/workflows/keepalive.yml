@@ -1,0 +1,42 @@
+name: 保活（防止定时发布被自动停用）
+
+# GitHub 有一条规则：仓库连续 60 天没有任何活动，schedule 触发器会被自动停用。
+# 它不是警告，是静默停用——发布看起来还在，其实已经不跑了，下一次有人发现
+# 往往是内容几个月没更新之后。
+#
+# 这个任务每月 1 号往 ops/keepalive.txt 写一次时间戳并提交，制造一次活动，
+# 让那个 60 天计时器永远归零。它不碰任何业务文件，失败也不影响站点。
+#
+# 如果哪天不想再自动发布，正确做法是删掉 publish.yml，而不是留着它靠这个保活。
+
+on:
+  schedule:
+    - cron: '0 4 1 * *' # UTC 每月 1 号 04:00 = 北京时间 12:00
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 写时间戳
+        run: |
+          mkdir -p ops
+          printf 'last keepalive: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > ops/keepalive.txt
+
+      - name: 提交
+        run: |
+          if git diff --quiet -- ops/keepalive.txt; then
+            echo "内容没变（同一天跑过两次），跳过提交。"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ops/keepalive.txt
+          git commit -m "chore(ops): 保活心跳 $(date -u +%Y-%m-%d)"
+          git push

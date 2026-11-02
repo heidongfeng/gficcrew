@@ -1,0 +1,113 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBand from '../components/CtaBand.astro';
+import JoinDropdown from '../components/JoinDropdown.astro';
+import { SITE } from '../data/site.js';
+import { PLANS, REFUND_TERMS } from '../data/plans.js';
+import { breadcrumbSchema, webPageSchema, itemListSchema } from '../data/schema.js';
+
+const url = `${SITE.url}/membership/`;
+
+const schema = [
+  webPageSchema({
+    url,
+    name: 'GFIC Crew membership — planned tiers, not open yet',
+    description: 'GFIC Crew membership is not open yet. Planned tiers: National Group RMB 288, City Group RMB 688, Business Group RMB 2,888, all lifetime and per person. Every group is free to join right now — paid membership has not opened yet.',
+  }),
+  breadcrumbSchema([{ name: 'Home', url: SITE.url + '/' }, { name: 'Membership', url }]),
+  itemListSchema({
+    id: `${url}#plans`,
+    name: 'GFIC Crew membership plans',
+    description: 'Three lifetime membership tiers planned for expats in China. None are on sale yet.',
+    items: PLANS.map((p) => ({
+      name: `${p.name} — RMB ${p.price.toLocaleString('en-US')}`,
+      url: `${url}#${p.id}`,
+      description: p.summary,
+    })),
+  }),
+];
+---
+
+<BaseLayout
+  title="Membership — GFIC Crew Plans (Free to Join Now)"
+  description="GFIC Crew membership is not open yet. Planned tiers: National RMB 288, City RMB 688, Business RMB 2,888, all lifetime. Every group is free to join right now."
+  schema={schema}
+>
+  <section class="section section--tight">
+    <div class="wrap wrap--measure">
+      <p class="breadcrumb"><a href="/">Home</a> / Membership</p>
+      <h1>Membership</h1>
+      <p class="lead">
+        Paid membership has not opened yet. When it does, it will be one payment rather than a
+        subscription: no renewal emails, priced per person, covering you for as long as the crew
+        exists.
+      </p>
+
+      <div class="block membership-free" style="margin-top:22px">
+        <p class="lead" style="margin-bottom:0">
+          <strong>Every group is free to join right now.</strong> Paid membership has not opened
+          yet, so joining today costs nothing. The three tiers below are the pricing we will use
+          when it does.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap wrap--measure">
+      <h2>Planned tiers</h2>
+      <div>
+        {
+          PLANS.map((plan) => (
+            <article class="block" id={plan.id} style="margin-bottom:34px">
+              <h3>{plan.name}</h3>
+              <p class="note" style="margin-bottom:4px">Planned when membership opens</p>
+              <p class="plan-price">
+                RMB {plan.price.toLocaleString('en-US')}
+                <span class="note"> · USD {plan.usd} · {plan.unit}</span>
+              </p>
+              <p>{plan.summary}</p>
+              <ul class="plain">
+                {plan.includes.map((i) => <li>{i}</li>)}
+              </ul>
+              <p class="note" style="margin-top:12px"><strong>Free to join today.</strong></p>
+            </article>
+          ))
+        }
+      </div>
+
+      <div class="block" id="refund">
+        <h3>Refund terms</h3>
+        <p>{REFUND_TERMS}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--soft" id="apply">
+    <div class="wrap wrap--measure">
+      <span class="eyebrow">Apply</span>
+      <h2>Join by WeChat</h2>
+      <p class="lead">
+        Everything runs through WeChat. Add us, tell us which group you want, and we add you.
+        There is nothing to pay while the groups are free. We reply within 24 hours.
+      </p>
+
+      <div style="margin-top:22px">
+        <JoinDropdown align="left" />
+      </div>
+
+      <ul class="plain" style="margin-top:24px">
+        <li>Say which group: national, your city, or business.</li>
+        <li>Say which city group you want, or “not decided yet”.</li>
+        <li>We add you to the group. No payment while membership is free.</li>
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand
+    title="Just want to see what it is like?"
+    text="Come and say hello in the group first. There is nothing to pay, and you can decide later."
+    cta="See what we run"
+    href="/events/"
+  />
+</BaseLayout>

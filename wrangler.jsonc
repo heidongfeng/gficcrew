@@ -1,0 +1,27 @@
+{
+  // Cloudflare Workers static assets — serves the prebuilt global variant.
+  //
+  // Why a Worker and not a Pages project: Cloudflare now recommends Workers static
+  // assets for new static sites, and this account cannot create Pages projects at all
+  // (error 8000030 "Subdomain is blocked" via both the dashboard and the API), while
+  // Workers create fine. See README section 7.
+  //
+  // `wrangler deploy` uploads ./dist-global as-is, so run `npm run build:global` first.
+  // Nothing secret lives here — the site's public config is baked in at build time by
+  // astro.config.mjs from .env.global.
+  "name": "gficcrew-web",
+  "compatibility_date": "2026-10-03",
+  "assets": {
+    "directory": "./dist-global",
+    // dist-global/404.html is a real page, so use it for unknown paths instead of
+    // letting the platform invent one.
+    "not_found_handling": "404-page"
+  },
+  // workers_dev is OFF on purpose. This account cannot register a *.workers.dev
+  // subdomain — wrangler fails with "An unexpected error occurred" when told to create
+  // one, the same account-level restriction that blocks Pages project creation. Leaving
+  // it on would make an otherwise fine `wrangler deploy` fail.
+  // The site is served from the gficcrew.com custom domain instead; bind it under
+  // Workers → gficcrew-web → Settings → Domains & Routes → Custom Domain.
+  "workers_dev": false
+}

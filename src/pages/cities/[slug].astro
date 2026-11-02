@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import JoinDropdown from '../../components/JoinDropdown.astro';
+import { SITE } from '../../data/site.js';
+import { CITIES } from '../../data/cities.js';
+import { guideForCity, guideUrl } from '../../data/guides.js';
+import { orgSchema, localCommunitySchema, breadcrumbSchema, webPageSchema } from '../../data/schema.js';
+
+// Decision B: only the two cities with real in-person organization receive standalone
+// landing pages. The other fourteen stay on the /cities/ collection as online communities.
+export function getStaticPaths() {
+  return CITIES.filter((city) => ['guangzhou', 'shenzhen'].includes(city.slug)).map((city) => ({
+    params: { slug: city.slug },
+    props: { city, guide: guideForCity(city.slug) },
+  }));
+}
+
+const { city, guide } = Astro.props;
+const url = new URL(`/cities/${city.slug}/`, SITE.url).href;
+const description = city.tagline || city.blurb;
+const schema = [
+  orgSchema(),
+  webPageSchema({ url, name: `GFIC Crew ${city.name}`, description }),
+  localCommunitySchema({ url, city: city.name, description, areaServed: [city.name] }),
+  breadcrumbSchema([
+    { name: 'Home', url: `${SITE.url}/` },
+    { name: 'Cities & Guides', url: `${SITE.url}/cities/` },
+    { name: city.name, url },
+  ]),
+];
+---
+
+<BaseLayout title={`${city.name} Expat Community — In Person with GFIC Crew`} description={description} schema={schema}>
+  <section class="section section--tight">
+    <div class="wrap wrap--measure">
+      <p class="breadcrumb"><a href="/">Home</a> / <a href="/cities/">Cities &amp; Guides</a> / {city.name}</p>
+      <h1>Meet GFIC Crew in {city.name}</h1>
+      <p class="lead">{description}</p>
+      <p>
+        {city.name} is one of the two cities where GFIC Crew can organize in-person meetups,
+        alongside {city.slug === 'guangzhou' ? 'Shenzhen' : 'Guangzhou'}. Every group is free to
+        join right now; paid membership has not opened yet.
+      </p>
+      <JoinDropdown label={`Join ${city.name}`} size="lg" align="left" />
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap wrap--measure">
+      <h2>Life and meetups in {city.name}</h2>
+      <p>{city.blurb}</p>
+      <ul class="plain">
+        {city.highlights.map((item) => <li>{item}</li>)}
+      </ul>
+      <p class="note" style="margin-top:20px"><strong>Cost of living:</strong> {city.livingNote}</p>
+      <p>
+        There is no fixed public event calendar yet. Confirmed meetups are announced inside the
+        WeChat groups. Add <strong>{SITE.wechat}</strong> and tell us you want the {city.name} group.
+      </p>
+      {
+        guide ? (
+          <p><a class="text-link" href={guideUrl(guide.slug)}>Read the full {city.name} living guide →</a></p>
+        ) : (
+          <p><a class="text-link" href="/contact/">Tell us what you need in a {city.name} living guide →</a></p>
+        )
+      }
+      <p><a class="text-link" href="/cities/">See all {CITIES.length} cities and online communities →</a></p>
+    </div>
+  </section>
+</BaseLayout>

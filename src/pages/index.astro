@@ -1,0 +1,218 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CtaBand from '../components/CtaBand.astro';
+import JoinDropdown from '../components/JoinDropdown.astro';
+import { SITE, HOME, SERVICES, WHY_JOIN } from '../data/site.js';
+import { fill } from '../data/contact.js';
+import { CITIES } from '../data/cities.js';
+import { upcomingEvents } from '../data/events.js';
+import { PLANS } from '../data/plans.js';
+import { GUIDES, guideUrl } from '../data/guides.js';
+import { orgSchema, websiteSchema, itemListSchema } from '../data/schema.js';
+
+const featuredCities = CITIES.filter((c) => c.priority).concat(CITIES.filter((c) => !c.priority)).slice(0, 6);
+// Soonest four that have not finished yet. Falls off automatically once they are over.
+const upcoming = upcomingEvents().slice(0, 4);
+
+// <meta name="description"> is not the brand paragraph.
+//
+// SITE.description is a deliberately long, keyword-rich paragraph — it feeds the OG tags
+// and the JSON-LD Organization node, where length is free. A SERP snippet is cut at about
+// 155 characters, so handing that paragraph to the meta tag only produced a sentence that
+// stopped mid-clause. The homepage therefore declares its own short one; the long version
+// still ships everywhere it is read in full.
+const metaDescription =
+  'GFIC Crew (GFIC歪果社) — a real-life social community for expats in China. Events, city guides and practical help, city by city.';
+
+// Homepage copy comes from 站点内容 → 首页 in the admin backend.
+// {brand} renders as the bolded brand name, {cityCount} as the live city count.
+const brandName = `${SITE.name} (${SITE.nameZh})`;
+const txt = (s) => fill(s).replaceAll('{cityCount}', String(CITIES.length));
+const leadNodes = String(HOME.lead || '')
+  .split('{brand}')
+  .map((part, i) => ({ text: txt(part), strong: i > 0, value: brandName }));
+// The footer line under "Why join" bolds the WeChat ID, matching the original design.
+const noteNodes = String(HOME.whyJoinNote || '')
+  .split('{wechat}')
+  .map((part, i) => ({ text: txt(part), strong: i > 0, value: SITE.wechat }));
+
+const schema = [
+  orgSchema(),
+  websiteSchema(),
+  itemListSchema({
+    id: `${SITE.url}/#cities`,
+    name: 'GFIC Crew cities covered in China',
+    description: 'Chinese cities covered by GFIC Crew guides and online groups, with in-person meetups in Guangzhou and Shenzhen.',
+    items: CITIES.map((c) => ({
+      name: c.name,
+      url: `${SITE.url}/cities/#${c.slug}`,
+      description: c.tagline || c.blurb,
+    })),
+  }),
+];
+---
+
+<BaseLayout
+  title="GFIC Crew (GFIC歪果社) — Expat Community & Events in China"
+  description={metaDescription}
+  schema={schema}
+>
+  <section class="hero">
+    <div class="wrap wrap--measure">
+      <span class="eyebrow">{HOME.eyebrow}</span>
+      <h1>{HOME.title}</h1>
+      <p class="lead">
+        {
+          leadNodes.map((n) => (
+            <>
+              {n.strong ? <strong>{n.value}</strong> : null}
+              {n.text}
+            </>
+          ))
+        }
+      </p>
+
+      <div class="hero-actions">
+        <JoinDropdown label="Join the Crew" align="left" />
+        <a class="text-link" href="/events/">See upcoming events</a>
+      </div>
+
+      <ul class="hero-list">
+        {HOME.highlights.map((h) => <li>{h}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">{HOME.servicesEyebrow}</span>
+        <h2>{HOME.servicesTitle}</h2>
+        <p class="lead">{txt(HOME.servicesLead)}</p>
+      </div>
+      <div class="grid grid--2">
+        {
+          SERVICES.map((service, i) => (
+            <article class="block" id={service.id}>
+              <span class="note">{String(i + 1).padStart(2, '0')}</span>
+              <h3>{service.title}</h3>
+              <p>{service.summary}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--soft">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">{HOME.citiesEyebrow}</span>
+        <h2>{HOME.citiesTitle}</h2>
+        <p class="lead">{txt(HOME.citiesLead)}</p>
+      </div>
+      <div class="grid grid--3">
+        {
+          featuredCities.map((city) => (
+            <article class="block">
+              <h3>{city.name}</h3>
+              <p>{city.tagline ? city.tagline : city.blurb}</p>
+            </article>
+          ))
+        }
+      </div>
+      <p style="margin-top:34px">
+        <a class="text-link" href="/cities/">All {CITIES.length} cities and guides →</a>
+      </p>
+      <p class="note" style="margin-top:10px">
+        City guides:
+        {
+          GUIDES.map((g, i) => (
+            <span>
+              {i > 0 ? ' · ' : ' '}
+              <a class="text-link" href={guideUrl(g.slug)}>{g.city}</a>
+            </span>
+          ))
+        }
+      </p>
+    </div>
+  </section>
+
+  {
+    /* No scheduled dates left means no preview block — the calendar link stays either way. */
+    upcoming.length ? (
+      <section class="section">
+        <div class="wrap wrap--measure">
+          <div class="section-head">
+            <span class="eyebrow">{HOME.eventsEyebrow}</span>
+            <h2>{HOME.eventsTitle}</h2>
+          </div>
+          {
+            upcoming.map((event) => (
+              <article class="event">
+                <div class="event-body">
+                  <h3>{event.title}</h3>
+                  <div class="event-meta">
+                    {new Date(event.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}
+                    · {event.city} · {event.cadence} · {event.price}
+                  </div>
+                  <p style="margin-bottom:10px">{event.description}</p>
+                  <a class="text-link" href={`/events/#${event.slug}`}>Details</a>
+                </div>
+              </article>
+            ))
+          }
+          <p style="margin-top:30px">
+            <a class="text-link" href="/events/">Full event calendar →</a>
+          </p>
+        </div>
+      </section>
+    ) : null
+  }
+
+  <section class="section section--soft">
+    <div class="wrap wrap--measure">
+      <div class="section-head">
+        <span class="eyebrow">{HOME.membershipEyebrow}</span>
+        <h2>{HOME.membershipTitle}</h2>
+        <p class="lead">{txt(HOME.membershipLead)}</p>
+      </div>
+      {
+        PLANS.map((plan) => (
+          <article class="block" id={plan.id}>
+            <h3>{plan.name}</h3>
+            <p>
+              <strong>RMB {plan.price}</strong>
+              <span class="note"> (USD {plan.usd}) · {plan.unit}</span>
+            </p>
+            <p>{plan.summary}</p>
+          </article>
+        ))
+      }
+      <p style="margin-top:30px">
+        <a class="text-link" href="/membership/">Compare plans →</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap wrap--measure">
+      <div class="section-head">
+        <span class="eyebrow">{HOME.whyJoinEyebrow}</span>
+        <h2>{HOME.whyJoinTitle}</h2>
+      </div>
+      <ul class="bullet" style="padding-left:0;list-style:none">
+        {
+          WHY_JOIN.map((why) => (
+            <li style="padding:14px 0;border-bottom:1px solid var(--line-soft)">{why}</li>
+          ))
+        }
+      </ul>
+      <p class="note" style="margin-top:20px">
+        {noteNodes.map((n) => (<>{n.strong ? <strong>{n.value}</strong> : null}{n.text}</>))}
+      </p>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
