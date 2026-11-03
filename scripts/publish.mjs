@@ -186,15 +186,18 @@ function fetchUrl(url) {
   return { code, body };
 }
 
-// 首次发布后 Pages 需要重新构建，轮询到 last-modified 变成今天为止。
-const today = new Date().toISOString().slice(0, 10);
+// 首次发布后 Pages 需要重新构建，轮询到 Last-Modified 变成今天为止。
+// 必须比较「日 + 月 + 年」。2026-11-02 的首轮 CI 曾用 slice(8, 16)，只比较了
+// 「Nov 2026」，于是把 11-01 的旧构建当成新构建，紧接着对四个仍在传播的文件
+// 各重试 9 秒就退出 1。日期这里只用于观察进度，最终仍以逐文件内容为准。
+const todayUtc = new Date().toUTCString().slice(5, 16); // "02 Nov 2026"
 let built = false;
 for (let i = 0; i < 15; i++) {
   const head = spawnSync('curl', ['-s', '-D', '-', '-o', '/dev/null', '--max-time', '20', '--noproxy', '*', SITE + '/'], {
     encoding: 'utf8',
   }).stdout;
   const lm = (head.match(/^last-modified:\s*(.+)$/im) || [])[1] || '';
-  if (lm && lm.includes(new Date().toUTCString().slice(8, 16))) {
+  if (lm && lm.includes(todayUtc)) {
     built = true;
     ok(`Pages 已重新构建（${lm.trim()}）`);
     break;
@@ -202,7 +205,7 @@ for (let i = 0; i < 15; i++) {
   console.log(C.dim(`  等待 Pages 构建… (${i + 1}/15) ${lm.trim()}`));
   spawnSync('sleep', ['20']);
 }
-if (!built) warn('未检测到新构建时间，继续核验（可能仍在构建，稍后复查）');
+if (!built) warn('未检测到今天的构建时间，继续以逐文件内容核验（可能仍在构建）');
 
 const mustMatch = files.filter((f) => /\.(html|xml|txt|webmanifest|json|css|js)$/.test(f));
 let checked = 0;
@@ -212,18 +215,18 @@ for (const f of mustMatch) {
   const localMd5 = md5(local);
   let code = '';
   let matched = false;
-  // Pages 刚推送后存在短暂的构建/CDN 传播窗口，瞬时读到旧内容是正常的。
-  // 对不一致的文件做有界重试，避免把「发布成功」误报成「内容不一致」。
-  for (let attempt = 0; attempt < 3; attempt++) {
+  // Pages 刚推送后存在构建/CDN 传播窗口，瞬时读到旧内容是正常的。
+  // 最多等 100 秒；原来的 3×3 秒覆盖不了真实构建窗口，会把已发布成功误判为失败。
+  for (let attempt = 0; attempt < 10; attempt++) {
     const r = fetchUrl(url);
     code = r.code;
     if (code === '200' && md5(r.body) === localMd5) { matched = true; break; }
-    spawnSync('sleep', ['3']);
+    spawnSync('sleep', ['10']);
   }
   if (code !== '200') {
     bad(`${f} → HTTP ${code}`);
   } else if (!matched) {
-    bad(`${f} → 200 但内容与本地不一致（已重试 3 次）`);
+    bad(`${f} → 200 但内容与本地不一致（已重试 10 次）`);
   } else {
     checked++;
   }
@@ -238,11 +241,18 @@ for (const p of ['admin/', 'admin/index.html', '.htaccess']) {
 }
 
 {
-  const { code, body } = fetchUrl(`${SITE}/cn-bundle.txt`);
+  let code = '';
+  let body = Buffer.alloc(0);
+  let matched = false;
+  for (let attempt = 0; attempt < 10; attempt++) {
+    ({ code, body } = fetchUrl(`${SITE}/cn-bundle.txt`));
+    if (code === '200' && md5(body) === md5(cnBuf)) { matched = true; break; }
+    spawnSync('sleep', ['10']);
+  }
   if (code !== '200') {
     bad(`/cn-bundle.txt → HTTP ${code}，国内站将拉不到新包`);
-  } else if (md5(body) !== md5(cnBuf)) {
-    bad('/cn-bundle.txt 与本地国内包不一致');
+  } else if (!matched) {
+    bad('/cn-bundle.txt 与本地国内包不一致（已重试 10 次）');
   } else {
     ok(`/cn-bundle.txt 可下载且与本地一致（${cnSizeKb} KB）`);
   }
