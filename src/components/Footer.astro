@@ -47,8 +47,8 @@ const footerCities = CITIES;
           </li>
           <li>{CONTACT.footerWechatLabel} {SITE.wechat}</li>
         </ul>
-        <ul style="margin-top:10px">
-          {footerCities.map((c) => <li style="display:inline;margin-right:10px"><a href={`/cities/#${c.slug}`}>{c.name}</a></li>)}
+        <ul class="footer-cities">
+          {footerCities.map((c) => <li><a href={`/cities/#${c.slug}`}>{c.name}</a></li>)}
         </ul>
       </div>
     </div>

@@ -1028,6 +1028,38 @@ textarea:focus-visible {
   color: var(--ink);
 }
 
+/* A row of inline city names used to expose only the text's ~16px line box as the
+   clickable area. Flex items plus real vertical padding give every city its own
+   target, while gaps keep adjacent targets from overlapping. */
+.footer-cities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-top: 10px;
+}
+.footer-cities li {
+  margin: 0;
+}
+.footer-cities a {
+  display: inline-flex;
+  align-items: center;
+  min-width: 28px;
+  min-height: 32px;
+  padding: 4px 2px;
+}
+
+/* Content links must be identifiable without relying on colour (WCAG 1.4.1).
+   Restrict this to prose/answers rather than underlining navigation and buttons. */
+.text-link,
+.prose p a,
+.prose li a,
+details.faq .answer a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.16em;
+}
+
 .footer-hint {
   margin-top: 52px;
   padding-top: 20px;
@@ -1066,6 +1098,27 @@ textarea:focus-visible {
   .footer-grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 28px;
+  }
+  /* WCAG 2.5.8 asks for at least 24×24 CSS px (or equivalent spacing). Give
+     footer and prose links a genuine box instead of relying on font line-height. */
+  .footer-grid a:not(.brand) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .footer-cities a {
+    min-height: 40px;
+  }
+  .text-link,
+  .prose p a,
+  .prose li a,
+  details.faq .answer a {
+    display: inline-block;
+    min-height: 24px;
+    padding-top: 2px;
+    padding-bottom: 2px;
   }
   /* The header collapses here, not at 720px. Seven nav items need about 947px to sit on
      one line; in the old 721–860px gap the inline nav was squeezed onto three lines inside

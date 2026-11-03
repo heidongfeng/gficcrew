@@ -74,6 +74,19 @@ ok(`凭证已就绪（来自 ${process.env.GITHUB_TOKEN ? 'GITHUB_TOKEN 环境�
 const dirty = run('git status', 'git', ['status', '--porcelain'], { capture: true }).trim();
 if (dirty) warn(`工作区有未提交改动：\n${dirty.split('\n').map((l) => '     ' + l).join('\n')}`);
 
+// 云端是内容源。手动在本机发布也必须先同步，否则一份旧的 generated/ 会把后台
+// 刚改的内容回退掉。CI 里虽然已有独立同步步骤，再跑一次只是多一次只读拉取，
+// 比允许人工发布绕过它安全得多；拉取失败会在这里直接停止，不能继续构建。
+console.log(C.dim('\n→ 先同步云端内容，避免本地旧快照覆盖后台更新'));
+try {
+  run('content:pull', 'npm', ['run', 'content:pull']);
+  run('content:import', 'npm', ['run', 'content:import']);
+  ok('云端内容已同步到 generated/');
+} catch (e) {
+  bad(e.message);
+  process.exit(1);
+}
+
 // ---------------------------------------------------------------- 1. 构建
 step(1, '构建两个变体');
 try {
@@ -186,26 +199,43 @@ function fetchUrl(url) {
   return { code, body };
 }
 
-// 首次发布后 Pages 需要重新构建，轮询到 Last-Modified 变成今天为止。
-// 必须比较「日 + 月 + 年」。2026-11-02 的首轮 CI 曾用 slice(8, 16)，只比较了
-// 「Nov 2026」，于是把 11-01 的旧构建当成新构建，紧接着对四个仍在传播的文件
-// 各重试 9 秒就退出 1。日期这里只用于观察进度，最终仍以逐文件内容为准。
-const todayUtc = new Date().toUTCString().slice(5, 16); // "02 Nov 2026"
-let built = false;
-for (let i = 0; i < 15; i++) {
-  const head = spawnSync('curl', ['-s', '-D', '-', '-o', '/dev/null', '--max-time', '20', '--noproxy', '*', SITE + '/'], {
-    encoding: 'utf8',
-  }).stdout;
-  const lm = (head.match(/^last-modified:\s*(.+)$/im) || [])[1] || '';
-  if (lm && lm.includes(todayUtc)) {
-    built = true;
-    ok(`Pages 已重新构建（${lm.trim()}）`);
-    break;
-  }
-  console.log(C.dim(`  等待 Pages 构建… (${i + 1}/15) ${lm.trim()}`));
-  spawnSync('sleep', ['20']);
+// 等 GitHub Pages 明确报告「本次 gh-pages 提交已 built」。
+// 不能用 Last-Modified：同一天内第二次发布时，上一版也是今天，会被误判为本次
+// 构建完成。2026-11-03 就因此在旧页面上逐文件重试。Pages API 同时给出 status
+// 和 commit，两者都与刚推送的分支头吻合才算完成。
+async function githubJson(apiPath) {
+  const r = await fetch(`https://api.github.com/repos/heidongfeng/gficcrew${apiPath}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github+json',
+      'User-Agent': 'gfic-publish',
+    },
+  });
+  if (!r.ok) throw new Error(`GitHub API ${apiPath} → HTTP ${r.status}`);
+  return r.json();
 }
-if (!built) warn('未检测到今天的构建时间，继续以逐文件内容核验（可能仍在构建）');
+
+let built = false;
+try {
+  const ref = await githubJson('/git/ref/heads/gh-pages');
+  const expectedCommit = ref.object.sha;
+  for (let i = 0; i < 30; i++) {
+    const build = await githubJson('/pages/builds/latest');
+    if (build.status === 'built' && build.commit === expectedCommit) {
+      built = true;
+      ok(`Pages 已完成本次提交 ${expectedCommit.slice(0, 7)} 的构建`);
+      break;
+    }
+    console.log(C.dim(`  等待 Pages 构建 ${expectedCommit.slice(0, 7)}… (${i + 1}/30) 当前 ${build.status || 'unknown'} ${(build.commit || '').slice(0, 7)}`));
+    spawnSync('sleep', ['10']);
+  }
+} catch (e) {
+  bad(`无法确认 Pages 构建状态：${e.message}`);
+}
+if (!built) {
+  bad('Pages 尚未完成本次提交构建，停止线上内容核验；发布内容仍保留，稍后重跑核验即可');
+  process.exit(1);
+}
 
 const mustMatch = files.filter((f) => /\.(html|xml|txt|webmanifest|json|css|js)$/.test(f));
 let checked = 0;
