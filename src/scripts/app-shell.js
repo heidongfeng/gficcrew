@@ -17,10 +17,17 @@ function initTheme() {
   if (!button) return;
   // The two glyphs live in the DOM and CSS picks the visible one from data-theme, so the
   // script only has to keep aria-label honest — it no longer writes glyph markup.
+  // Sync on startup too: the inline theme bootstrap restores dark mode before this module
+  // loads, while the server-rendered button still carries the light-mode label.
+  const syncLabel = () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    button.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+  };
+  syncLabel();
   button.addEventListener('click', () => {
     const dark = document.documentElement.getAttribute('data-theme') !== 'dark';
     setTheme(dark);
-    button.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+    syncLabel();
   });
 }
 

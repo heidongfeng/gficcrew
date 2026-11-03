@@ -12,7 +12,8 @@ export const IS_CN = VARIANT === 'cn';
 export const SLOGAN = 'Life happens face to face.';
 
 const SOCIALS_ALL = [
-  { label: 'WeChat Official Account', handle: 'GFIC Crew', note: 'WeChat ID: DN8117' },
+  { label: 'Personal WeChat', handle: 'DN8117', note: 'Add as a friend to join or contact the crew' },
+  { label: 'WeChat Official Account', handle: 'GFIC Crew', note: 'Search the official account name' },
   { label: 'WeChat Channels', labelZh: '视频号', handle: 'GFIC Crew', note: '' },
   { label: 'Xiaohongshu', labelZh: '小红书', handle: 'GFIC歪果社', note: '' },
   { label: 'YouTube', handle: '@GFICCrew', note: '' },
@@ -22,7 +23,8 @@ const SOCIALS_ALL = [
 
 // The mainland build drops platforms that are not reachable in China.
 const SOCIALS_CN = [
-  { label: 'WeChat Official Account', handle: 'GFIC Crew', note: 'WeChat ID: DN8117' },
+  { label: 'Personal WeChat', handle: 'DN8117', note: 'Add as a friend to join or contact the crew' },
+  { label: 'WeChat Official Account', handle: 'GFIC Crew', note: 'Search the official account name' },
   { label: 'WeChat Channels', labelZh: '视频号', handle: 'GFIC Crew', note: '' },
   { label: 'Xiaohongshu', labelZh: '小红书', handle: 'GFIC歪果社', note: '' },
 ];
@@ -404,7 +406,7 @@ const LOCAL_HOME = {
   citiesEyebrow: 'Cities & guides',
   citiesTitle: 'Where the crew meets',
   citiesLead:
-    '{cityCount} cities covered by guides and online groups. Guangzhou and Shenzhen are where we meet in person.',
+    '{cityCount} cities have online groups and city notes. The full living guide currently covers Guangzhou. Guangzhou and Shenzhen are where we meet in person.',
 
   // 活动日历
   eventsEyebrow: 'Events',
@@ -413,12 +415,12 @@ const LOCAL_HOME = {
   // 会员
   membershipEyebrow: 'Membership',
   membershipTitle: 'Lifetime membership',
-  membershipLead: 'Every group is free to join right now. Paid membership has not opened yet. When it does, it is one payment with no subscription, and your first week is refundable.',
+  membershipLead: 'Every group is free to join right now. Paid membership has not opened yet. When it does, it is one payment with no subscription. First-week refunds require that you have not joined an activity or broken the community rules.',
 
   // 为什么加入
   whyJoinEyebrow: 'Why join',
   whyJoinTitle: 'Why expats stick with the crew',
-  whyJoinNote: 'Search “{name}” on {socialLine}. WeChat ID: {wechat}.',
+  whyJoinNote: 'Search “{name}” on {socialLine}. Personal WeChat ID: {wechat}.',
 };
 
 const genHome = (genSite && typeof genSite.home === 'object' && genSite.home) || {};

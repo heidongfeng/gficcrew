@@ -61,12 +61,12 @@ const LOCAL_FAQ = [
     category: 'Events & Activities',
   },
   {
-    a: 'We are just getting started, so there is no fixed schedule yet. Meetups are announced inside the WeChat groups as they are confirmed, and we add people to the event group the day before each one. Guangzhou and Shenzhen are where in-person meetups happen first; other cities join in through the online and national groups until a local group forms.',
+    a: 'There is no fixed recurring schedule. Confirmed dates are published on the Events page and announced inside the WeChat groups, and we add people to the event group the day before each one. Guangzhou and Shenzhen are where in-person meetups happen first; other cities join in through the online and national groups until a local group forms.',
     q: 'How often are events held?',
     category: 'Events & Activities',
   },
   {
-    a: 'Add us on WeChat (DN8117) and tell us you want to join. Meetups are announced in the groups rather than on a public calendar, and we add you to the event group the day before it happens. Every group is free to join right now.',
+    a: 'Check the confirmed dates on the Events page, then add personal WeChat ID DN8117 and tell us which event you want to join. Dates are also announced in the WeChat groups, and we add you to the event group the day before it happens. Every group is free to join right now.',
     q: 'How do I sign up for an event?',
     category: 'Events & Activities',
   },
@@ -146,7 +146,7 @@ const LOCAL_FAQ = [
     category: 'Community Rules',
   },
   {
-    a: 'Add WeChat ID DN8117, or search “GFIC Crew” on WeChat Official Account, WeChat Channels, Xiaohongshu and the other platforms where the crew uses the same name. We normally reply within 24 hours.',
+    a: 'Add personal WeChat ID DN8117 as a friend, or search “GFIC Crew” separately on WeChat Official Account, WeChat Channels, Xiaohongshu and the other platforms where the crew uses the same name. We normally reply within 24 hours.',
     q: 'How do I contact GFIC Crew?',
     category: 'Getting in Touch',
   },
@@ -181,7 +181,7 @@ const LOCAL_FAQ = [
     category: 'Living in China · Daily Life',
   },
   {
-    a: 'Golden Week is one of the easiest weeks of the year to meet people, because nobody is working. Local communities, malls and expat groups all put things on. Because it is a public holiday the logistics change though: venues get crowded, trains and tickets sell out early, and some places keep holiday hours. Our own meetups are announced inside the WeChat groups rather than on a calendar, so if you are heading to Guangzhou or Shenzhen, add us before you travel and we will tell you what is on.',
+    a: 'Golden Week is one of the easiest weeks of the year to meet people, because nobody is working. Local communities, malls and expat groups all put things on. Because it is a public holiday the logistics change though: venues get crowded, trains and tickets sell out early, and some places keep holiday hours. Our own confirmed meetup dates are published on the Events page and announced inside the WeChat groups, so if you are heading to Guangzhou or Shenzhen, check the page and add us before you travel.',
     q: 'Can foreigners join local events in China during Golden Week?',
     category: 'Living in China · Daily Life',
   },

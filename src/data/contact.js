@@ -32,10 +32,10 @@ const LOCAL_CONTACT = {
   // --- "Find us" on /about/ and in the footer --------------------------------
   findUsTitle: 'Find us',
   findUsText:
-    'Search “GFIC Crew” on {socialLine}. The name is the same everywhere. WeChat ID: {wechat}.',
+    'Search “GFIC Crew” on {socialLine}. Personal WeChat ID: {wechat}.',
   footerFindUs: 'Search “GFIC Crew” on {socialLine}.',
   footerWebsiteLabel: 'Website:',
-  footerWechatLabel: 'WeChat ID:',
+  footerWechatLabel: 'Personal WeChat ID:',
 };
 
 export const CONTACT = { ...LOCAL_CONTACT, ...(genContact && typeof genContact === 'object' ? genContact : {}) };
