@@ -10,8 +10,9 @@
 set -e
 SITE=/www/wwwroot/gficcrew.cn
 URL="https://gficcrew.com/cn-bundle.txt"
-# 本地包优先：把包上传到服务器后，同步完全不依赖任何远端地址。
-# 远端只在本地没有包时才作为兜底。这样 .com 的发布出任何问题都波及不到国内站。
+# 远端新包优先，本地包只作断网/发布故障时的兜底。
+# 不能反过来：若永远优先使用本地旧包，后台内容即使已经自动发布到 .com，
+# 国内站也会一直停留在旧版。每次成功拉取后刷新本地副本，兜底包随之保持最新。
 LOCAL=/www/backup/gfic-cn/pkg/cn-bundle.zip
 TMP=$(mktemp -d /tmp/gfic-cn.XXXXXX)
 # 备份不能放 /tmp：服务器重启会清空，等于没有备份。放 /www 下，跟站点同盘。
@@ -23,17 +24,18 @@ trap cleanup EXIT
 log "=== 开始同步 ==="
 mkdir -p "$TMP/site"
 
-# 1) 取包：本地优先，其次远端
-if [ -f "$LOCAL" ]; then
+# 1) 取包：先尝试远端新包；失败才使用本地兜底包
+mkdir -p "$(dirname "$LOCAL")"
+log "拉取远端新包：$URL"
+http=$(curl -sS -o "$TMP/bundle" -w '%{http_code}' --max-time 300 "$URL" || echo 000)
+if [ "$http" = "200" ] && [ "$(head -c 2 "$TMP/bundle" 2>/dev/null || true)" = "PK" ]; then
+  log "拉取成功 200，$(wc -c < "$TMP/bundle") 字节；刷新本地兜底包"
+  cp -f "$TMP/bundle" "$LOCAL"
+elif [ -f "$LOCAL" ]; then
+  log "WARN: 远端不可用 HTTP=$http，改用本地兜底包：$LOCAL"
   cp -f "$LOCAL" "$TMP/bundle"
-  log "使用服务器本地包：$LOCAL（$(wc -c < "$TMP/bundle") 字节）"
 else
-  log "本地无包，回退远端：$URL"
-  http=$(curl -sS -o "$TMP/bundle" -w '%{http_code}' --max-time 300 "$URL" || echo 000)
-  if [ "$http" != "200" ]; then
-    log "ERROR: 拉取失败 HTTP=$http（站点保持上一版，不会被破坏）"; exit 1
-  fi
-  log "拉取成功 200，$(wc -c < "$TMP/bundle") 字节"
+  log "ERROR: 远端不可用 HTTP=$http，且没有本地兜底包（站点保持上一版）"; exit 1
 fi
 
 # 2) 校验是不是真 ZIP（404 页面、错误页都是 HTML，解压前先挡掉）
