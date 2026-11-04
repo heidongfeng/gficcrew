@@ -203,7 +203,7 @@ const LOCAL_FAQ = [
   {
     category: 'Language & Culture',
     q: 'How is your language exchange different from the ones I have tried?',
-    a: 'The complaint we hear most is that they quietly turn into a dating event, or an English corner where nobody talks to anyone new. What we aim for instead is a host, a structure and an actual topic, so you get paired with somebody early instead of standing in a corner. It also pulls two crowds into one room: expats who want Chinese and locals who want English. Demand for this in China is enormous and the quality is uneven, which is why ours runs with a host, a structure and an actual topic.',
+    a: 'The complaint we hear most is that they quietly turn into a dating event, or an English corner where nobody talks to anyone new. What we aim for instead is a host, a structure and an actual topic, so you get paired with somebody early instead of standing in a corner. It also pulls two crowds into one room: expats who want Chinese and locals who want English. Demand for this in China is enormous, but the quality is uneven.',
   },
   {
     category: 'Events & Activities',

@@ -65,7 +65,7 @@ const LOCAL_SITE = {
   // you can see -- and leaving it stale means the wrong sentence reappears the moment the
   // generated snapshot goes missing. Keep the two in sync by hand.
   description:
-    'GFIC Crew (GFIC歪果社) is a growing real-life social community for expats in China, founded by locals who know the country well. We meet up in person in Guangzhou and Shenzhen, and we run online groups plus a national group that expats in any Chinese city can join. We keep ten meetup formats on the board, from parties and networking mixers to food crawls, language exchange and weekend getaways.',
+    'GFIC Crew (GFIC歪果社) is a growing real-life social community for expats in China, founded by locals who know the country well. We meet up in person in Guangzhou and Shenzhen, and we run online groups plus a national group that expats in any Chinese city can join. We organize ten types of meetups, from parties and networking mixers to food crawls, language exchange and weekend getaways.',
   keywords: [
     'expat community China',
     'foreigners in China',
@@ -86,7 +86,7 @@ const LOCAL_SITE = {
     ? 'WeChat Official Account, WeChat Channels or Xiaohongshu'
     : 'X, Instagram, YouTube, Xiaohongshu or WeChat Official Account',
   intro:
-    'GFIC Crew (known in Chinese as GFIC歪果社) is a growing real-life social community for expats in China. Founded by locals who know the country well, we are dedicated to helping global friends live a fun, connected, and hassle-free life here. We\'re starting in Guangzhou and Shenzhen, and expats anywhere in China can join our online groups and our national group. Here\'s what we\'re building towards: social events, parties, and meetups: everything from rooftop parties, BBQs, karaoke nights, wine tastings, and club nights to networking mixers, food crawls, language exchanges, hikes, sports leagues, Chinese cultural experiences, weekend getaways, and more.',
+    'GFIC Crew (known in Chinese as GFIC歪果社) is a growing real-life social community for expats in China. Founded by locals who know the country well, we are dedicated to helping global friends live a fun, connected, and hassle-free life here. We\'re starting in Guangzhou and Shenzhen, and expats anywhere in China can join our online groups and our national group. We\'re building a program of social events and meetups, from rooftop parties, BBQs, karaoke nights, wine tastings, and club nights to networking mixers, food crawls, language exchanges, hikes, sports leagues, Chinese cultural experiences, weekend getaways, and more.',
 };
 
 export const SITE = { ...LOCAL_SITE, ...editableOverride };
@@ -104,9 +104,9 @@ export const NAV = (genSite && Array.isArray(genSite.nav) && genSite.nav.length 
 const LOCAL_SERVICES = [
   {
     id: 'social',
-    title: 'Organization of Social Activities',
+    title: 'Social Events & Meetups',
     summary:
-      'We organize and share social events across China, so no expat has to spend a weekend sitting at home. Ten formats sit on the board: from rooftop parties, BBQs, karaoke nights, wine tastings and club nights to networking mixers, food crawls, hikes, sports leagues and weekend getaways. We pick the place, set the time and gather the crew; all you have to do is turn up.',
+      'We organize and share social events across China, so no expat has to spend a weekend sitting at home. We organize ten types of meetups: from rooftop parties, BBQs, karaoke nights, wine tastings and club nights to networking mixers, food crawls, hikes, sports leagues and weekend getaways. We pick the place, set the time and gather the crew; all you have to do is turn up.',
     points: [
       'Parties and socials: rooftop parties, BBQs, karaoke nights, wine tastings and club nights',
       'Networking mixers, food crawls and shared meals, hikes, sports leagues and weekend getaways',
@@ -115,7 +115,7 @@ const LOCAL_SERVICES = [
   },
   {
     id: 'culture',
-    title: 'Cultural Experience Activities',
+    title: 'Chinese Cultural Experiences',
     summary:
       'Culture workshops are the ones that need organizing before anything happens, and that is exactly why they are worth doing with a crew. Interest in Chinese culture is common; acting on it alone is harder, because you have to find someone who teaches it, get to the right part of town and then work out what you are looking at. A workshop handles all three.',
     points: [
@@ -128,7 +128,7 @@ const LOCAL_SERVICES = [
   },
   {
     id: 'language',
-    title: 'Chinese Language Exchange and Learning',
+    title: 'Chinese Language Exchange',
     summary:
       'Language exchange puts expats who want Mandarin next to locals who want English, and it gives anyone a stated reason to turn up.',
     points: [
@@ -141,7 +141,7 @@ const LOCAL_SERVICES = [
   },
   {
     id: 'daily',
-    title: 'Daily Crew Communication',
+    title: 'Daily Life & Peer Support',
     summary:
       'Online groups where expats swap first-hand answers about daily life in China: housing, healthcare, banking, mobile payments and everything in between. Peer advice from people who have already done it, not a service desk.',
     points: [
@@ -388,7 +388,7 @@ const LOCAL_HOME = {
   // 和紧随的 lead 首句承担，标题本身不必再塞品类词。
   title: 'Life happens face to face.',
   lead:
-    'GFIC Crew (known in Chinese as GFIC歪果社) is a growing real-life social community for expats in China. Founded by locals who know the country well, we are dedicated to helping global friends live a fun, connected, and hassle-free life here. We\'re starting in Guangzhou and Shenzhen, and expats anywhere in China can join our online groups and our national group. Here\'s what we\'re building towards: social events, parties, and meetups: everything from rooftop parties, BBQs, karaoke nights, wine tastings, and club nights to networking mixers, food crawls, language exchanges, hikes, sports leagues, Chinese cultural experiences, weekend getaways, and more.',
+    'GFIC Crew (known in Chinese as GFIC歪果社) is a growing real-life social community for expats in China. Founded by locals who know the country well, we are dedicated to helping global friends live a fun, connected, and hassle-free life here. We\'re starting in Guangzhou and Shenzhen, and expats anywhere in China can join our online groups and our national group. We\'re building a program of social events and meetups, from rooftop parties, BBQs, karaoke nights, wine tastings, and club nights to networking mixers, food crawls, language exchanges, hikes, sports leagues, Chinese cultural experiences, weekend getaways, and more.',
   highlights: [
     'Parties and socials: rooftop parties, BBQs, karaoke nights and club nights',
     'Networking mixers: a room where everyone is there to meet someone new',
