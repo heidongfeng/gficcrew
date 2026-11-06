@@ -128,6 +128,21 @@ gficcrew.cn 打开会因为 Origin 不匹配而被拒绝（页面顶部会显示
 > 本地跑端到端脚本时口令从环境变量读，不要写进代码：
 > `ADMIN_PW=你的口令 node tools/admin-e2e.cjs`
 
+### 一键发布
+
+保存内容后，点后台顶部的 **「发布上线」** 就会触发 GitHub Actions，不需要再等人手动跑命令。
+页面会显示排队、构建中、成功或失败，并给出运行日志入口。
+
+首次使用要在左下角 **「发布设置」** 里粘贴一个 GitHub fine-grained token：
+
+1. Repository access 只选 `heidongfeng/gficcrew`。
+2. Permissions 只给 **Actions: Read and write**，不要给代码或 Secrets 权限。
+3. 令牌用当前后台口令加密后存在该浏览器的 localStorage，不上传云端，也不进仓库。
+4. 后台口令通过「改口令」轮换时，页面会自动用新口令重新加密已保存的令牌。
+
+按钮触发的是 `.com` 发布；`.cn` 仍由腾讯云服务器的拉包任务同步，所以后台会显示
+“国内站会在下一次拉包任务后同步”。如果 `.cn` 的 cron 没配好，它不会自动更新。
+
 ### 能改什么
 
 | 集合 | 内容 | 删除 |

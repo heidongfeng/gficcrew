@@ -157,6 +157,8 @@ const SEED = {
       .btn--ghost:hover { background: var(--surface-2); border-color: var(--line); }
       .btn--danger { color: var(--accent); border-color: var(--line); }
       .btn--danger:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+      .btn--publish { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+      .btn--publish:hover { filter: brightness(0.94); background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
       .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
       .svg-btn { padding: 7px; }
 
@@ -394,12 +396,14 @@ const SEED = {
       /* ---------- modal ---------- */
       .modal {
         position: fixed; inset: 0; z-index: 200; display: grid; place-items: center;
+        padding: 24px 0; overflow-y: auto;
         background: rgba(21, 20, 15, 0.35); backdrop-filter: blur(3px);
         opacity: 0; pointer-events: none; transition: opacity 0.16s;
       }
       .modal.is-open { opacity: 1; pointer-events: auto; }
       .modal-box {
-        width: min(420px, calc(100% - 40px)); background: var(--surface);
+        width: min(420px, calc(100% - 40px)); max-height: calc(100dvh - 48px); overflow-y: auto;
+        background: var(--surface);
         border: 1px solid var(--line); border-radius: 14px; padding: 26px 28px;
         box-shadow: var(--shadow-lg); transform: translateY(10px) scale(0.98);
         transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -407,6 +411,17 @@ const SEED = {
       .modal.is-open .modal-box { transform: none; }
       .modal-box h4 { margin: 0 0 8px; font: 400 20px/1.3 var(--serif); }
       .modal-box p { margin: 0 0 20px; font-size: 14px; color: var(--ink-soft); }
+      .modal-box--wide { width: min(600px, calc(100% - 40px)); }
+      .pub-steps { margin: 0 0 16px; padding-left: 20px; font-size: 13.5px; line-height: 1.75; color: var(--ink-soft); }
+      .pub-steps code { font: 500 12px/1.5 var(--mono); background: var(--surface-2); padding: 2px 5px; border-radius: 4px; }
+      .pub-token { width: 100%; min-height: 86px; box-sizing: border-box; }
+      .pub-modal-msg { min-height: 21px; margin-top: 8px; font-size: 13px; }
+      .pub-modal-msg.is-err { color: var(--accent); }
+      .pub-modal-msg.is-ok { color: var(--ink-soft); }
+      .pub-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+      @media (max-width: 640px) {
+        .btn--publish { flex: 1 1 100%; justify-content: center; }
+      }
 
       .warnbar {
         padding: 10px 34px; background: var(--warn-bg); color: var(--warn-ink);
@@ -655,6 +670,7 @@ const SEED = {
         <div class="side-foot">
           <button class="btn btn--ghost svg-btn" id="btn-theme" type="button" title="切换深浅色">◐</button>
           <button class="btn btn--ghost" id="btn-pw" type="button" style="font-size: 12.5px">改口令</button>
+          <button class="btn btn--ghost" id="btn-pub-config" type="button" style="font-size: 12.5px">发布设置</button>
           <span style="flex: 1"></span>
           <button class="btn btn--ghost" id="btn-out" type="button" style="font-size: 12.5px">退出</button>
         </div>
@@ -668,6 +684,8 @@ const SEED = {
           </div>
           <div class="topbar-actions">
             <input class="search" id="search" type="text" placeholder="筛选…" />
+            <button class="btn btn--publish" id="btn-publish" type="button">发布上线</button>
+            <a class="btn btn--ghost hidden" id="pub-log" href="#" target="_blank" rel="noopener">运行日志</a>
             <button class="btn btn--primary" id="btn-new" type="button">+ 新增</button>
             <button class="btn" id="btn-export" type="button">导出 JSON</button>
             <button class="btn" id="btn-seed" type="button">导入初始数据</button>
@@ -700,6 +718,26 @@ const SEED = {
       </div>
     </div>
 
+    <div class="modal" id="pub-modal">
+      <div class="modal-box modal-box--wide">
+        <h4>设置一键发布</h4>
+        <p>只需配置一次。令牌只用于触发发布，不需要给代码读写权限，也不会保存到云端。</p>
+        <ol class="pub-steps">
+          <li>打开 <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub 新建 fine-grained token</a>。</li>
+          <li>Repository access 只选 <code>heidongfeng/gficcrew</code>。</li>
+          <li>Permissions 里只把 <code>Actions</code> 设为 <code>Read and write</code>，其余保持 No access。</li>
+          <li>生成后复制令牌，粘贴到下面。令牌会用当前后台口令加密后仅存在这台浏览器。</li>
+        </ol>
+        <label class="eyebrow" for="pub-token">GitHub token</label>
+        <textarea class="pub-token" id="pub-token" autocomplete="off" spellcheck="false" placeholder="github_pat_…"></textarea>
+        <div class="pub-modal-msg" id="pub-modal-msg"></div>
+        <div class="pub-actions">
+          <button class="btn btn--ghost" type="button" id="pub-cancel">取消</button>
+          <button class="btn btn--primary" type="button" id="pub-save">验证并保存</button>
+        </div>
+      </div>
+    </div>
+
     <script>
       import { createWorkBuddyCloud } from '@tencent-ai/workbuddy-cloud-sdk';
       import { codecToText, codecFromText, CODEC_HINT, slugify } from '../scripts/guide-codec.js';
@@ -708,6 +746,11 @@ const SEED = {
       const PUBLISHABLE_KEY = 'wbpk_1uORfVuxR6GP7CtKSD3Ciw_ZlNBhhoZQmyPg3rXxYL6aZvBv5miIAum';
       const PW_KEY = 'gfic_admin_pw';
       const THEME_KEY = 'gfic_admin_theme';
+      const PUB_TOKEN_KEY = 'gfic_publish_token_v1';
+      const PUB_LAST_KEY = 'gfic_publish_last_run';
+      const GH_REPO = 'heidongfeng/gficcrew';
+      const GH_WORKFLOW = 'publish.yml';
+      const GH_API = 'https://api.github.com';
 
       const SEED = JSON.parse(document.getElementById('seed-payload').textContent || '{}');
 
@@ -980,10 +1023,11 @@ const SEED = {
             { key: 'startDate', label: '开始时间', type: 'datetime-local', hint: '点输入框右侧的日历图标直接选日期和时间' },
             { key: 'endDate', label: '结束时间', type: 'datetime-local', hint: '同上，需晚于开始时间' },
             { key: 'venue', label: '地点', type: 'text' },
-            { key: 'price', label: '费用', type: 'text' },
-            { key: 'description', label: '活动介绍', type: 'textarea', wide: true },
+            { key: 'price', label: '费用', type: 'text', hint: '例如 ¥69 advance / ¥99 door；有多个价位时写清楚适用范围' },
+            { key: 'summary', label: '短摘要（列表与搜索用，≤155 字符）', type: 'textarea', wide: true, hint: '一句话说明时间、地点和活动内容；太长会被搜索结果截断' },
+            { key: 'description', label: '活动介绍（详情页正文）', type: 'textarea', wide: true },
           ],
-          blank: () => ({ slug: 'new-event', title: '新活动', category: 'Social', city: 'Guangzhou', cadence: '', startDate: '', endDate: '', venue: '', price: '', description: '' }),
+          blank: () => ({ slug: 'new-event', title: '新活动', category: 'Social', city: 'Guangzhou', cadence: '', startDate: '', endDate: '', venue: '', price: '', summary: '', description: '' }),
         },
         faq: {
           label: 'FAQ',
@@ -1070,6 +1114,7 @@ const SEED = {
         app: $('app'), side: $('side'), sideTools: $('side-tools'), pane: $('pane'), msg: $('msg'), warn: $('origin-warn'),
         title: $('title'), search: $('search'), actionbar: $('actionbar'), saveHint: $('save-hint'),
         progress: $('progress'), modal: $('modal'), modalTitle: $('modal-title'), modalText: $('modal-text'),
+        publish: $('btn-publish'), publishLog: $('pub-log'),
       };
 
       function show(node, text, kind) {
@@ -1098,6 +1143,247 @@ const SEED = {
           $('modal-cancel').onclick = () => done(false);
         });
       }
+
+      /* ---------- one-click publish ----------
+       * The admin is a static page, so the button cannot upload files itself. It triggers
+       * publish.yml through the GitHub Actions API. The user supplies a fine-grained token
+       * with Actions: read/write only. It is AES-GCM encrypted with the admin password and
+       * kept in this browser's localStorage; only the password holder can decrypt it.
+       * A plaintext token is never written to the repository or the cloud database.
+       */
+      let publishTokenCache = '';
+
+      const pubEnc = new TextEncoder();
+      const pubDec = new TextDecoder();
+      const PUB_AAD = pubEnc.encode('gfic-publish-token-v1');
+
+      function bytesToB64(bytes) {
+        let s = '';
+        for (const b of bytes) s += String.fromCharCode(b);
+        return btoa(s);
+      }
+      function b64ToBytes(text) {
+        const s = atob(text);
+        return Uint8Array.from(s, (c) => c.charCodeAt(0));
+      }
+      async function derivePublishKey(password, salt) {
+        const base = await crypto.subtle.importKey('raw', pubEnc.encode(password), 'PBKDF2', false, ['deriveKey']);
+        return crypto.subtle.deriveKey(
+          { name: 'PBKDF2', salt, iterations: 250000, hash: 'SHA-256' },
+          base,
+          { name: 'AES-GCM', length: 256 },
+          false,
+          ['encrypt', 'decrypt'],
+        );
+      }
+      async function savePublishToken(token) {
+        const salt = crypto.getRandomValues(new Uint8Array(16));
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const key = await derivePublishKey(state.pw, salt);
+        const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: PUB_AAD }, key, pubEnc.encode(token));
+        localStorage.setItem(PUB_TOKEN_KEY, JSON.stringify({
+          v: 1, salt: bytesToB64(salt), iv: bytesToB64(iv), cipher: bytesToB64(new Uint8Array(cipher)),
+        }));
+        publishTokenCache = token;
+      }
+      async function getPublishToken() {
+        if (publishTokenCache) return publishTokenCache;
+        const raw = localStorage.getItem(PUB_TOKEN_KEY);
+        if (!raw) return '';
+        try {
+          const box = JSON.parse(raw);
+          const key = await derivePublishKey(state.pw, b64ToBytes(box.salt));
+          const plain = await crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: b64ToBytes(box.iv), additionalData: PUB_AAD },
+            key,
+            b64ToBytes(box.cipher),
+          );
+          publishTokenCache = pubDec.decode(plain);
+          return publishTokenCache;
+        } catch {
+          // Usually the admin password was rotated: the old ciphertext is no longer usable.
+          localStorage.removeItem(PUB_TOKEN_KEY);
+          return '';
+        }
+      }
+
+      async function ghFetch(token, apiPath, options = {}) {
+        const res = await fetch(GH_API + apiPath, {
+          ...options,
+          headers: {
+            Authorization: 'Bearer ' + token,
+            Accept: 'application/vnd.github+json',
+            'X-GitHub-Api-Version': '2022-11-28',
+            ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+          },
+        });
+        if (!res.ok) {
+          const text = await res.text();
+          let detail = '';
+          try { detail = JSON.parse(text).message || ''; } catch { detail = text.slice(0, 200); }
+          if (res.status === 401) throw new Error('令牌无效，请重新生成');
+          if (res.status === 403) throw new Error('令牌没有 Actions 读写权限');
+          if (res.status === 404) throw new Error('令牌没有这个仓库的权限');
+          if (res.status === 422) throw new Error(detail || 'GitHub 拒绝了发布参数');
+          throw new Error(detail || `GitHub 返回 HTTP ${res.status}`);
+        }
+        return res.status === 204 ? null : res.json();
+      }
+
+      async function verifyPublishToken(token) {
+        await ghFetch(token, `/repos/${GH_REPO}/actions/workflows/${GH_WORKFLOW}`);
+        return true;
+      }
+
+      function setPublishBusy(busy, label) {
+        els.publish.disabled = busy;
+        els.publish.textContent = busy ? (label || '发布中…') : '发布上线';
+      }
+
+      function showPublishRun(run) {
+        if (!run || !run.html_url) return;
+        els.publishLog.href = run.html_url;
+        els.publishLog.classList.remove('hidden');
+      }
+
+      function rememberPublish(run, text) {
+        try {
+          localStorage.setItem(PUB_LAST_KEY, JSON.stringify({
+            at: new Date().toISOString(),
+            status: run && run.status,
+            conclusion: run && run.conclusion,
+            url: run && run.html_url,
+            text,
+          }));
+        } catch { /* storage disabled: publishing still works */ }
+      }
+
+      async function findPublishRun(token, since) {
+        const data = await ghFetch(
+          token,
+          `/repos/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/runs?event=workflow_dispatch&branch=main&per_page=20`,
+        );
+        const runs = (data && data.workflow_runs) || [];
+        return runs.find((r) => new Date(r.created_at).getTime() >= since - 30000) || null;
+      }
+
+      async function waitForPublish(token, since) {
+        let run = null;
+        for (let i = 0; i < 120; i += 1) {
+          await new Promise((r) => setTimeout(r, 8000));
+          run = await findPublishRun(token, since);
+          if (!run) {
+            show(els.msg, '发布请求已提交，等待 GitHub 接收…', '');
+            continue;
+          }
+          showPublishRun(run);
+          if (run.status === 'queued') {
+            show(els.msg, '已排队，等待构建机…', '');
+            setPublishBusy(true, '排队中…');
+          } else if (run.status === 'in_progress') {
+            show(els.msg, '正在拉取内容、构建、审计并发布…', '');
+            setPublishBusy(true, '发布中…');
+          } else if (run.status === 'completed') {
+            if (run.conclusion === 'success') {
+              show(els.msg, 'gficcrew.com 已发布。国内站会在下一次拉包任务后同步。', 'ok');
+              rememberPublish(run, '已上线');
+            } else {
+              show(els.msg, `发布失败（${run.conclusion || '未知原因'}），站点保持上一版。请打开运行日志。`, 'err');
+              rememberPublish(run, '发布失败');
+            }
+            return run;
+          }
+        }
+        show(els.msg, '发布仍在进行。可打开运行日志查看，页面无需一直开着。', '');
+        rememberPublish(run, '仍在进行');
+        return run;
+      }
+
+      async function publishNow() {
+        if (!els.actionbar.classList.contains('hidden')) {
+          show(els.msg, '当前有未保存的修改。请先点“保存”，再发布。', 'err');
+          return;
+        }
+        let token = '';
+        try { token = await getPublishToken(); } catch { token = ''; }
+        if (!token) {
+          show(els.msg, '还没有配置发布令牌，请先完成一次“发布设置”。', 'err');
+          openPublishSettings();
+          return;
+        }
+        setPublishBusy(true, '提交中…');
+        show(els.msg, '正在提交发布请求…', '');
+        try {
+          const since = Date.now();
+          await ghFetch(token, `/repos/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/dispatches`, {
+            method: 'POST',
+            body: JSON.stringify({ ref: 'main', inputs: { source: 'admin' } }),
+          });
+          show(els.msg, '发布请求已提交，等待 GitHub 接收…', '');
+          await waitForPublish(token, since);
+        } catch (err) {
+          const message = err.message || String(err);
+          show(els.msg, '发布失败：' + message, 'err');
+          if (/令牌|权限/.test(message)) {
+            publishTokenCache = '';
+            localStorage.removeItem(PUB_TOKEN_KEY);
+          }
+        } finally {
+          setPublishBusy(false);
+        }
+      }
+
+      function openPublishSettings() {
+        const modal = $('pub-modal');
+        const msg = $('pub-modal-msg');
+        $('pub-token').value = '';
+        msg.textContent = localStorage.getItem(PUB_TOKEN_KEY)
+          ? '已保存过令牌。留空可直接取消；输入新令牌会覆盖旧配置。'
+          : '令牌只保存在这台浏览器，不会上传到云端。';
+        msg.className = 'pub-modal-msg';
+        modal.classList.add('is-open');
+        setTimeout(() => $('pub-token').focus(), 50);
+      }
+
+      function closePublishSettings() {
+        $('pub-modal').classList.remove('is-open');
+      }
+
+      $('btn-pub-config').addEventListener('click', openPublishSettings);
+      $('pub-cancel').addEventListener('click', closePublishSettings);
+      $('pub-save').addEventListener('click', async () => {
+        const token = $('pub-token').value.trim();
+        const msg = $('pub-modal-msg');
+        if (!token) {
+          if (localStorage.getItem(PUB_TOKEN_KEY)) {
+            closePublishSettings();
+            show(els.msg, '已保留现有发布设置。', '');
+          } else {
+            msg.textContent = '请先粘贴 GitHub token。';
+            msg.className = 'pub-modal-msg is-err';
+          }
+          return;
+        }
+        const btn = $('pub-save');
+        btn.disabled = true;
+        btn.textContent = '验证中…';
+        msg.textContent = '正在验证仓库和 Actions 权限…';
+        msg.className = 'pub-modal-msg';
+        try {
+          await verifyPublishToken(token);
+          await savePublishToken(token);
+          closePublishSettings();
+          show(els.msg, '发布令牌已验证并保存。以后保存内容后点“发布上线”即可。', 'ok');
+        } catch (err) {
+          msg.textContent = err.message || String(err);
+          msg.className = 'pub-modal-msg is-err';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = '验证并保存';
+        }
+      });
+
+      els.publish.addEventListener('click', publishNow);
 
       function fieldLabel(cfg, key) {
         const all = (cfg.groups || [{ fields: cfg.fields }]).flatMap((g) => g.fields);
@@ -2847,6 +3133,7 @@ ${digest}
       function logout() {
         sessionStorage.removeItem(PW_KEY);
         state.pw = '';
+        publishTokenCache = '';
         els.app.classList.add('hidden');
         els.gate.classList.remove('hidden');
         els.gatePw.value = '';
@@ -3539,7 +3826,7 @@ ${digest}
           $('btn-del').classList.remove('hidden');
           show(
             els.msg,
-            '已保存到云端' + (renamedFrom ? '（原标识 ' + renamedFrom + ' 已替换）' : '') + '。要让官网生效，还需要重新构建并发布两个版本。',
+            '已保存到云端' + (renamedFrom ? '（原标识 ' + renamedFrom + ' 已替换）' : '') + '。点顶部「发布上线」即可发布。',
             'ok',
           );
         } catch (err) {
@@ -3581,10 +3868,15 @@ ${digest}
       $('btn-pw').addEventListener('click', async () => {
         const next = prompt('新的管理口令（至少 8 位）：');
         if (!next) return;
+        let savedToken = '';
+        try { savedToken = await getPublishToken(); } catch { savedToken = ''; }
         try {
           await rpc('cms_set_password', { p_password: state.pw, p_new_password: next });
           state.pw = next;
           sessionStorage.setItem(PW_KEY, next);
+          publishTokenCache = '';
+          // Keep the one-click publish token usable after a password rotation.
+          if (savedToken) await savePublishToken(savedToken);
           show(els.msg, '口令已更新，下次登录请用新口令', 'ok');
         } catch (err) {
           show(els.msg, '修改失败：' + (err.message || err), 'err');

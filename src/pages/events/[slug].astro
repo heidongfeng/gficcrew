@@ -13,12 +13,14 @@ export function getStaticPaths() {
 
 const { event } = Astro.props;
 const url = new URL(`/events/${event.slug}/`, SITE.url).href;
+const summary = event.summary || event.description;
+const body = event.summary && event.description && event.description !== event.summary ? event.description : '';
 const date = new Date(`${event.startDate.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', {
   day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
 });
 const schema = [
   orgSchema(),
-  webPageSchema({ url, name: event.title, description: event.description }),
+  webPageSchema({ url, name: event.title, description: summary }),
   eventSchema(event, url),
   breadcrumbSchema([
     { name: 'Home', url: `${SITE.url}/` },
@@ -28,12 +30,13 @@ const schema = [
 ];
 ---
 
-<BaseLayout title={`${event.title} — GFIC Crew ${event.city}`} description={event.description} schema={schema}>
+<BaseLayout title={`${event.title} — GFIC Crew ${event.city}`} description={summary} schema={schema}>
   <section class="section section--tight">
     <div class="wrap wrap--measure">
       <p class="breadcrumb"><a href="/">Home</a> / <a href="/events/">Events</a> / {event.title}</p>
       <h1>{event.title}</h1>
-      <p class="lead">{event.description}</p>
+      <p class="lead">{summary}</p>
+      {body ? <p class="event-body">{body}</p> : null}
     </div>
   </section>
 
@@ -61,6 +64,7 @@ const schema = [
 </BaseLayout>
 
 <style>
+  .event-body { white-space: pre-line; color: var(--body); }
   .event-facts { margin: 0 0 42px; }
   .event-facts div { display: grid; grid-template-columns: 110px 1fr; gap: 18px; padding: 12px 0; border-bottom: 1px solid var(--line-soft); }
   .event-facts dt { color: var(--muted); }

@@ -122,7 +122,7 @@ const PAGES: FeedItem[] = [
     path: `/events/${event.slug}/`,
     category: 'Events',
     title: `${event.title} — GFIC Crew ${event.city}`,
-    description: event.description,
+    description: event.summary || event.description,
   })),
 ];
 

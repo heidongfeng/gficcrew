@@ -38,7 +38,7 @@ const schema = [
           id: `${url}#event-list`,
           name: 'GFIC Crew upcoming events',
           description: 'Rolling calendar of crew events across Chinese cities.',
-          items: calendar.map((e) => ({ name: e.title, url: `${SITE.url}/events/${e.slug}/`, description: e.description })),
+          items: calendar.map((e) => ({ name: e.title, url: `${SITE.url}/events/${e.slug}/`, description: e.summary || e.description })),
         }),
         ...calendar.map((e) => eventSchema(e, `${SITE.url}/events/${e.slug}/`)),
       ]
@@ -142,7 +142,7 @@ const schema = [
                   {event.startDate.slice(11, 16)}–{event.endDate.slice(11, 16)} · {event.city} ·{' '}
                   {event.cadence} · {event.venue} · {event.price}
                 </div>
-                <p style="margin-bottom:14px">{event.description}</p>
+                <p style="margin-bottom:14px">{event.summary || event.description}</p>
                 <JoinDropdown align="left" />
               </div>
             </article>

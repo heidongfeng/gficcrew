@@ -167,7 +167,7 @@ export function eventSchema(event, url) {
     '@type': 'Event',
     '@id': `${url}#${event.slug}`,
     name: event.title,
-    description: event.description,
+    description: event.summary || event.description,
     startDate: event.startDate,
     endDate: event.endDate,
     eventStatus: 'https://schema.org/EventScheduled',

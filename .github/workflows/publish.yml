@@ -20,8 +20,14 @@ on:
   schedule:
     # UTC。0/6/12/18 点 = 北京时间 8/14/20/02 点
     - cron: '0 */6 * * *'
-  # 改完内容想立刻上线时，在这里点一下
+  # 改完内容想立刻上线时，在这里点一下；后台「发布上线」也走这里
   workflow_dispatch:
+    inputs:
+      source:
+        description: '触发来源（后台按钮填 admin）'
+        required: false
+        default: 'manual'
+        type: string
 
 # 不允许两轮并发：一轮正在推 gh-pages 时再起一轮，会把 tree 比对建立在过期的父提交上
 concurrency:

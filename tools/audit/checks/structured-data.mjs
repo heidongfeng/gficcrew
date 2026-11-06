@@ -188,9 +188,17 @@ export async function run() {
     // Finished events are deliberately absent from the page, so this compares against what is
     // still upcoming rather than against every row in the data file.
     const expectedEvents = D.upcomingEvents().length;
-    const eventCount = blocks.filter((b) => !b.error && b.data?.['@type'] === 'Event').length;
+    // The same event intentionally appears twice: once in the /events/ calendar and once on
+    // its own detail page. Count unique events, not JSON-LD blocks, or any published event
+    // looks like a duplicate the moment it gets a detail page.
+    const eventKeys = new Set(
+      blocks
+        .filter((b) => !b.error && b.data?.['@type'] === 'Event')
+        .map((b) => `${b.data.name || ''}|${b.data.startDate || ''}`),
+    );
+    const eventCount = eventKeys.size;
     if (expectedEvents > 0 && eventCount !== expectedEvents)
-      dataChecks.push(`Event 节点有 ${eventCount} 个，应渲染的未结束活动有 ${expectedEvents} 个（可能少渲染了活动）`);
+      dataChecks.push(`Event 节点对应 ${eventCount} 场活动，应渲染的未结束活动有 ${expectedEvents} 场（可能少渲染了活动）`);
     if (expectedEvents === 0 && eventCount > 0)
       dataChecks.push(`日历上已无未结束的活动，却仍渲染了 ${eventCount} 个 Event 节点`);
     out.push(
