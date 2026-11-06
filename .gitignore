@@ -59,3 +59,10 @@ Thumbs.db
 
 # 口令轮换时的旧凭据备份，只在本机留一份用于回退
 .adminpw.*
+
+.export-token
+
+dist-cn-admin/
+
+# 迁移导出的内容副本：真源在服务器 /www/gfic-data，不进仓库
+migration/

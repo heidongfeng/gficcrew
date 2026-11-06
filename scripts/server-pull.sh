@@ -6,17 +6,17 @@
 #   若只用默认的 size+mtime 快速校验，「内容变了但字节数相同」的文件（如恒为 225B 的
 #   sitemap-index.xml）会被 rsync 误判为未变而跳过，导致线上一直残留旧版本。
 # 安全：只覆盖本站点目录，保留 .well-known（证书续签）与 .user.ini（宝塔防跨站）；
-#       同步后强制清理后台 admin/ 与 _astro/admin.*。
+#       admin/ admin-assets/ api/ 是部署在本机的内容后台与数据接口，必须原样保留。
 set -e
-SITE=/www/wwwroot/gficcrew.cn
-URL="https://gficcrew.com/cn-bundle.txt"
+SITE="${SITE:-/www/wwwroot/gficcrew.cn}"
+URL="${URL:-https://gficcrew.com/cn-bundle.txt}"
 # 远端新包优先，本地包只作断网/发布故障时的兜底。
 # 不能反过来：若永远优先使用本地旧包，后台内容即使已经自动发布到 .com，
 # 国内站也会一直停留在旧版。每次成功拉取后刷新本地副本，兜底包随之保持最新。
-LOCAL=/www/backup/gfic-cn/pkg/cn-bundle.zip
+LOCAL="${LOCAL:-/www/backup/gfic-cn/pkg/cn-bundle.zip}"
 TMP=$(mktemp -d /tmp/gfic-cn.XXXXXX)
 # 备份不能放 /tmp：服务器重启会清空，等于没有备份。放 /www 下，跟站点同盘。
-BK=/www/backup/gfic-cn
+BK="${BK:-/www/backup/gfic-cn}"
 log(){ echo "$(date '+%F %T') $*"; }
 cleanup(){ rm -rf "$TMP"; }
 trap cleanup EXIT
@@ -58,18 +58,24 @@ tar -czf "$BK/cn-$(date +%Y%m%d-%H%M%S).tar.gz" -C "$SITE" . 2>/dev/null || true
 ls -1t "$BK"/cn-*.tar.gz 2>/dev/null | tail -n +4 | xargs -r rm -f
 
 # 4) 覆盖站点（--checksum 按内容比对，避免固定 mtime 造成漏传）
+#
+# admin/ admin-assets/ api/ 必须排除：内容后台和数据接口现在就部署在这台服务器上，
+# 它们不属于公开包。不排除的话，每次拉包都会把后台删掉（旧脚本确实这么干，
+# 因为当时后台还托管在 WorkBuddy 上）。数据本体在 /www/gfic-data，不在网站根目录。
 if command -v rsync >/dev/null 2>&1; then
-  rsync -a --checksum --delete --exclude='.well-known' --exclude='.user.ini' "$TMP/site/" "$SITE/" || { log "ERROR: rsync 失败"; exit 1; }
+  rsync -a --checksum --delete \
+    --exclude='.well-known' --exclude='.user.ini' \
+    --exclude='/admin/' --exclude='/admin-assets/' --exclude='/api/' \
+    "$TMP/site/" "$SITE/" || { log "ERROR: rsync 失败"; exit 1; }
 else
   log "提示: 无 rsync，改用清空+复制"
-  find "$SITE" -mindepth 1 -maxdepth 1 ! -name '.well-known' ! -name '.user.ini' -exec rm -rf {} +
+  find "$SITE" -mindepth 1 -maxdepth 1 \
+    ! -name '.well-known' ! -name '.user.ini' \
+    ! -name 'admin' ! -name 'admin-assets' ! -name 'api' \
+    -exec rm -rf {} +
   cp -a "$TMP/site/." "$SITE/"
 fi
 chown -R www:www "$SITE" 2>/dev/null || true
-
-# 5) 清理后台残留（无论是否走 rsync 都执行，防止旧部署把后台留在公网）
-rm -rf "$SITE/admin"
-find "$SITE/_astro" -maxdepth 1 -type f -name 'admin.*' -delete 2>/dev/null || true
 
 # 6) 逐字节校验：文件存在 ≠ 内容已更新，必须与发布包比对
 for rel in index.html 404.html sitemap-0.xml sitemap-index.xml robots.txt; do
@@ -77,5 +83,10 @@ for rel in index.html 404.html sitemap-0.xml sitemap-index.xml robots.txt; do
     log "ERROR: 同步后 $rel 与发布包不一致，检查 $SITE 权限/所有权"; exit 1
   fi
 done
-[ ! -d "$SITE/admin" ] || { log "ERROR: 后台目录仍存在，已中止"; exit 1; }
+# 6) 后台与接口应原样保留，不能被公开包覆盖
+if [ -f "$SITE/admin/index.html" ]; then
+  grep -q 'admin-assets' "$SITE/admin/index.html" || { log "ERROR: 后台页面资源路径异常"; exit 1; }
+  [ -f "$SITE/api/login.php" ] || { log "ERROR: 后台在但数据接口缺失，请检查 /api 目录"; exit 1; }
+  log "后台与数据接口已保留（/admin/、/api/ 不参与公开包同步）"
+fi
 log "SUCCESS: gficcrew.cn 已同步为最新构建；关键文件与发布包逐字节一致（--checksum）"

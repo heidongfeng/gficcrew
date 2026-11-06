@@ -91,39 +91,87 @@ public/        # favicon.ico icon-192.png apple-touch-icon.png logo.png logo-mar
 `/guides/shenzhen/` 会自动生成，`/cities/` 里深圳卡片会自动出现「Guide available」标记和入口，
 `/guides/` 列表、页脚导航、llms.txt 全部自动同步。
 
-## 6. 云数据库
+## 6. 内容数据：自有服务器（gficcrew.cn）
 
-| 表 | 用途 | 权限 |
-| --- | --- | --- |
-| `cms_docs` | 后台内容：`collection` + `doc_id` + `data`(jsonb) | 不开 RLS 策略，只允许经 SECURITY DEFINER 函数访问 |
-| `cms_admin` | 后台管理口令哈希（bcrypt，带口令拉伸） | 同上 |
-| `crew_requests` | 早期表单提交（已停用，表单已全站移除） | anon 可写 |
+内容、后台页面、数据接口现在都在 `gficcrew.cn` 这台腾讯云服务器上，**不再依赖 WorkBuddy**。
+后台和接口同域，浏览器走同源请求，没有跨域问题，也不需要配置 Origin 白名单。
 
-后台通过 5 个 RPC 访问数据库，每个都先校验口令：
-
-| 函数 | 作用 |
+| 位置 | 内容 |
 | --- | --- |
-| `cms_login(p_password)` | 校验口令 |
-| `cms_list(p_password, p_collection)` | 读取某个集合的全部条目 |
-| `cms_save(p_password, p_collection, p_doc_id, p_data, p_sort_order)` | 新增 / 更新 |
-| `cms_delete(p_password, p_collection, p_doc_id)` | 删除 |
-| `cms_set_password(p_password, p_new_password)` | 改口令 |
+| `/www/gfic-data/data.json` | **唯一真源**，7 个集合（site / contact / cities / events / faq / plans / guides） |
+| `/www/gfic-data/config.php` | 口令哈希、只读导出 token、可选的 AI 模型配置 |
+| `/www/gfic-data/backups/` | 写前备份 + 每日快照，保留 30 天 |
+| `<网站根目录>/admin/` | 后台静态页面 |
+| `<网站根目录>/admin-assets/` | 后台专用 JS/CSS，与公开站 `/_astro/` 隔离 |
+| `<网站根目录>/api/` | PHP 接口 |
 
-前端配置在 `src/scripts/cloud.js` 的 `PUBLIC_CONFIG`：`endpoint` 必须等于应用发布域名
-（`gficcrew.app.workbuddy.host`），否则服务端 Origin 校验会拒绝请求。
-**后台必须从 `https://gficcrew.app.workbuddy.host/admin/` 打开**，从 gficcrew.com 或
-gficcrew.cn 打开会因为 Origin 不匹配而被拒绝（页面顶部会显示黄色提示条）。
+**数据目录必须在网站根目录之外。** 接口是数据的唯一入口，任何 URL 都下载不到
+`data.json` 或 `config.php`。不要把数据放进 `cn-bundle.txt`，也不要放进公开包里。
+
+### 接口
+
+| 接口 | 作用 |
+| --- | --- |
+| `POST /api/login.php` | 口令换 2 小时会话令牌；同一 IP 连续错 5 次锁 15 分钟 |
+| `GET /api/data.php` | 读全量数据（需 `Authorization: Bearer <令牌>`） |
+| `POST /api/data.php` | 全量写回（需令牌，**写前自动备份**，文件锁 + 原子替换） |
+| `POST /api/password.php` | 改口令，成功后吊销所有已发令牌 |
+| `GET /api/export.php?token=` | 只读导出，给 CI 用；token 独立，与后台口令无关 |
+| `POST /api/llm.php` | 后台 AI 功能的同源代理，转发到 OpenAI 兼容端点 |
+
+AI 功能是可选项：在 `config.php` 里补 `llm` 配置即可启用，例如
+
+```php
+'llm' => array(
+  'baseUrl' => 'https://api.deepseek.com/v1',
+  'apiKey' => 'sk-...',
+  'model' => 'deepseek-chat',
+),
+```
+
+未配置时该接口返回 503，**内容编辑、保存和发布都不受影响**。
+
+### 首次部署
+
+```bash
+# 1. 本地生成部署目录（admin/ + admin-assets/ + api/）
+npm run build:all && npm run app:prepare && npm run admin:cn
+
+# 2. 把 dist-cn-admin 里的三个目录上传到网站根目录
+# 3. 把迁移导出的 data.json 上传为 /www/gfic-data/seed.json
+# 4. 在服务器执行（自动探测宝塔 PHP、初始化数据、配每日备份并自检）
+bash server/install-server.sh
+```
+
+初始化时会打印一次**只读导出 token**，把它配到仓库 Secret `GFIC_EXPORT_TOKEN`。
+本地开发则写到项目根目录的 `.export-token`（已 git-ignore）。
+
+### 备份与恢复
+
+- 每次保存前自动备份到 `backups/data-*.json`，并刷新 `backups/latest.json`；
+- 每天 03:17 由 cron 生成 `backups/daily-YYYYmmdd.json`，保留 30 天；
+- 恢复：`DATA_DIR=/www/gfic-data bash server/restore-backup.sh <备份文件>`，
+  恢复前会自动给当前数据留一份 `before-restore-*.json`，恢复本身也可回退。
+
+### 回滚到旧云端
+
+`content:pull` 默认拉 `https://gficcrew.cn/api/export.php`。只要没配导出 token、
+而本机还留着 `.adminpw`，它会自动回退到旧 WorkBuddy 云端并打印提示；CI 里则用
+`GFIC_CONTENT_SOURCE` 区分（未配 `GFIC_EXPORT_TOKEN` 时自动为 `cloud`）。
+也可以显式执行 `GFIC_CONTENT_SOURCE=cloud npm run content:pull`。
+**云端数据在观察期内不要删**，确认新链路稳定一周后再停用云服务。
 
 ## 6.1 内容管理后台（/admin/）
 
-一个后台管两个版本。境外版和国内版用的是**同一份云端内容**，只有域名、备案号、
+一个后台管两个版本。境外版和国内版用的是**同一份内容数据**，只有域名、备案号、
 社交平台列表按构建版本分叉，所以后台改一次，两个站点同时更新。
 
 ### 登录
 
-打开 `https://gficcrew.app.workbuddy.host/admin/`，输入管理口令。**不需要邮箱、不需要验证码。**
-初始口令为 `Admin@2026`（与社群小程序后台一致），**首次登录后务必改掉**（顶部「修改口令」，至少 8 位）。
-口令存在 `sessionStorage`，关掉标签页即失效。口令哈希存在云端 `cms_admin`，只有哈希落库，明文不留任何地方。
+打开 `https://gficcrew.cn/admin/`，输入管理口令。**不需要邮箱、不需要验证码。**
+登录成功后拿到 2 小时会话令牌，存在 `sessionStorage`，关掉标签页即失效；
+口令本身只留在内存，用于给「发布设置」里的 GitHub 令牌加密，不会写入 localStorage。
+口令哈希存在服务器的 `config.php`，明文不落盘。同一 IP 连续错 5 次锁 15 分钟。
 
 > 本地跑端到端脚本时口令从环境变量读，不要写进代码：
 > `ADMIN_PW=你的口令 node tools/admin-e2e.cjs`
@@ -143,9 +191,9 @@ gficcrew.cn 打开会因为 Origin 不匹配而被拒绝（页面顶部会显示
 按钮触发的是 `.com` 发布；`.cn` 仍由腾讯云服务器的拉包任务同步，所以后台会显示
 “国内站会在下一次拉包任务后同步”。如果 `.cn` 的 cron 没配好，它不会自动更新。
 
-轮换后台口令后，除了在后台点「改口令」，还要同步更新仓库 Secret `GFIC_ADMIN_PW`；
-否则 Actions 会在 `content:pull` 处失败，站点保持上一版。工作流已开启 `pipefail`，
-这种失败会显示为红色运行，不会再被 `tee` 伪装成成功。
+工作流已开启 `pipefail`，发布失败会显示为红色运行，不会被 `tee` 伪装成成功。
+内容源由 Secret `GFIC_EXPORT_TOKEN` 控制：没配就走旧云端（那时才需要 `GFIC_ADMIN_PW`
+跟后台口令一致），配好之后走自己的服务器，**后台口令轮换不再影响自动发布**。
 
 ### 能改什么
 

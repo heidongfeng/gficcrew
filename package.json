@@ -33,7 +33,8 @@
     "preview": "astro preview",
     "publish": "node scripts/publish.mjs",
     "publish:apply": "node scripts/publish.mjs --apply",
-    "deploy:cn:remote": "bash scripts/deploy-cn-remote.sh"
+    "deploy:cn:remote": "bash scripts/deploy-cn-remote.sh",
+    "admin:cn": "node scripts/prepare-cn-admin.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",

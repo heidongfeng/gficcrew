@@ -423,11 +423,6 @@ const SEED = {
         .btn--publish { flex: 1 1 100%; justify-content: center; }
       }
 
-      .warnbar {
-        padding: 10px 34px; background: var(--warn-bg); color: var(--warn-ink);
-        border-bottom: 1px solid var(--warn-line); font-size: 13px;
-      }
-
       @media (max-width: 960px) {
         .shell { grid-template-columns: minmax(0, 1fr); }
         .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
@@ -442,7 +437,6 @@ const SEED = {
       @media (max-width: 640px) {
         .content { padding: 18px 14px 156px; }
         .topbar { padding: 14px 14px 12px; gap: 12px; }
-        .warnbar { padding: 10px 14px; }
         .topbar h2 { font-size: 22px; }
         .topbar-actions { width: 100%; margin-left: 0; }
         .search { width: 100%; }
@@ -631,8 +625,6 @@ const SEED = {
     </style>
   </head>
   <body>
-    <div class="warnbar hidden" id="origin-warn"></div>
-
     <div class="auth" id="gate">
       <div class="auth-card">
         <span class="wordmark">GFIC <em>Crew</em></span>
@@ -739,12 +731,10 @@ const SEED = {
     </div>
 
     <script>
-      import { createWorkBuddyCloud } from '@tencent-ai/workbuddy-cloud-sdk';
       import { codecToText, codecFromText, CODEC_HINT, slugify } from '../scripts/guide-codec.js';
 
-      const ENDPOINT = 'https://gficcrew.app.workbuddy.host';
-      const PUBLISHABLE_KEY = 'wbpk_1uORfVuxR6GP7CtKSD3Ciw_ZlNBhhoZQmyPg3rXxYL6aZvBv5miIAum';
-      const PW_KEY = 'gfic_admin_pw';
+      const TOKEN_KEY = 'gfic_admin_token_v2';
+      sessionStorage.removeItem('gfic_admin_pw');
       const THEME_KEY = 'gfic_admin_theme';
       const PUB_TOKEN_KEY = 'gfic_publish_token_v1';
       const PUB_LAST_KEY = 'gfic_publish_last_run';
@@ -753,9 +743,6 @@ const SEED = {
       const GH_API = 'https://api.github.com';
 
       const SEED = JSON.parse(document.getElementById('seed-payload').textContent || '{}');
-
-      const cloud = createWorkBuddyCloud({ endpoint: ENDPOINT, publishableKey: PUBLISHABLE_KEY });
-      const db = cloud.database;
 
       // slugify 由 ../scripts/guide-codec.js 提供，这里不再重复定义。
       // 之前两者同名并存：import 被本地 function 遮蔽，打包器把失效的 import 丢掉所以线上
@@ -1093,7 +1080,10 @@ const SEED = {
       };
 
       const state = {
-        pw: sessionStorage.getItem(PW_KEY) || '',
+        token: sessionStorage.getItem(TOKEN_KEY) || '',
+        // The password is needed only to encrypt/decrypt the publishing token. Never persist it.
+        pw: '',
+        data: null,
         collection: 'site',
         // Which SEO/GEO tool is open. When set, the collection machinery is bypassed.
         tool: null,
@@ -1111,7 +1101,7 @@ const SEED = {
       const $ = (id) => document.getElementById(id);
       const els = {
         gate: $('gate'), gateForm: $('gate-form'), gatePw: $('gate-pw'), gateGo: $('gate-go'), gateMsg: $('gate-msg'),
-        app: $('app'), side: $('side'), sideTools: $('side-tools'), pane: $('pane'), msg: $('msg'), warn: $('origin-warn'),
+        app: $('app'), side: $('side'), sideTools: $('side-tools'), pane: $('pane'), msg: $('msg'),
         title: $('title'), search: $('search'), actionbar: $('actionbar'), saveHint: $('save-hint'),
         progress: $('progress'), modal: $('modal'), modalTitle: $('modal-title'), modalText: $('modal-text'),
         publish: $('btn-publish'), publishLog: $('pub-log'),
@@ -1322,6 +1312,10 @@ const SEED = {
           show(els.msg, '当前有未保存的修改。请先点“保存”，再发布。', 'err');
           return;
         }
+        if (!state.pw) {
+          show(els.msg, '当前会话无法解密发布令牌，请退出后重新登录再发布。', 'err');
+          return;
+        }
         let token = '';
         try { token = await getPublishToken(); } catch { token = ''; }
         if (!token) {
@@ -1352,6 +1346,10 @@ const SEED = {
       }
 
       function openPublishSettings() {
+        if (!state.pw) {
+          show(els.msg, '当前会话无法加密发布令牌，请退出后重新登录再配置。', 'err');
+          return;
+        }
         const modal = $('pub-modal');
         const msg = $('pub-modal-msg');
         $('pub-token').value = '';
@@ -1423,22 +1421,103 @@ const SEED = {
         cur[last] = value;
       }
 
-      async function rpc(name, args) {
-        const { data, error } = await db.rpc(name, args);
-        if (error) throw new Error(error.message || '请求失败');
-        return data;
-      }
-      async function list(collection) {
-        return (await rpc('cms_list', { p_password: state.pw, p_collection: collection })) || [];
-      }
-      async function save(collection, docId, data, sortOrder) {
-        await rpc('cms_save', { p_password: state.pw, p_collection: collection, p_doc_id: docId, p_data: data, p_sort_order: sortOrder || 0 });
-      }
-      async function remove(collection, docId) {
-        await rpc('cms_delete', { p_password: state.pw, p_collection: collection, p_doc_id: docId });
+      async function api(path, options = {}) {
+        const { method = 'GET', body, auth = true, raw = false, signal } = options;
+        let res;
+        try {
+          res = await fetch(path, {
+            method,
+            signal,
+            headers: {
+              Accept: raw ? 'text/event-stream' : 'application/json',
+              ...(auth && state.token ? { Authorization: 'Bearer ' + state.token } : {}),
+              ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+            },
+            ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+          });
+        } catch (err) {
+          if (err && err.name === 'AbortError') throw err;
+          throw new Error('网络请求失败，请检查连接后重试');
+        }
+
+        if (raw && res.ok) return res;
+        let payload = null;
+        try { payload = await res.json(); } catch {
+          if (res.ok) throw new Error(`服务器返回了无法解析的响应（HTTP ${res.status}）`);
+        }
+        if (!res.ok) {
+          const detail = payload && typeof payload.error === 'string' ? payload.error : '';
+          let message = detail ? '请求失败：' + detail :
+            (res.status === 401 ? '登录状态已失效，请重新登录' :
+              res.status === 429 ? '登录尝试次数过多，请稍后重试' : `请求失败（HTTP ${res.status}）`);
+          const retryAfter = Number(payload && payload.retryAfter);
+          if (res.status === 429 && retryAfter > 0) message += `（约 ${Math.ceil(retryAfter)} 秒后重试）`;
+          if (res.status === 401) {
+            logout();
+            show(els.gateMsg, message, 'err');
+          }
+          const err = new Error(message);
+          err.status = res.status;
+          throw err;
+        }
+        if (payload && payload.ok === false) throw new Error(payload.error || '请求失败');
+        return payload;
       }
 
-      /* ---------- AI content generation (managed WorkBuddy LLM, keyless) ---------- */
+      const cloneData = (value) => JSON.parse(JSON.stringify(value));
+
+      async function loadAllData() {
+        const result = await api('/api/data.php');
+        if (!result || result.ok !== true || !result.data || typeof result.data !== 'object' || Array.isArray(result.data)) {
+          throw new Error('数据接口返回格式不正确');
+        }
+        state.data = result.data;
+      }
+
+      async function writeAllData(next, previous) {
+        state.data = next;
+        try {
+          await api('/api/data.php', { method: 'POST', body: { data: next } });
+        } catch (err) {
+          // A failed write must not leave the editor showing data the server did not accept.
+          if (state.token) state.data = previous;
+          throw err;
+        }
+      }
+
+      async function list(collection) {
+        if (!state.data) throw new Error('内容尚未载入');
+        const rows = Array.isArray(state.data[collection]) ? cloneData(state.data[collection]) : [];
+        return rows.sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+      }
+      async function save(collection, docId, data, sortOrder) {
+        if (!state.data) throw new Error('内容尚未载入');
+        const previous = state.data;
+        const next = cloneData(previous);
+        const rows = Array.isArray(next[collection]) ? next[collection] : [];
+        const index = rows.findIndex((row) => row.docId === docId);
+        const record = {
+          ...(index >= 0 ? rows[index] : {}),
+          data: cloneData(data),
+          docId,
+          sortOrder: sortOrder || 0,
+          updatedAt: new Date().toISOString(),
+        };
+        if (index >= 0) rows[index] = record;
+        else rows.push(record);
+        next[collection] = rows;
+        await writeAllData(next, previous);
+      }
+      async function remove(collection, docId) {
+        if (!state.data) throw new Error('内容尚未载入');
+        const previous = state.data;
+        const next = cloneData(previous);
+        const rows = Array.isArray(next[collection]) ? next[collection] : [];
+        next[collection] = rows.filter((row) => row.docId !== docId);
+        await writeAllData(next, previous);
+      }
+
+      /* ---------- AI content generation (same-origin streaming endpoint) ---------- */
       // Compliance system prompt — hard guardrails against the four illegal categories we
       // just purged from the site (visa agency / job placement for foreigners / VPN / illegal work).
       const AI_SYSTEM = `You are a content editor for GFIC Crew (GFIC歪果社) — an English-language community for expats living in China. Our brand: warm, peer-to-peer, practical and reassuring. We help foreigners actually live day-to-day in China (housing, banking, transport, healthcare, food, social life, and visa/residence-permit facts). We are a community — NOT an agency, NOT a job board, NOT a visa service.
@@ -1471,19 +1550,62 @@ STRICT COMPLIANCE RULES — never violate:
 
       // temperature 只在「选题建议」时显式抬高：同一个 prompt 多问几次要能拿到不同方向，
       // 而不是同一句话重来。正文生成/润色不传，保持默认（要稳、要一致）。
-      async function aiStream(messages, onDelta, signal, temperature) {
-        const stream = await cloud.llm.chat.completions.create({
-          stream: true,
-          model: 'auto',
-          messages,
-          ...(temperature == null ? {} : { temperature }),
+      async function llmStream(messages, { onDelta, signal, temperature } = {}) {
+        const stream = await api('/api/llm.php', {
+          method: 'POST',
+          body: {
+            stream: true,
+            model: 'auto',
+            messages,
+            ...(temperature == null ? {} : { temperature }),
+          },
+          raw: true,
+          signal,
         });
-        let buf = '';
-        for await (const chunk of stream) {
-          const d = chunk?.choices?.[0]?.delta?.content;
-          if (d) { buf += d; onDelta(buf); }
+        if (!stream.body) throw new Error('AI 接口不支持流式响应');
+
+        const reader = stream.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let text = '';
+        let finished = false;
+        const consume = (block) => {
+          const data = block.split(/\r?\n/)
+            .filter((line) => line.startsWith('data:'))
+            .map((line) => line.slice(5).replace(/^ /, ''))
+            .join('\n');
+          if (!data) return;
+          if (data === '[DONE]') { finished = true; return; }
+          let chunk;
+          try { chunk = JSON.parse(data); } catch { throw new Error('AI 接口返回了无法解析的数据'); }
+          const delta = chunk?.choices?.[0]?.delta?.content;
+          if (delta) {
+            text += delta;
+            if (onDelta) onDelta(text);
+          }
+        };
+
+        try {
+          while (!finished) {
+            const { done, value } = await reader.read();
+            buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+            let match;
+            while ((match = buffer.match(/\r?\n\r?\n/))) {
+              const block = buffer.slice(0, match.index);
+              buffer = buffer.slice(match.index + match[0].length);
+              consume(block);
+            }
+            if (done) break;
+          }
+          if (buffer.trim()) consume(buffer);
+        } finally {
+          reader.releaseLock();
         }
-        return buf;
+        return text;
+      }
+
+      async function aiStream(messages, onDelta, signal, temperature) {
+        return llmStream(messages, { onDelta, signal, temperature });
       }
 
       /*
@@ -2037,13 +2159,7 @@ Name concrete communities, organizations, apps or resources when they are genuin
       }
 
       async function llmOnce(messages) {
-        const stream = await cloud.llm.chat.completions.create({ stream: true, model: 'auto', messages });
-        let buf = '';
-        for await (const chunk of stream) {
-          const d = chunk?.choices?.[0]?.delta?.content;
-          if (d) buf += d;
-        }
-        return buf;
+        return llmStream(messages);
       }
 
       /**
@@ -2906,7 +3022,7 @@ Name concrete communities, organizations, apps or resources when they are genuin
 
           const report = buildReport(rows);
           report.at = new Date().toISOString();
-          report.model = 'auto（WorkBuddy 托管模型）';
+          report.model = 'auto（站内模型）';
 
           report.round = currentRound();
           setProgress(94);
@@ -3117,10 +3233,16 @@ ${digest}
         els.gateGo.disabled = true;
         els.gateGo.textContent = '验证中…';
         try {
-          const ok = await rpc('cms_login', { p_password: pw });
-          if (ok !== true) throw new Error('口令不正确');
+          const result = await api('/api/login.php', {
+            method: 'POST',
+            body: { password: pw },
+            auth: false,
+          });
+          if (!result || result.ok !== true || !result.token) throw new Error('登录接口返回格式不正确');
           state.pw = pw;
-          sessionStorage.setItem(PW_KEY, pw);
+          state.token = result.token;
+          sessionStorage.setItem(TOKEN_KEY, result.token);
+          await loadAllData();
           enter();
         } catch (err) {
           show(els.gateMsg, err.message || '登录失败', 'err');
@@ -3149,8 +3271,10 @@ ${digest}
       }
 
       function logout() {
-        sessionStorage.removeItem(PW_KEY);
+        sessionStorage.removeItem(TOKEN_KEY);
+        state.token = '';
         state.pw = '';
+        state.data = null;
         publishTokenCache = '';
         els.app.classList.add('hidden');
         els.gate.classList.remove('hidden');
@@ -3829,7 +3953,6 @@ ${digest}
           }
           // Renaming the identifying field would otherwise orphan the old record.
           if (!doc.isNew && doc.docId && doc.docId !== docId) renamedFrom = doc.docId;
-          doc.docId = docId;
         }
         const sortInput = $('f-sort');
         const sortOrder = sortInput ? Number(sortInput.value || 0) : 0;
@@ -3837,6 +3960,7 @@ ${digest}
         try {
           await save(state.collection, docId, data, sortOrder);
           if (renamedFrom) await remove(state.collection, renamedFrom);
+          doc.docId = docId;
           doc.data = data;
           doc.isNew = false;
           // 站点内容 holds shared option lists (event categories), so keep the local copy fresh.
@@ -3844,7 +3968,7 @@ ${digest}
           $('btn-del').classList.remove('hidden');
           show(
             els.msg,
-            '已保存到云端' + (renamedFrom ? '（原标识 ' + renamedFrom + ' 已替换）' : '') + '。点顶部「发布上线」即可发布。',
+            '已保存，线上将在下次发布后生效' + (renamedFrom ? '（原标识 ' + renamedFrom + ' 已替换）' : '') + '。点顶部「发布上线」即可发布。',
             'ok',
           );
         } catch (err) {
@@ -3886,16 +4010,24 @@ ${digest}
       $('btn-pw').addEventListener('click', async () => {
         const next = prompt('新的管理口令（至少 8 位）：');
         if (!next) return;
-        let savedToken = '';
-        try { savedToken = await getPublishToken(); } catch { savedToken = ''; }
+        const current = state.pw || prompt('当前管理口令：');
+        if (!current) return;
         try {
-          await rpc('cms_set_password', { p_password: state.pw, p_new_password: next });
-          state.pw = next;
-          sessionStorage.setItem(PW_KEY, next);
+          await api('/api/password.php', {
+            method: 'POST',
+            body: { password: current, newPassword: next },
+          });
+          // Re-encrypt the publishing token before forgetting the old password.
+          state.pw = current;
+          const savedToken = await getPublishToken();
           publishTokenCache = '';
-          // Keep the one-click publish token usable after a password rotation.
-          if (savedToken) await savePublishToken(savedToken);
-          show(els.msg, '口令已更新，下次登录请用新口令', 'ok');
+          let publishNote = '';
+          if (savedToken) {
+            state.pw = next;
+            try { await savePublishToken(savedToken); } catch { publishNote = '；发布令牌请重新配置'; }
+          }
+          logout();
+          show(els.gateMsg, '口令已更新，请重新登录' + publishNote, 'ok');
         } catch (err) {
           show(els.msg, '修改失败：' + (err.message || err), 'err');
         }
@@ -3942,8 +4074,8 @@ ${digest}
       $('btn-export').addEventListener('click', async () => {
         show(els.msg, '导出中…', '');
         try {
-          const out = {};
-          for (const key of Object.keys(COLLECTIONS)) out[key] = await list(key);
+          if (!state.data) throw new Error('内容尚未载入');
+          const out = cloneData(state.data);
           const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
@@ -3959,17 +4091,14 @@ ${digest}
 
       /* ---------- boot ---------- */
 
-      if (location.origin !== ENDPOINT) {
-        els.warn.classList.remove('hidden');
-        els.warn.textContent =
-          '当前域名是 ' + location.origin + '，与云服务绑定的 ' + ENDPOINT +
-          ' 不一致，云端读写会被拒绝。请从 ' + ENDPOINT + '/admin/ 打开本页。';
-      }
-
-      if (state.pw) {
-        rpc('cms_login', { p_password: state.pw })
-          .then((ok) => { if (ok === true) enter(); else logout(); })
-          .catch(() => logout());
+      if (state.token) {
+        show(els.gateMsg, '正在恢复会话…', '');
+        loadAllData()
+          .then(enter)
+          .catch((err) => {
+            logout();
+            show(els.gateMsg, err.message || '会话恢复失败，请重新登录', 'err');
+          });
       }
     </script>
     <script

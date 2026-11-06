@@ -51,8 +51,10 @@ function buildZip(dir) {
       }
       const rel = path.relative(dir, full).split(path.sep).join('/'); // forward slash!
       // The public-site bundle must never contain the CMS client or its hashed assets.
-      // .app is the only admin origin; shipping these files to .cn exposes internal field
-      // names and RPC contracts for no operational benefit.
+      // The admin now lives on .cn too, but it is deployed separately by
+      // scripts/prepare-cn-admin.mjs into admin/ + admin-assets/ + api/, and
+      // server-pull.sh excludes those prefixes from the rsync. If the bundle also
+      // carried an admin build, the two would overwrite each other on every sync.
       if (/^admin(?:\/|$)/.test(rel) || /^_astro\/admin[.-]/.test(rel)) continue;
       const data = fs.readFileSync(full);
       const comp = zlib.deflateRawSync(data);

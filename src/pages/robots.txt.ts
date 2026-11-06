@@ -54,7 +54,14 @@ const CN_SEARCH_ENGINES = ['Bingbot', 'Sogou web spider', '360Spider', 'YisouSpi
  * Listing crawlers in order to be welcoming therefore has to repeat the restrictions, or
  * every named crawler ends up less restricted than an unnamed one.
  */
-const ALLOW_ALL = ['Allow: /', 'Disallow: /404.html', 'Disallow: /admin/'];
+const ALLOW_ALL = [
+  'Allow: /',
+  'Disallow: /404.html',
+  'Disallow: /admin/',
+  // 内容后台与数据接口现在部署在 .cn 上：页面靠 noindex 和口令，这里再挡一层爬虫。
+  'Disallow: /admin-assets/',
+  'Disallow: /api/',
+];
 
 export const GET: APIRoute = () => {
   const lines = [
