@@ -1280,7 +1280,9 @@ const SEED = {
           `/repos/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/runs?event=workflow_dispatch&branch=main&per_page=20`,
         );
         const runs = (data && data.workflow_runs) || [];
-        return runs.find((r) => new Date(r.created_at).getTime() >= since - 30000) || null;
+        // Five seconds of clock skew is enough; a 30-second window could match the previous
+        // run when someone publishes twice in quick succession.
+        return runs.find((r) => new Date(r.created_at).getTime() >= since - 5000) || null;
       }
 
       async function waitForPublish(token, since) {
