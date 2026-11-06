@@ -72,7 +72,13 @@ jobs:
       - name: 构建 · 审计 · 发布
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run publish:apply 2>&1 | tee /tmp/publish.log || (tail -60 /tmp/publish.log; exit 1)
+        shell: bash
+        # `set -o pipefail` is essential: without it, `tee` exits 0 and a failed publish
+        # still reports a green workflow. That is worse than a red run because it hides
+        # the fact that nothing went live.
+        run: |
+          set -o pipefail
+          npm run publish:apply 2>&1 | tee /tmp/publish.log || { tail -60 /tmp/publish.log; exit 1; }
 
       # IndexNow 只加速发现，失败不代表站点有问题，所以不阻塞这次运行
       - name: 通知搜索引擎（IndexNow）
