@@ -5,6 +5,8 @@ User-agent: *
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 # ---- Google ----
 # 境外站就是要被 Google 读到：收录、AI 摘要、Gemini 训练语料全部放行。
@@ -12,96 +14,134 @@ User-agent: Googlebot
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: Google-Extended
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 # ---- AI assistants and generative engines ----
 User-agent: GPTBot
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: ChatGPT-User
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: ClaudeBot
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: Claude-User
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: anthropic-ai
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: Applebot
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: Applebot-Extended
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: Bytespider
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: Baiduspider
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: CCBot
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: Amazonbot
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: DuckAssistBot
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: meta-externalagent
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: YouBot
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 User-agent: Diffbot
 Allow: /
 Disallow: /404.html
 Disallow: /admin/
+Disallow: /admin-assets/
+Disallow: /api/
 
 Sitemap: https://gficcrew.com/sitemap-index.xml
