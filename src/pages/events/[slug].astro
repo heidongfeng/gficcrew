@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import JoinDropdown from '../../components/JoinDropdown.astro';
 import { SITE } from '../../data/site.js';
-import { upcomingEvents } from '../../data/events.js';
+import { upcomingEvents, formatDateRange, formatTimeRange } from '../../data/events.js';
 import { eventSchema, orgSchema, breadcrumbSchema, webPageSchema } from '../../data/schema.js';
 
 // Only confirmed, not-yet-finished events get a canonical URL. Adding real event data in
@@ -15,9 +15,6 @@ const { event } = Astro.props;
 const url = new URL(`/events/${event.slug}/`, SITE.url).href;
 const summary = event.summary || event.description;
 const body = event.summary && event.description && event.description !== event.summary ? event.description : '';
-const date = new Date(`${event.startDate.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', {
-  day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
-});
 const schema = [
   orgSchema(),
   webPageSchema({ url, name: event.title, description: summary }),
@@ -44,8 +41,8 @@ const schema = [
     <div class="wrap wrap--measure">
       <h2>Event details</h2>
       <dl class="event-facts">
-        <div><dt>Date</dt><dd>{date}</dd></div>
-        <div><dt>Time</dt><dd>{event.startDate.slice(11, 16)}–{event.endDate.slice(11, 16)} (China Standard Time, UTC+8)</dd></div>
+        <div><dt>Date</dt><dd>{formatDateRange(event)}</dd></div>
+        <div><dt>Time</dt><dd>{formatTimeRange(event, { withDays: true })} (China Standard Time, UTC+8)</dd></div>
         <div><dt>City</dt><dd>{event.city}</dd></div>
         <div><dt>Venue</dt><dd>{event.venue}</dd></div>
         <div><dt>Price</dt><dd>{event.price}</dd></div>

@@ -36,6 +36,11 @@ const LOCAL_FAQ = [
     category: 'Membership & Fees',
   },
   {
+    a: 'Currently, yes. We are offering a temporary free-access window while our official lifetime membership system (National Group ¥288 / City Group ¥688) is being finalized. You can join and attend events for free right now. However, please note that once the transition is complete, standard membership fees will apply.',
+    q: 'Is GFIC Crew free to join?',
+    category: 'Membership & Fees',
+  },
+  {
     a: 'The National Group (RMB 288) is the nationwide community: online groups and event announcements, open wherever you are in China. A City Group (RMB 688) adds the local group for your city and its local knowledge. The Business Group (RMB 2,888) adds business networking and visibility for your own projects within the crew. These are our membership tiers for when paid membership opens. Every group is free to join right now.',
     q: 'What is the difference between the National Group, City Group and Business Group?',
     category: 'Membership & Fees',

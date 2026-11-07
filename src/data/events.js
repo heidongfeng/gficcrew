@@ -26,3 +26,55 @@ export function upcomingEvents(now = Date.now()) {
     return Number.isFinite(end) && end >= now;
   }).sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 }
+
+/**
+ * How an event's dates read to a human.
+ *
+ * A weekend festival has a start and an end on different days, so rendering only
+ * startDate told visitors a two-day event was a one-day one. Both helpers live here
+ * rather than in each page so the detail page, the calendar and the homepage cannot
+ * drift apart again.
+ */
+const enDate = (iso, opts) =>
+  new Date(`${iso.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', {
+    ...opts,
+    timeZone: 'UTC',
+  });
+
+export function formatDateRange(event) {
+  const start = (event.startDate || '').slice(0, 10);
+  const end = (event.endDate || event.startDate || '').slice(0, 10);
+  if (!start) return '';
+  if (!end || end === start) {
+    return enDate(start, { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+  if (start.slice(0, 7) === end.slice(0, 7)) {
+    // 14–15 November 2026
+    return `${enDate(start, { day: 'numeric' })}–${enDate(end, { day: 'numeric', month: 'long', year: 'numeric' })}`;
+  }
+  if (start.slice(0, 4) === end.slice(0, 4)) {
+    // 30 November – 1 December 2026
+    return `${enDate(start, { day: 'numeric', month: 'long' })} – ${enDate(end, { day: 'numeric', month: 'long', year: 'numeric' })}`;
+  }
+  // 30 December 2026 – 2 January 2027
+  return `${enDate(start, { day: 'numeric', month: 'long', year: 'numeric' })} – ${enDate(end, { day: 'numeric', month: 'long', year: 'numeric' })}`;
+}
+
+/**
+ * Time of day.
+ *
+ * `withDays` adds weekday and date to each end, which the detail page needs: its Date row
+ * is a plain range ("14–15 November"), so without the day qualifier "10:00–23:59" reads as
+ * if the event finished on the first evening. Listings already print the date range, so
+ * there the qualifier would only repeat itself.
+ */
+export function formatTimeRange(event, { withDays = false } = {}) {
+  const start = event.startDate || '';
+  const end = event.endDate || start;
+  const hm = (iso) => (iso.length >= 16 ? iso.slice(11, 16) : '');
+  const multiDay = start.slice(0, 10) !== end.slice(0, 10);
+  if (!multiDay) return `${hm(start)}–${hm(end)}`;
+  if (!withDays) return `${hm(start)}–${hm(end)}`;
+  const day = (iso) => enDate(iso, { weekday: 'short', day: 'numeric', month: 'short' });
+  return `${day(start)}, ${hm(start)} – ${day(end)}, ${hm(end)}`;
+}

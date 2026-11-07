@@ -5,7 +5,7 @@ import JoinDropdown from '../components/JoinDropdown.astro';
 import { SITE, HOME, SERVICES, WHY_JOIN } from '../data/site.js';
 import { fill } from '../data/contact.js';
 import { CITIES } from '../data/cities.js';
-import { upcomingEvents } from '../data/events.js';
+import { upcomingEvents, formatDateRange } from '../data/events.js';
 import { PLANS } from '../data/plans.js';
 import { GUIDES, guideUrl } from '../data/guides.js';
 import { orgSchema, websiteSchema, itemListSchema } from '../data/schema.js';
@@ -153,7 +153,7 @@ const schema = [
                 <div class="event-body">
                   <h3>{event.title}</h3>
                   <div class="event-meta">
-                    {new Date(event.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}
+                    {formatDateRange(event)}
                     · {event.city} · {event.cadence} · {event.price}
                   </div>
                   <p style="margin-bottom:10px">{event.description}</p>

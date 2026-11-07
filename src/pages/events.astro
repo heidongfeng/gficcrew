@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import CtaBand from '../components/CtaBand.astro';
 import JoinDropdown from '../components/JoinDropdown.astro';
 import { SITE, EVENT_CATEGORIES, FORMATS, FORMAT_TIERS } from '../data/site.js';
-import { upcomingEvents } from '../data/events.js';
+import { upcomingEvents, formatDateRange, formatTimeRange } from '../data/events.js';
 import { itemListSchema, eventSchema, breadcrumbSchema, webPageSchema } from '../data/schema.js';
 
 const url = `${SITE.url}/events/`;
@@ -138,8 +138,7 @@ const schema = [
               <div class="event-body">
                 <h3><a href={`/events/${event.slug}/`}>{event.title}</a></h3>
                 <div class="event-meta">
-                  {new Date(event.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })},
-                  {event.startDate.slice(11, 16)}–{event.endDate.slice(11, 16)} · {event.city} ·{' '}
+                  {formatDateRange(event)}, {formatTimeRange(event)} · {event.city} ·{' '}
                   {event.cadence} · {event.venue} · {event.price}
                 </div>
                 <p style="margin-bottom:14px">{event.summary || event.description}</p>
