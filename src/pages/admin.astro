@@ -1308,7 +1308,7 @@ const SEED = {
       }
 
       async function publishNow() {
-        if (!els.actionbar.classList.contains('hidden')) {
+        if (!els.actionbar.classList.contains('hidden') && els.actionbar.dataset.dirty === '1') {
           show(els.msg, '当前有未保存的修改。请先点“保存”，再发布。', 'err');
           return;
         }
@@ -3879,13 +3879,24 @@ ${digest}
         }
 
         els.actionbar.classList.remove('hidden');
+        els.actionbar.dataset.dirty = '0';
         $('btn-del').classList.toggle('hidden', !!cfg.single || !!doc.isNew);
         show(els.msg, '', '');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
       $('btn-back').addEventListener('click', () => {
-        if (!COLLECTIONS[state.collection].single) renderList();
+        if (!COLLECTIONS[state.collection].single) {
+          renderList();
+          return;
+        }
+        // 站点内容 / 联系与关注是单条集合，没有列表可回；返回就是收起编辑区，
+        // 让顶部「发布上线」不再被「有未保存修改」挡住。
+        if (els.actionbar.dataset.dirty === '1') {
+          show(els.msg, '有未保存的修改，请先点「保存」。', 'err');
+          return;
+        }
+        els.actionbar.classList.add('hidden');
       });
 
       $('btn-new').addEventListener('click', () => {
@@ -3966,9 +3977,10 @@ ${digest}
           // 站点内容 holds shared option lists (event categories), so keep the local copy fresh.
           if (state.collection === 'site') await loadSiteData();
           $('btn-del').classList.remove('hidden');
+          els.actionbar.dataset.dirty = '0';
           show(
             els.msg,
-            '已保存，线上将在下次发布后生效' + (renamedFrom ? '（原标识 ' + renamedFrom + ' 已替换）' : '') + '。点顶部「发布上线」即可发布。',
+            '已保存，线上将在下次发布后生效' + (renamedFrom ? '（原标识 ' + renamedFrom + ' 已替换）' : '') + '。现在可以直接点顶部「发布上线」。',
             'ok',
           );
         } catch (err) {
@@ -3981,6 +3993,18 @@ ${digest}
       }
 
       $('btn-save').addEventListener('click', doSave);
+
+      // 编辑区一旦被改动就标记为「脏」，保存成功后清零。
+      // 不能只看编辑区是否展开：站点内容这类单条集合没有列表可回，展开就等于一直被判定成「有未保存的修改」。
+      const markDirty = (event) => {
+        const target = event.target;
+        if (!target || !target.closest) return;
+        if (els.actionbar.classList.contains('hidden')) return;
+        if (!target.closest('#pane')) return;
+        els.actionbar.dataset.dirty = '1';
+      };
+      document.addEventListener('input', markDirty, true);
+      document.addEventListener('change', markDirty, true);
 
       document.addEventListener('keydown', (e) => {
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
